@@ -1,0 +1,12 @@
+{
+  "name": "@dishine/prompt-library",
+  "version": "1.0.0",
+  "description": "Expert prompt engineering library with CLI search — frameworks, system prompts, and model-specific techniques",
+  "type": "module",
+  "bin": { "prompt-lib": "bin/prompt-lib.js" },
+  "main": "src/index.js",
+  "keywords": ["prompt-engineering", "llm", "claude", "gpt", "templates"],
+  "author": "diShine Digital Agency (https://dishine.it)",
+  "license": "MIT",
+  "engines": { "node": ">=18" }
+}
