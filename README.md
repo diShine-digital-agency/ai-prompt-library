@@ -1,26 +1,36 @@
-# Prompt Library
+# prompt-library
 
-**Expert prompt engineering library with CLI search** -- frameworks, system prompts, model-specific techniques, and production-ready templates for professionals.
+**42 expert-level prompt templates with a CLI to search, browse, and use them.**
 
-Built by [diShine Digital Agency](https://dishine.it)
+If you work with LLMs regularly, you've probably got prompts scattered across Notion docs, Slack messages, and random text files. This library collects the prompting techniques, system prompts, and templates we actually use in client work -- organized, searchable, and ready to copy-paste. It covers everything from Chain-of-Thought fundamentals to production system prompts for specific use cases like code review, SEO briefs, and data analysis.
+
+There's a CLI so you can search and read prompts from your terminal, and you can also import the library programmatically if you're building something on top of it.
+
+Zero npm dependencies. Just Node.js built-in modules.
+
+Built by [diShine](https://dishine.it)
 
 ---
 
-## What's Inside
+## What's in here
 
-42 expert-level prompt guides organized across 7 categories:
+42 prompts across 7 categories:
 
-| Category | Count | Description |
-|----------|-------|-------------|
-| **frameworks** | 6 | Core prompting techniques (CoT, Few-Shot, ReAct, ToT, Role-Based, Meta) |
-| **model-specific** | 6 | Optimized patterns for Claude, GPT, Gemini, Llama, Mistral + comparison |
-| **system-prompts** | 6 | Production-ready system prompts (coding, writing, data, research, exec, support) |
-| **marketing** | 6 | SEO briefs, email campaigns, social calendars, competitor analysis, ads, brand voice |
-| **development** | 6 | Code review, API design, DB schema, testing, refactoring, architecture decisions |
-| **data** | 6 | SQL builder, pipelines, dashboards, quality audits, statistics, visualization |
-| **business** | 6 | Proposals, meeting summaries, OKRs, stakeholder updates, risk, pitch decks |
+| Category | Count | What's covered |
+|----------|-------|----------------|
+| **frameworks** | 6 | core prompting techniques -- Chain-of-Thought, Few-Shot, ReAct, Tree-of-Thought, Role-Based, Meta-prompting |
+| **model-specific** | 6 | optimized patterns for Claude, GPT, Gemini, Llama, Mistral, plus a comparison guide |
+| **system-prompts** | 6 | production-ready system prompts for coding, writing, data analysis, research, executive assistant, support |
+| **marketing** | 6 | SEO briefs, email campaigns, social calendars, competitor analysis, ad copy, brand voice |
+| **development** | 6 | code review, API design, database schema, testing strategy, refactoring, architecture decisions |
+| **data** | 6 | SQL builder, data pipelines, dashboards, quality audits, statistics, visualization |
+| **business** | 6 | proposals, meeting summaries, OKRs, stakeholder updates, risk assessment, pitch decks |
 
-## Quick Start
+These aren't generic "write me a blog post" prompts. They're structured templates with placeholders, examples, tips, and common mistakes -- the kind of thing you'd build up over months of actual use.
+
+---
+
+## Quick start
 
 ```bash
 # Clone and run directly
@@ -31,7 +41,9 @@ npm install -g @dishine/prompt-library
 prompt-lib list
 ```
 
-## CLI Usage
+---
+
+## CLI usage
 
 ```bash
 # List all prompts grouped by category
@@ -48,10 +60,10 @@ prompt-lib show code-review
 # List all categories with counts
 prompt-lib categories
 
-# Show a random prompt for inspiration
+# Show a random prompt (good for discovering things you forgot were in here)
 prompt-lib random
 
-# Show library statistics
+# Library statistics
 prompt-lib stats
 
 # Help and version
@@ -59,7 +71,9 @@ prompt-lib --help
 prompt-lib --version
 ```
 
-## Prompt Format
+---
+
+## Prompt format
 
 Every prompt file uses YAML frontmatter with Markdown content:
 
@@ -77,17 +91,19 @@ models: [claude, gpt-4, gemini, llama, mistral]
 [Content with sections: When to Use, The Technique, Template, Examples, Tips, Common Mistakes]
 ```
 
-### Metadata Fields
+### Metadata fields
 
 | Field | Description |
 |-------|-------------|
-| `title` | Human-readable name |
-| `category` | One of the 7 categories |
-| `tags` | Searchable keywords |
+| `title` | human-readable name |
+| `category` | one of the 7 categories listed above |
+| `tags` | searchable keywords |
 | `difficulty` | `beginner`, `intermediate`, or `advanced` |
-| `models` | Which LLMs this technique works best with |
+| `models` | which LLMs this technique works best with |
 
-## Programmatic Usage
+---
+
+## Programmatic usage
 
 ```javascript
 import { loadPrompts } from '@dishine/prompt-library';
@@ -97,46 +113,58 @@ const prompts = loadPrompts();
 const results = searchPrompts(prompts, 'code review');
 
 console.log(results[0].title);   // "Code Review Prompt"
-console.log(results[0].content); // Full prompt content
+console.log(results[0].content); // full prompt content
 ```
 
-## Project Structure
+---
+
+## Adding your own prompts
+
+The library is designed to be extended. To add a prompt:
+
+1. Create a `.md` file in the appropriate `prompts/` subdirectory
+2. Add YAML frontmatter with `title`, `category`, `tags`, `difficulty`, `models`
+3. Structure the content with these sections:
+   - **When to use** -- when this technique applies
+   - **The technique** -- detailed explanation
+   - **Template** -- copy-paste ready template with `{{placeholders}}`
+   - **Examples** -- real-world usage examples
+   - **Tips** -- expert advice from actual use
+   - **Common mistakes** -- pitfalls to avoid
+
+The CLI picks up new files automatically -- no registration step.
+
+---
+
+## Project structure
 
 ```
 ai-prompt-library/
   bin/prompt-lib.js        CLI entry point
   src/
-    index.js               Prompt loader with YAML frontmatter parser
-    search.js              Scored search (title/tag/category/content)
+    index.js               prompt loader with YAML frontmatter parser
+    search.js              scored search (title/tag/category/content)
     formatter.js           ANSI terminal formatting
   prompts/
-    frameworks/            Core prompting techniques
-    model-specific/        Model-optimized patterns
-    system-prompts/        Production system prompts
-    marketing/             Marketing templates
-    development/           Development templates
-    data/                  Data & analytics templates
-    business/              Business templates
-  test/run.js              Test suite
+    frameworks/            core prompting techniques
+    model-specific/        model-optimized patterns
+    system-prompts/        production system prompts
+    marketing/             marketing templates
+    development/           development templates
+    data/                  data & analytics templates
+    business/              business templates
+  test/run.js              test suite
 ```
 
-## Adding Your Own Prompts
+---
 
-1. Create a `.md` file in the appropriate `prompts/` subdirectory
-2. Add YAML frontmatter with `title`, `category`, `tags`, `difficulty`, `models`
-3. Write your prompt content with these sections:
-   - **When to Use** -- when this technique applies
-   - **The Technique** -- detailed explanation
-   - **Template** -- copy-paste ready template with `{{placeholders}}`
-   - **Examples** -- real-world usage examples
-   - **Tips** -- expert advice
-   - **Common Mistakes** -- pitfalls to avoid
+## Requirements
 
-## Zero Dependencies
+- **Node.js** 18 or later
+- No npm dependencies at all -- uses only Node.js built-in modules (`fs`, `path`, `url`)
 
-This library has no npm dependencies. It uses only Node.js built-in modules
-(`fs`, `path`, `url`). Works with Node.js 18+.
+---
 
 ## License
 
-MIT -- [diShine Digital Agency](https://dishine.it)
+MIT -- [diShine](https://dishine.it)
