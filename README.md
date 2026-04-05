@@ -4,7 +4,7 @@
 
 If you work with LLMs regularly, you've probably got prompts scattered across Notion docs, Slack messages, and random text files. This library collects the prompting techniques, system prompts, and templates we actually use in client work -- organized, searchable, and ready to copy-paste. It covers everything from Chain-of-Thought fundamentals to production system prompts for specific use cases like code review, SEO briefs, and data analysis.
 
-There's a CLI so you can search and read prompts from your terminal, and you can also import the library programmatically if you're building something on top of it.
+There's a CLI so you can search and read prompts from your terminal, a standalone Prompt Workshop (just open `viewer.html`) where you can fill in placeholders interactively, compose multi-layer prompts, and save your work to a personal library -- and you can also import everything programmatically if you're building something on top of it.
 
 Zero npm dependencies. Just Node.js built-in modules.
 
@@ -66,7 +66,7 @@ prompt-lib copy email-campaign
 # Combine a system prompt + framework + domain template into one prompt
 prompt-lib compose
 
-# Open the visual prompt browser in your default browser
+# Open the Prompt Workshop in your default browser
 prompt-lib viewer
 
 # List all categories with counts
@@ -165,7 +165,7 @@ ai-prompt-library/
     development/           development templates
     data/                  data & analytics templates
     business/              business templates
-  viewer.html              standalone web viewer template
+  viewer.html              interactive Prompt Workshop (standalone, works offline)
   test/run.js              test suite
 ```
 

@@ -163,36 +163,55 @@ in interactively, and the result is copied to clipboard. This is useful when
 you want, say, a "Data Analyst" persona using "Chain-of-Thought" reasoning
 to work through a "SQL Query Builder" template.
 
-### Visual browser
+### Prompt Workshop (viewer.html)
 
-There are two ways to use the visual prompt browser:
+The Prompt Workshop is a full interactive web app that turns the library into
+something genuinely useful -- not just a reader, but a builder.
 
-**Option 1: open viewer.html directly**
+**How to open it:**
 
-Just open `viewer.html` from the repo in any browser — double-click it or
-drag it into a browser window. All 52 prompts are embedded directly in the
-file, so it works offline with no server needed. You can bookmark it, share
-it with your team, or host it on any static site.
+- **Option 1**: open `viewer.html` from the repo directly in any browser.
+  All 52 prompts are embedded in the file, so it works offline.
+- **Option 2**: run `prompt-lib viewer` to generate a fresh version with any
+  prompts you've added, and open it in your default browser automatically.
 
-**Option 2: use the CLI command**
+**Three tabs:**
 
-```bash
-prompt-lib viewer
-```
+1. **Browse** -- the default. Shows all prompts in a searchable sidebar with
+   filters for category, difficulty, and model family (claude, gpt, gemini,
+   llama, mistral). Click a prompt to read it. Each prompt has:
+   - **Build this prompt** -- opens an interactive workshop with form fields
+     for every `{{placeholder}}`. A live preview updates as you type. Copy
+     the filled result, save it to My Library, or download it as `.md`.
+   - **Copy template** -- copies the template section to clipboard.
+   - **Copy all** -- copies the entire prompt content.
+   - **Save** -- bookmarks the prompt to your personal library.
+   - **Export** -- downloads the prompt as a `.md` file with frontmatter.
 
-This generates a fresh version with the latest prompts (including any you've
-added yourself) and opens it in your default browser automatically.
+2. **Compose** -- the layered prompt builder. Pick up to three layers:
+   - a system prompt (persona and rules)
+   - a reasoning framework (chain-of-thought, tree-of-thought, etc.)
+   - a task template (marketing, dev, data, business)
 
-**What the viewer gives you:**
+   Steps 1 and 2 are optional. The layers combine into one prompt, and you
+   fill in all the placeholders in an interactive form before copying.
 
-- a searchable sidebar with all prompts grouped by category
-- real-time filtering as you type — results update instantly
-- clickable tag pills to filter by topic (reasoning, copywriting, sql, etc.)
-- full prompt content rendered in the main panel with formatted markdown
-- "copy template" and "copy full" buttons that put the content on your clipboard
-- dark/light mode toggle
-- responsive design — works on phones and tablets too
-- everything in a single HTML file, no dependencies, no server
+3. **My Library** -- everything you've saved, stored in your browser's
+   localStorage (nothing leaves your machine). This includes:
+   - **Favorites** -- prompts you bookmarked from Browse.
+   - **Filled prompts** -- prompts you built with the Workshop, with all
+     your inputs preserved.
+   - **Composed prompts** -- multi-layer prompts from the Compose tab.
+
+   You can export your entire library as JSON, import it on another device,
+   or download individual saved prompts as `.md`.
+
+**Other features:**
+
+- dark/light mode toggle (remembered across sessions)
+- full markdown rendering with tables, code blocks, and blockquotes
+- responsive -- works on phones and tablets
+- single HTML file, no dependencies, no server, no tracking
 
 ### The manual way
 
