@@ -1,20 +1,44 @@
 ---
 title: GPT Prompting Best Practices
 category: model-specific
-tags: [openai, gpt-4, gpt-4o, json-mode, structured-outputs, function-calling, vision, batch-api]
+tags: [openai, gpt-5, gpt-5.4, json-mode, structured-outputs, function-calling, vision, codex, batch-api]
 difficulty: intermediate
-models: [gpt-4, gpt-4o, gpt-4-turbo, gpt-4o-mini]
+models: [gpt-5.4, gpt-5.3, gpt-5.4-pro, gpt-5.3-codex]
 ---
 
 # GPT prompting best practices
 
 OpenAI's GPT models have specific features and conventions that optimize performance. This guide covers JSON mode vs. structured outputs, function calling patterns, system message weighting, reproducibility tricks, and model-specific tuning.
 
+## Current models (as of April 2026)
+
+| Model | Type | Context | Best for |
+|-------|------|---------|----------|
+| **GPT-5.4** | frontier | large | most capable and efficient for professional work, available as "Thinking" mode in ChatGPT |
+| **GPT-5.4 Pro** | frontier+ | large | maximum performance on complex tasks, highest tier |
+| **GPT-5.3 Instant** | fast | large | default for ChatGPT users — fast workhorse for everyday tasks, info-seeking, technical writing |
+| **GPT-5.3-Codex** | coding agent | large | most capable agentic coding model, combines Codex + GPT-5 training |
+| **GPT-5.2-Codex** | coding agent | large | agentic coding for complex real-world engineering, context compaction |
+
+**Retired models:** GPT-4o, GPT-4.1, GPT-4.1 mini, o4-mini have all been retired from ChatGPT. If your code still references `gpt-4o` or `gpt-4-turbo`, it's time to migrate.
+
+**Key changes from GPT-4 era:**
+- the GPT-5 family replaced the GPT-4o/4-turbo lineup entirely
+- Codex models are now a separate agentic track optimized for long-running code tasks
+- GPT-5.4 "Thinking" mode gives chain-of-thought reasoning built into the model
+- context windows have expanded significantly across the board
+
+**Which model to pick:**
+- **GPT-5.4 Pro**: complex analysis, research, tasks where quality trumps speed
+- **GPT-5.4**: professional work, production systems, balanced capability/efficiency
+- **GPT-5.3 Instant**: everyday tasks, content generation, quick Q&A
+- **GPT-5.3-Codex**: dedicated coding tasks, code review, refactoring, agentic software engineering
+
 ## When to use
 
 - Applications requiring guaranteed JSON schema compliance
 - Function calling and tool integration
-- Vision tasks (GPT-4o, GPT-4 Turbo)
+- Vision tasks (all GPT-5 models support multimodal)
 - Tasks needing reproducible outputs (seed parameter)
 - Batch processing pipelines
 - Fine-tuned model deployments

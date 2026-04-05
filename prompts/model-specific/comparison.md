@@ -1,14 +1,16 @@
 ---
 title: Model Comparison Guide
 category: model-specific
-tags: [comparison, selection, pricing, benchmarks, latency, routing, cost-optimization]
+tags: [comparison, selection, pricing, benchmarks, latency, routing, cost-optimization, gpt-5, claude-4, gemini-3, llama-4, mistral-3]
 difficulty: beginner
-models: [claude, gpt-4, gemini, llama, mistral]
+models: [claude-opus-4.6, claude-sonnet-4.6, gpt-5.4, gemini-3-pro, llama-4-maverick, mistral-large-3]
 ---
 
 # Model comparison guide
 
 Choosing the right model for your task is one of the highest-leverage decisions in prompt engineering. This guide provides pricing, benchmarks, latency comparisons, rate limits, and a decision framework for selecting the best model per scenario.
+
+**Last updated: April 2026.** Model pricing and availability change frequently. Verify current rates on each provider's pricing page before making cost projections.
 
 ## When to use
 
@@ -20,67 +22,70 @@ Choosing the right model for your task is one of the highest-leverage decisions 
 
 ## The technique
 
-### Pricing table (2025-2026 rates)
+### Pricing table (April 2026)
 
-Prices per million tokens. These change frequently -- verify current rates before making cost projections.
+Prices per million tokens.
 
 | Model | Input | Output | Context | Notes |
 |-------|-------|--------|---------|-------|
-| **Claude 4 Opus** | $15.00 | $75.00 | 200K | Top reasoning, highest cost |
-| **Claude 4 Sonnet** | $3.00 | $15.00 | 200K | Best overall value for complex tasks |
-| **Claude 3.5 Haiku** | $0.80 | $4.00 | 200K | Fast, good for classification |
-| **GPT-4o** | $2.50 | $10.00 | 128K | Strong general purpose |
-| **GPT-4o mini** | $0.15 | $0.60 | 128K | Extremely cheap, good quality |
-| **GPT-4 Turbo** | $10.00 | $30.00 | 128K | Legacy, still available |
-| **Gemini 2.5 Pro** | $1.25-$2.50 | $10.00-$15.00 | 2M | Tiered by prompt length |
-| **Gemini 2.0 Flash** | $0.10 | $0.40 | 1M | Very cheap, very fast |
-| **Mistral Large** | $2.00 | $6.00 | 128K | Good value for reasoning |
-| **Mistral Small** | $0.10 | $0.30 | 32K | Very cost-effective |
-| **Codestral** | $0.30 | $0.90 | 32K | Specialized for code |
-| **Llama 3.3 70B** | Free (compute) | Free (compute) | 128K | Self-hosted cost: ~$1-2/hr GPU |
-| **Llama 3.1 405B** | Free (compute) | Free (compute) | 128K | Self-hosted cost: ~$8-15/hr GPU |
+| **Claude Opus 4.6** | $5.00 | $25.00 | 1M | deep reasoning, multi-agent, massive context |
+| **Claude Sonnet 4.6** | $3.00 | $15.00 | 200K | best balanced workhorse, coding + design |
+| **Claude Haiku 4.5** | $1.00 | $5.00 | 200K | fastest Claude, near-frontier quality |
+| **GPT-5.4** | varies | varies | large | most capable GPT, "Thinking" mode available |
+| **GPT-5.4 Pro** | premium | premium | large | maximum quality tier |
+| **GPT-5.3 Instant** | mid | mid | large | default ChatGPT — fast everyday workhorse |
+| **GPT-5.3-Codex** | code tier | code tier | large | agentic coding model |
+| **Gemini 3 Pro** | premium | premium | large | frontier reasoning, multimodal, agentic |
+| **Gemini 3 Flash** | mid | mid | large | new default — fast, capable |
+| **Gemini 2.5 Pro** | $1.25 | $10.00 | 1M+ | deprecated June 2026 |
+| **Gemini 2.5 Flash** | $0.30 | $2.50 | 1M | deprecated June 2026 |
+| **Mistral Large 3** | premium | premium | large | MoE 41B/675B, scores 9.4/10 overall |
+| **Mistral Medium 3** | $0.40 | $2.00 | large | GPT-4 class at 1/5 the cost — best value |
+| **Codestral** | code tier | code tier | 256K | 86.6% HumanEval, 80+ languages |
+| **Llama 4 Maverick** | free (compute) | free (compute) | large | open-weight, beats GPT-4o on benchmarks |
+| **Llama 4 Scout** | free (compute) | free (compute) | 10M | 10M context, fits single H100 |
+| **Llama 3.3 70B** | free (compute) | free (compute) | 128K | best for fine-tuning, mature ecosystem |
+
+**Retired models (don't use in new projects):**
+GPT-4o, GPT-4.1, GPT-4.1 mini, GPT-4 Turbo, o4-mini, Gemini 2.0 Flash, Claude 3.5 Haiku
 
 **Batch API discounts:**
 - OpenAI Batch API: 50% off (24hr turnaround)
 - Anthropic Batches API: 50% off (24hr turnaround)
-- Google Batch API: varies
+- Google Batch API: varies by model
 
-### Benchmark comparisons by task type
+### Benchmark comparisons by task type (April 2026)
 
 Rather than overall benchmarks (which are gamed and misleading), here is a practitioner's view of relative performance per task category:
 
 | Task | Tier 1 (best) | Tier 2 | Tier 3 |
 |------|--------------|--------|--------|
-| Complex reasoning | Claude Opus, o1 | GPT-4o, Gemini Pro | Mistral Large, Llama 405B |
-| Code generation | Claude Sonnet, GPT-4o | Codestral, Gemini Pro | Llama 70B |
-| Instruction following | Claude Sonnet/Opus | GPT-4o | Gemini Pro, Mistral Large |
-| Creative writing | Claude Opus/Sonnet | GPT-4o | Gemini Pro |
-| Data extraction | GPT-4o (structured outputs) | Claude Sonnet | Gemini Flash, Mistral |
-| Long document analysis | Gemini Pro (2M ctx) | Claude (200K ctx) | GPT-4o (128K) |
-| Multilingual | Gemini Pro, Mistral Large | GPT-4o, Claude | Llama |
-| Vision (images) | GPT-4o, Gemini Pro | Claude Sonnet, Pixtral | Llama 3.2 90B |
-| Video understanding | Gemini Pro (native) | GPT-4o (frame extraction) | -- |
-| Classification (high volume) | GPT-4o mini, Gemini Flash | Claude Haiku, Mistral Small | Llama 8B |
-| Safety/refusal | Claude (most careful) | GPT-4o | Gemini, Mistral |
+| Complex reasoning | Claude Opus 4.6, GPT-5.4 Pro | Gemini 3 Pro, Mistral Large 3 | Llama 4 Maverick, Magistral |
+| Code generation | Claude Sonnet 4.6, GPT-5.3-Codex | Codestral, Devstral 2 | Gemini 3 Flash, Llama 4 Maverick |
+| Instruction following | Claude Sonnet/Opus 4.6 | GPT-5.4, Gemini 3 Pro | Mistral Large 3 |
+| Creative writing | Claude Opus 4.6, GPT-5.4 | Gemini 3 Pro | Mistral Large 3 |
+| Data extraction | GPT-5.4 (structured outputs) | Claude Sonnet 4.6 | Gemini 3 Flash, Mistral Medium 3 |
+| Long document analysis | Claude Opus 4.6 (1M ctx), Llama 4 Scout (10M ctx) | Gemini 3 Pro | GPT-5.4 |
+| Multilingual | Gemini 3 Pro, Mistral Large 3 | GPT-5.4, Claude 4.6 | Llama 4 |
+| Vision (images) | Gemini 3 Pro, GPT-5.4 | Claude Sonnet 4.6, Pixtral | Llama 4 Maverick |
+| Video understanding | Gemini 3 Pro (native) | GPT-5.4 | Llama 4 Maverick |
+| Agentic coding | GPT-5.3-Codex, Devstral 2 | Claude Sonnet 4.6 | Codestral |
+| Classification (high volume) | Gemini 3 Flash, Mistral Medium 3 | Claude Haiku 4.5 | Ministral 3, Llama 3.2 |
+| Chain-of-thought reasoning | GPT-5.4 Thinking, Magistral | Claude Opus 4.6 (extended thinking) | Gemini 3 Pro |
+| Safety/refusal | Claude (most careful) | GPT-5.4 | Gemini, Mistral |
 
-These are directional -- the best model for your specific task depends on your prompts, data, and evaluation criteria. Always test with your actual workload.
+These are directional — the best model for your specific task depends on your prompts, data, and evaluation criteria. Always test with your actual workload.
 
 ### Latency comparison
 
-Approximate time-to-first-token and throughput for a typical request:
+Approximate ranges for typical requests. These vary significantly by region, load, and prompt length:
 
-| Model | TTFT (median) | Tokens/sec | Notes |
-|-------|--------------|------------|-------|
-| GPT-4o mini | ~200ms | ~100 | Fastest API model |
-| Gemini 2.0 Flash | ~250ms | ~150 | Very fast |
-| Claude 3.5 Haiku | ~300ms | ~80 | Good balance |
-| Mistral Small | ~200ms | ~90 | Fast |
-| GPT-4o | ~400ms | ~60 | Moderate |
-| Claude Sonnet | ~500ms | ~70 | Moderate |
-| Gemini 2.5 Pro | ~600ms | ~50 | Slower, higher quality |
-| Claude Opus | ~800ms | ~40 | Slowest API model |
-| Mistral Large | ~500ms | ~50 | Moderate |
-| Llama 70B (self-hosted, A100) | ~300ms | ~40-80 | Depends on hardware |
+| Model tier | TTFT (median) | Throughput | Examples |
+|-----------|--------------|------------|----------|
+| Fast/economy | ~150-300ms | ~100-150 tok/s | Gemini 3 Flash, Claude Haiku 4.5, Mistral Medium 3, GPT-5.3 Instant |
+| Balanced | ~300-600ms | ~50-80 tok/s | Claude Sonnet 4.6, GPT-5.4, Gemini 3 Pro, Mistral Large 3 |
+| Frontier/reasoning | ~500-1000ms | ~30-50 tok/s | Claude Opus 4.6, GPT-5.4 Pro, thinking/reasoning modes |
+| Self-hosted (A100/H100) | ~200-500ms | ~40-100 tok/s | Llama 4 Scout, Llama 3.3 70B — depends on hardware |
 
 Latency varies significantly by region, load, and prompt length. These are rough medians for guidance, not SLAs.
 

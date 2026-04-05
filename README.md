@@ -57,6 +57,18 @@ prompt-lib search "marketing email"
 prompt-lib show chain-of-thought
 prompt-lib show code-review
 
+# Build a prompt interactively — fills in {{placeholders}} for you
+prompt-lib use chain-of-thought
+
+# Copy a prompt template to clipboard
+prompt-lib copy email-campaign
+
+# Combine a system prompt + framework + domain template into one prompt
+prompt-lib compose
+
+# Open the visual prompt browser in your default browser
+prompt-lib viewer
+
 # List all categories with counts
 prompt-lib categories
 
@@ -153,6 +165,7 @@ ai-prompt-library/
     development/           development templates
     data/                  data & analytics templates
     business/              business templates
+  viewer.html              standalone web viewer template
   test/run.js              test suite
 ```
 
@@ -161,7 +174,7 @@ ai-prompt-library/
 ## Requirements
 
 - **Node.js** 18 or later
-- No npm dependencies at all -- uses only Node.js built-in modules (`fs`, `path`, `url`)
+- No npm dependencies at all -- uses only Node.js built-in modules (`fs`, `path`, `url`, `readline`, `child_process`, `os`)
 
 ---
 

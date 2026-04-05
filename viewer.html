@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prompt Library — diShine</title>
+<style>
+  :root {
+    --accent: #2563eb;
+    --accent-light: #3b82f6;
+    --bg: #ffffff;
+    --bg-sidebar: #f8fafc;
+    --bg-card: #ffffff;
+    --text: #1e293b;
+    --text-secondary: #64748b;
+    --text-dim: #94a3b8;
+    --border: #e2e8f0;
+    --code-bg: #f1f5f9;
+    --badge-beginner: #22c55e;
+    --badge-intermediate: #eab308;
+    --badge-advanced: #ef4444;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08);
+    --radius: 8px;
+  }
+  .dark {
+    --bg: #0f172a;
+    --bg-sidebar: #1e293b;
+    --bg-card: #1e293b;
+    --text: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-dim: #64748b;
+    --border: #334155;
+    --code-bg: #0f172a;
+    --shadow: 0 1px 3px rgba(0,0,0,0.3);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+  }
+  .sidebar {
+    width: 320px;
+    min-width: 320px;
+    background: var(--bg-sidebar);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+  }
+  .sidebar-header {
+    padding: 20px 16px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sidebar-header h1 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+  .sidebar-header h1 span { color: var(--text-dim); font-weight: 400; font-size: 13px; }
+  .search-box {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 14px;
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+  }
+  .search-box:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(37,99,235,0.15); }
+  .tag-filters {
+    padding: 8px 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    border-bottom: 1px solid var(--border);
+    max-height: 80px;
+    overflow-y: auto;
+  }
+  .tag-filter {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .tag-filter:hover { border-color: var(--accent); color: var(--accent); }
+  .tag-filter.active { background: var(--accent); color: white; border-color: var(--accent); }
+  .sidebar-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 0;
+  }
+  .category-group { margin-bottom: 4px; }
+  .category-label {
+    padding: 8px 16px 4px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-dim);
+  }
+  .prompt-item {
+    padding: 8px 16px;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: all 0.1s;
+  }
+  .prompt-item:hover { background: var(--bg); }
+  .prompt-item.active { border-left-color: var(--accent); background: var(--bg); }
+  .prompt-item .title { font-size: 13px; font-weight: 500; margin-bottom: 2px; }
+  .prompt-item .meta {
+    font-size: 11px;
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .difficulty-badge {
+    display: inline-block;
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 10px;
+    font-weight: 600;
+    color: white;
+  }
+  .difficulty-badge.beginner { background: var(--badge-beginner); }
+  .difficulty-badge.intermediate { background: var(--badge-intermediate); color: #1e293b; }
+  .difficulty-badge.advanced { background: var(--badge-advanced); }
+  .main {
+    flex: 1;
+    overflow-y: auto;
+    padding: 32px 48px;
+  }
+  .main.empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-dim);
+    font-size: 16px;
+  }
+  .detail-header { margin-bottom: 24px; }
+  .detail-header h2 { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+  .detail-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+  .detail-meta .tag {
+    background: var(--code-bg);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+  .detail-actions { margin: 16px 0 24px; display: flex; gap: 8px; }
+  .btn {
+    padding: 8px 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: white; border-color: var(--accent); }
+  .btn.primary:hover { background: var(--accent-light); }
+  .detail-content {
+    font-size: 15px;
+    line-height: 1.7;
+  }
+  .detail-content h1, .detail-content h2, .detail-content h3 {
+    margin: 24px 0 8px;
+    font-weight: 600;
+  }
+  .detail-content h1 { font-size: 22px; }
+  .detail-content h2 { font-size: 18px; color: var(--accent); }
+  .detail-content h3 { font-size: 16px; }
+  .detail-content p { margin: 8px 0; }
+  .detail-content ul, .detail-content ol { margin: 8px 0 8px 24px; }
+  .detail-content li { margin: 4px 0; }
+  .detail-content pre {
+    background: var(--code-bg);
+    padding: 16px;
+    border-radius: var(--radius);
+    overflow-x: auto;
+    margin: 12px 0;
+    font-size: 13px;
+    line-height: 1.5;
+    border: 1px solid var(--border);
+  }
+  .detail-content code {
+    background: var(--code-bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 13px;
+  }
+  .detail-content pre code { background: none; padding: 0; }
+  .detail-content strong { font-weight: 600; }
+  .detail-content blockquote {
+    border-left: 3px solid var(--accent);
+    padding-left: 16px;
+    color: var(--text-secondary);
+    margin: 12px 0;
+  }
+  .toolbar {
+    position: fixed;
+    top: 12px;
+    right: 16px;
+    display: flex;
+    gap: 8px;
+    z-index: 10;
+  }
+  .toolbar button {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .toolbar button:hover { border-color: var(--accent); color: var(--accent); }
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--accent);
+    color: white;
+    padding: 10px 20px;
+    border-radius: var(--radius);
+    font-size: 14px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+    z-index: 100;
+  }
+  .toast.show { opacity: 1; }
+  .footer {
+    padding: 12px 16px;
+    border-top: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--text-dim);
+    text-align: center;
+  }
+  .footer a { color: var(--accent); text-decoration: none; }
+  .hidden { display: none !important; }
+  @media (max-width: 768px) {
+    .sidebar { width: 100%; min-width: 100%; position: fixed; z-index: 20; }
+    .sidebar.collapsed { transform: translateX(-100%); }
+    .main { padding: 16px; }
+    .mobile-toggle {
+      position: fixed; bottom: 16px; left: 16px; z-index: 30;
+      width: 48px; height: 48px; border-radius: 50%;
+      background: var(--accent); color: white; border: none;
+      font-size: 20px; cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+  }
+  @media (min-width: 769px) { .mobile-toggle { display: none; } }
+</style>
+</head>
+<body>
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <h1>Prompt Library <span id="countBadge"></span></h1>
+    <input type="text" class="search-box" id="searchInput" placeholder="Search prompts...">
+  </div>
+  <div class="tag-filters" id="tagFilters"></div>
+  <div class="sidebar-list" id="promptList"></div>
+  <div class="footer">
+    Built by <a href="https://dishine.it" target="_blank">diShine</a>
+  </div>
+</div>
+<div class="main empty" id="mainPanel">
+  Select a prompt from the sidebar to view it here.
+</div>
+<div class="toolbar">
+  <button id="darkBtn" title="Toggle dark mode">&#9789;</button>
+</div>
+<div class="toast" id="toast">Copied to clipboard</div>
+<button class="mobile-toggle" id="mobileToggle">&#9776;</button>
+
+<script>
+/*__PROMPT_DATA__*/
+
+if (typeof PROMPTS === 'undefined') {
+  var PROMPTS = [];
+}
+
+var activeSlug = null;
+var activeTag = null;
+
+function escapeHtml(s) {
+  var div = document.createElement('div');
+  div.appendChild(document.createTextNode(s));
+  return div.textContent ? div.innerHTML : '';
+}
+
+function renderMarkdown(text) {
+  var html = escapeHtml(text);
+  html = html.replace(/```[^\n]*\n([\s\S]*?)```/g, function(_, code) { return '<pre><code>' + code.trim() + '</code></pre>'; });
+  html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+  html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+  html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+  html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  html = html.replace(/^- (.+)$/gm, '<li>$1</li>');
+  html = html.replace(/^(\d+)\. (.+)$/gm, '<li>$2</li>');
+  html = html.replace(/((?:<li>.*<\/li>\n?)+)/g, '<ul>$1</ul>');
+  html = html.replace(/\n\n+/g, '</p><p>');
+  html = '<p>' + html + '</p>';
+  html = html.replace(/<p>\s*<\/p>/g, '');
+  html = html.replace(/<p>\s*(<h[123]>)/g, '$1');
+  html = html.replace(/(<\/h[123]>)\s*<\/p>/g, '$1');
+  html = html.replace(/<p>\s*(<pre>)/g, '$1');
+  html = html.replace(/(<\/pre>)\s*<\/p>/g, '$1');
+  html = html.replace(/<p>\s*(<ul>)/g, '$1');
+  html = html.replace(/(<\/ul>)\s*<\/p>/g, '$1');
+  return html;
+}
+
+function getTopTags(n) {
+  var tags = {};
+  PROMPTS.forEach(function(p) { (p.tags || []).forEach(function(t) { tags[t] = (tags[t] || 0) + 1; }); });
+  return Object.entries(tags).sort(function(a, b) { return b[1] - a[1]; }).slice(0, n).map(function(e) { return e[0]; });
+}
+
+function filterPrompts(query, tag) {
+  var list = PROMPTS;
+  if (tag) {
+    list = list.filter(function(p) { return (p.tags || []).indexOf(tag) !== -1; });
+  }
+  if (query) {
+    var q = query.toLowerCase();
+    list = list.filter(function(p) {
+      return p.title.toLowerCase().indexOf(q) !== -1 ||
+        p.slug.toLowerCase().indexOf(q) !== -1 ||
+        (p.tags || []).some(function(t) { return t.toLowerCase().indexOf(q) !== -1; }) ||
+        p.category.toLowerCase().indexOf(q) !== -1 ||
+        p.content.toLowerCase().indexOf(q) !== -1;
+    });
+  }
+  return list;
+}
+
+function renderSidebar(filtered) {
+  var cats = {};
+  filtered.forEach(function(p) {
+    var c = p.category || 'uncategorized';
+    if (!cats[c]) cats[c] = [];
+    cats[c].push(p);
+  });
+  var container = document.getElementById('promptList');
+  container.textContent = '';
+  var sortedCats = Object.keys(cats).sort();
+  for (var ci = 0; ci < sortedCats.length; ci++) {
+    var cat = sortedCats[ci];
+    var items = cats[cat].sort(function(a, b) { return a.slug.localeCompare(b.slug); });
+    var group = document.createElement('div');
+    group.className = 'category-group';
+    var label = document.createElement('div');
+    label.className = 'category-label';
+    label.textContent = cat + ' (' + items.length + ')';
+    group.appendChild(label);
+    for (var ii = 0; ii < items.length; ii++) {
+      var p = items[ii];
+      var item = document.createElement('div');
+      item.className = 'prompt-item' + (p.slug === activeSlug ? ' active' : '');
+      item.setAttribute('data-slug', p.slug);
+      item.addEventListener('click', (function(slug) { return function() { showPrompt(slug); }; })(p.slug));
+      var titleDiv = document.createElement('div');
+      titleDiv.className = 'title';
+      titleDiv.textContent = p.title;
+      item.appendChild(titleDiv);
+      var metaDiv = document.createElement('div');
+      metaDiv.className = 'meta';
+      var badge = document.createElement('span');
+      badge.className = 'difficulty-badge ' + p.difficulty;
+      badge.textContent = p.difficulty;
+      metaDiv.appendChild(badge);
+      var tagText = document.createTextNode(' ' + (p.tags || []).slice(0, 3).join(', '));
+      metaDiv.appendChild(tagText);
+      item.appendChild(metaDiv);
+      group.appendChild(item);
+    }
+    container.appendChild(group);
+  }
+  document.getElementById('countBadge').textContent = '(' + filtered.length + ')';
+}
+
+function renderTagFilters() {
+  var tags = getTopTags(12);
+  var container = document.getElementById('tagFilters');
+  container.textContent = '';
+  tags.forEach(function(t) {
+    var span = document.createElement('span');
+    span.className = 'tag-filter' + (t === activeTag ? ' active' : '');
+    span.textContent = t;
+    span.addEventListener('click', function() { toggleTag(t); });
+    container.appendChild(span);
+  });
+}
+
+function showPrompt(slug) {
+  var p = PROMPTS.find(function(x) { return x.slug === slug; });
+  if (!p) return;
+  activeSlug = slug;
+  var main = document.getElementById('mainPanel');
+  main.className = 'main';
+  main.textContent = '';
+
+  // Header
+  var header = document.createElement('div');
+  header.className = 'detail-header';
+  var h2 = document.createElement('h2');
+  h2.textContent = p.title;
+  header.appendChild(h2);
+
+  var meta = document.createElement('div');
+  meta.className = 'detail-meta';
+  var diffBadge = document.createElement('span');
+  diffBadge.className = 'difficulty-badge ' + p.difficulty;
+  diffBadge.textContent = p.difficulty;
+  meta.appendChild(diffBadge);
+  var catSpan = document.createElement('span');
+  catSpan.textContent = p.category;
+  meta.appendChild(catSpan);
+  (p.tags || []).forEach(function(t) {
+    var tag = document.createElement('span');
+    tag.className = 'tag';
+    tag.textContent = t;
+    meta.appendChild(tag);
+  });
+  (p.models || []).forEach(function(m) {
+    var tag = document.createElement('span');
+    tag.className = 'tag';
+    tag.textContent = m;
+    meta.appendChild(tag);
+  });
+  header.appendChild(meta);
+  main.appendChild(header);
+
+  // Actions
+  var actions = document.createElement('div');
+  actions.className = 'detail-actions';
+  var copyBtn = document.createElement('button');
+  copyBtn.className = 'btn primary';
+  copyBtn.textContent = 'Copy template';
+  copyBtn.addEventListener('click', function() { copyTemplate(slug); });
+  actions.appendChild(copyBtn);
+  var fullBtn = document.createElement('button');
+  fullBtn.className = 'btn';
+  fullBtn.textContent = 'Copy full content';
+  fullBtn.addEventListener('click', function() { copyFull(slug); });
+  actions.appendChild(fullBtn);
+  main.appendChild(actions);
+
+  // Content (rendered markdown - safe because escapeHtml runs first in renderMarkdown)
+  var content = document.createElement('div');
+  content.className = 'detail-content';
+  content.innerHTML = renderMarkdown(p.content);
+  main.appendChild(content);
+
+  main.scrollTop = 0;
+  renderSidebar(filterPrompts(document.getElementById('searchInput').value, activeTag));
+
+  if (window.innerWidth <= 768) {
+    document.getElementById('sidebar').classList.add('collapsed');
+  }
+}
+
+function extractTemplateText(content) {
+  var match = content.match(/## Template\s*\n+```[^\n]*\n([\s\S]*?)```/);
+  return match ? match[1].trim() : null;
+}
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 2000);
+}
+
+function copyTemplate(slug) {
+  var p = PROMPTS.find(function(x) { return x.slug === slug; });
+  if (!p) return;
+  var tmpl = extractTemplateText(p.content);
+  var text = tmpl || p.content;
+  navigator.clipboard.writeText(text).then(function() { showToast('Template copied!'); }).catch(function() { showToast('Copy failed'); });
+}
+
+function copyFull(slug) {
+  var p = PROMPTS.find(function(x) { return x.slug === slug; });
+  if (!p) return;
+  navigator.clipboard.writeText(p.content).then(function() { showToast('Full content copied!'); }).catch(function() { showToast('Copy failed'); });
+}
+
+function toggleTag(tag) {
+  activeTag = activeTag === tag ? null : tag;
+  renderTagFilters();
+  var q = document.getElementById('searchInput').value;
+  renderSidebar(filterPrompts(q, activeTag));
+}
+
+function toggleDark() {
+  document.documentElement.classList.toggle('dark');
+  var btn = document.getElementById('darkBtn');
+  btn.textContent = document.documentElement.classList.contains('dark') ? '\u2606' : '\u263D';
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('collapsed');
+}
+
+// Init
+document.getElementById('darkBtn').addEventListener('click', toggleDark);
+document.getElementById('mobileToggle').addEventListener('click', toggleSidebar);
+document.getElementById('searchInput').addEventListener('input', function(e) {
+  renderSidebar(filterPrompts(e.target.value, activeTag));
+});
+
+renderTagFilters();
+renderSidebar(filterPrompts('', null));
+</script>
+</body>
+</html>

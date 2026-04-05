@@ -1,25 +1,56 @@
 ---
 title: Llama Prompting Best Practices
 category: model-specific
-tags: [meta, llama, open-source, instruction-format, quantization, tool-use, llama-guard]
+tags: [meta, llama, open-source, instruction-format, quantization, tool-use, llama-guard, llama-4, moe]
 difficulty: intermediate
-models: [llama-3.1, llama-3.2, llama-3.3]
+models: [llama-4-scout, llama-4-maverick, llama-3.3, llama-3.2, llama-3.1]
 ---
 
 # Llama prompting best practices
 
-Meta's Llama models are open-weight models with specific instruction formats that vary by version. Using the correct template is critical. This guide covers format differences across Llama 3.x versions, quantization-aware prompting, tool use, Llama Guard, and strategies for different model sizes.
+Meta's Llama models are open-weight models with specific instruction formats that vary by version. This guide covers the latest Llama 4 series (mixture-of-experts architecture) as well as the Llama 3.x line for self-hosted deployments.
+
+## Current models (as of April 2026)
+
+| Model | Architecture | Active params | Total params | Context | Key features |
+|-------|-------------|--------------|-------------|---------|--------------|
+| **Llama 4 Scout** | MoE, 16 experts | 17B | ~109B | 10M tokens | fits on a single H100, natively multimodal, industry-leading context window |
+| **Llama 4 Maverick** | MoE, 128 experts | 17B | ~400B | large | beats GPT-4o and Gemini 2.0 Flash on benchmarks, half the active params of DeepSeek v3 |
+| **Llama 4 Behemoth** | MoE, 16 experts | 288B | ~2T | large | preview only — outperforms GPT-4.5, Claude Sonnet 3.7, Gemini 2.0 Pro on STEM |
+| **Llama 3.3** | dense | 70B | 70B | 128K | best dense model, great for fine-tuning |
+| **Llama 3.2** | dense | 1B / 3B / 11B / 90B | same | 128K | edge deployment, on-device, vision (11B/90B) |
+| **Llama 3.1** | dense | 8B / 70B / 405B | same | 128K | established workhorse, most fine-tunes available |
+
+**Key changes with Llama 4:**
+- mixture-of-experts architecture — 17B active parameters route to different experts per token, so you get much larger model capacity with reasonable compute
+- natively multimodal — text, image, and video understanding built in (not bolted on)
+- Llama 4 Scout has a 10M token context window, the longest of any open model
+- Scout fits on a single H100 GPU despite its effective parameter count
+- Maverick matches or beats closed models (GPT-4o, Gemini 2.0 Flash) while being open-weight
+- all Llama 4 models are available on Hugging Face and via Meta AI (WhatsApp, Messenger, Instagram)
+
+**Which model to pick:**
+- **Llama 4 Maverick**: highest quality open model — use when you want closed-model quality with open weights
+- **Llama 4 Scout**: when you need massive context (10M tokens) or single-GPU deployment
+- **Llama 3.3 70B**: best option for fine-tuning — mature ecosystem, well-understood behavior
+- **Llama 3.2 1B/3B**: edge/mobile deployment, on-device inference
+- **Llama 3.1 405B**: when you need the largest dense model and have the compute
 
 ## When to use
 
 - Self-hosted or private deployments where data cannot leave your infrastructure
 - Cost-sensitive applications with high volume
-- Custom fine-tuning workflows
+- Custom fine-tuning workflows (Llama 3.x especially)
 - Edge deployment or on-device inference (Llama 3.2 1B/3B)
 - When you need full control over the model pipeline
 - Applications requiring safety classification (Llama Guard)
+- Massive context analysis (Llama 4 Scout, 10M tokens)
 
 ## The technique
+
+### Llama 4 vs. Llama 3.x prompt format differences
+
+Llama 4 models use the same chat template format as Llama 3.x but with improved multimodal handling. The MoE architecture is transparent to the prompt — you don't need to change your prompting approach, but you'll notice better instruction-following and reasoning.
 
 ### Llama 3.1 vs. 3.2 vs. 3.3 prompt format differences
 

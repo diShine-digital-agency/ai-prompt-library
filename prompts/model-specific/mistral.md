@@ -1,22 +1,54 @@
 ---
 title: Mistral Prompting Best Practices
 category: model-specific
-tags: [mistral, mixtral, codestral, pixtral, function-calling, guardrails, le-chat]
+tags: [mistral, mistral-large-3, codestral, pixtral, devstral, magistral, function-calling, guardrails, le-chat]
 difficulty: intermediate
-models: [mistral-large, mixtral, mistral-small, codestral, pixtral]
+models: [mistral-large-3, mistral-medium-3, codestral, devstral-2, magistral, pixtral, ministral]
 ---
 
 # Mistral prompting best practices
 
 Mistral models offer a strong performance-to-cost ratio with particular strengths in code generation, multilingual tasks, and function calling. This guide covers the model lineup, function calling patterns, Codestral for code tasks, Pixtral for vision, and guardrailing techniques.
 
+## Current models (as of April 2026)
+
+| Model | Architecture | Parameters | Pricing (input/output) | Best for |
+|-------|-------------|-----------|----------------------|----------|
+| **Mistral Large 3** | MoE | 41B active / 675B total | premium | frontier-class, scored 9.4/10 overall — beats Claude Opus 4.5 on some benchmarks |
+| **Mistral Medium 3** | dense | undisclosed | $0.40/$2.00 per M | GPT-4 class performance at a fraction of the cost — best value in the market |
+| **Magistral Medium** | reasoning | undisclosed | mid tier | chain-of-thought reasoning model, Mistral's answer to o1/thinking models |
+| **Magistral Small** | reasoning | open-source | free | open-source reasoning model with chain-of-thought |
+| **Codestral** | code | undisclosed | code tier | 86.6% on HumanEval, 256K context, 80+ languages |
+| **Devstral 2** | agentic coding | undisclosed | code tier | agentic software development, long-horizon tasks |
+| **Devstral Small 2** | agentic coding | compact | free/low cost | lighter agentic coding for simpler tasks |
+| **Pixtral** | vision | undisclosed | mid tier | multimodal (image understanding), Mistral's vision model |
+| **Ministral 3** | edge | 3B / 7B / 14B | very low | small dense models for edge deployment, on-device |
+| **Mistral Vibe** | CLI tool | — | — | command-line AI-assisted development (like Cursor but terminal-native) |
+
+**Key changes from previous generations:**
+- Mistral Large 3 moved to MoE architecture (41B active / 675B total) — massive quality jump
+- Magistral series introduced reasoning/thinking capabilities (chain-of-thought)
+- Devstral line created for agentic coding tasks (separate from Codestral)
+- Mistral Medium 3 is arguably the best value model on the market at $0.40 input
+- Ministral 3 expanded the small model lineup to 3B/7B/14B
+
+**Which model to pick:**
+- **Mistral Large 3**: when you need maximum quality and are comparing against Claude/GPT — genuinely competitive at the frontier
+- **Mistral Medium 3**: production workhorse — GPT-4 quality at ~1/5 the cost
+- **Magistral**: when you need explicit chain-of-thought reasoning (math, logic, code analysis)
+- **Codestral / Devstral**: dedicated coding tasks — Codestral for generation, Devstral for agentic multi-file work
+- **Pixtral**: image understanding, document parsing, visual QA
+- **Ministral 3B/7B**: edge, mobile, or high-volume low-latency workloads
+
 ## When to use
 
 - Cost-effective production deployments with strong instruction following
-- Code generation and analysis (Codestral)
+- Code generation and analysis (Codestral, Devstral)
+- Chain-of-thought reasoning (Magistral)
 - Function calling with structured outputs
-- Multilingual applications (strong in European languages)
+- Multilingual applications (strong in European languages, especially French)
 - Vision tasks (Pixtral)
+- Edge deployment (Ministral 3B/7B/14B)
 - Fast inference requirements
 
 ## The technique

@@ -1,20 +1,41 @@
 ---
 title: Gemini Prompting Best Practices
 category: model-specific
-tags: [google, gemini, multimodal, grounding, safety-settings, context-caching, video, code-execution]
+tags: [google, gemini, multimodal, grounding, safety-settings, context-caching, video, code-execution, gemini-3]
 difficulty: intermediate
-models: [gemini, gemini-2.0-flash, gemini-2.5-pro]
+models: [gemini-3-pro, gemini-3-flash, gemini-2.5-pro, gemini-2.5-flash]
 ---
 
 # Gemini prompting best practices
 
 Google's Gemini models excel at multimodal tasks, grounded responses using Google Search, and processing massive context windows. This guide covers Gemini-specific features including grounding API parameters, context caching strategy, video understanding, and the differences between model variants.
 
+## Current models (as of April 2026)
+
+| Model | Type | Context | Pricing (input/output) | Best for |
+|-------|------|---------|----------------------|----------|
+| **Gemini 3 Pro** | frontier | very large | premium tier | state-of-the-art reasoning, multimodal understanding, agentic and coding tasks |
+| **Gemini 3 Flash** | fast frontier | very large | mid tier | new default in Gemini app — major capability upgrade over 2.5 Flash, lightning speed |
+| **Gemini 2.5 Pro** | previous gen | 1M+ tokens | $1.25/$10 per M | still very capable, good value for complex tasks (deprecated June 2026) |
+| **Gemini 2.5 Flash** | previous gen | 1M tokens | $0.30/$2.50 per M | budget-friendly, fast (deprecated June 2026) |
+| **Gemini 2.5 Flash-Lite** | economy | large | lowest cost | cost-effective upgrade path from 1.5/2.0 Flash, lowest latency |
+
+**Key changes:**
+- Gemini 3 series has launched — 3 Flash is now the default in the Gemini app
+- Gemini 3 Pro brings significant reasoning improvements over 2.5 Pro
+- 2.5 Pro and 2.5 Flash are being deprecated on June 17, 2026 — migrate to 3 series
+- all models support native multimodal (text, image, audio, video)
+
+**Which model to pick:**
+- **Gemini 3 Pro**: complex reasoning, large codebases, research, tasks where quality matters most
+- **Gemini 3 Flash**: general-purpose workhorse — fast, capable, good price/performance
+- **Gemini 2.5 Flash-Lite**: high-volume, cost-sensitive workloads where you need speed over depth
+
 ## When to use
 
 - Multimodal tasks combining text, images, audio, and video
 - Tasks requiring grounded, current information via Google Search
-- Long-context processing (up to 2M tokens with Gemini 2.5 Pro)
+- Long-context processing (up to 1M+ tokens)
 - Code generation with built-in code execution
 - Tasks requiring safety-tuned outputs with configurable thresholds
 

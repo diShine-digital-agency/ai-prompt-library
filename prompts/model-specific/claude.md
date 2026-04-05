@@ -1,19 +1,38 @@
 ---
 title: Claude Prompting Best Practices
 category: model-specific
-tags: [claude, anthropic, xml-tags, extended-thinking, prefill, tool-use, artifacts]
+tags: [claude, anthropic, xml-tags, extended-thinking, prefill, tool-use, artifacts, opus, sonnet, haiku]
 difficulty: intermediate
-models: [claude]
+models: [claude-opus-4.6, claude-sonnet-4.6, claude-haiku-4.5]
 ---
 
 # Claude prompting best practices
 
 Claude responds exceptionally well to structured prompts using XML tags, clear instruction hierarchies, and explicit output formatting. This guide covers techniques specific to Claude's architecture that working practitioners rely on daily.
 
+## Current models (as of April 2026)
+
+| Model | Parameters | Context | Input price | Output price | Best for |
+|-------|-----------|---------|-------------|--------------|----------|
+| **Opus 4.6** | undisclosed | 1M tokens (GA) | $5/M | $25/M | deep reasoning, multi-agent coordination, massive context analysis |
+| **Sonnet 4.6** | undisclosed | 200K tokens | $3/M | $15/M | balanced performance — coding, design, knowledge work, data processing |
+| **Haiku 4.5** | undisclosed | 200K tokens | $1/M | $5/M | fastest response, near-frontier performance, cost-effective for high-volume |
+
+**Key changes from previous generations:**
+- Opus 4.6 now supports 1M token context (GA, unified pricing) — previously beta-only
+- Sonnet 4.6 significantly improved at computer use, coding, and design tasks
+- Haiku 4.5 remains the free-tier default in claude.ai — best price-to-performance in its class
+- all models use the same API format, so prompts are portable across tiers
+
+**Which model to pick:**
+- **Opus 4.6**: when you need the absolute best reasoning, or you're processing documents over 200K tokens, or running multi-agent workflows
+- **Sonnet 4.6**: the workhorse — use this for 90% of tasks (coding, analysis, writing, tool use)
+- **Haiku 4.5**: high-volume classification, routing, quick extractions, or anywhere latency/cost matters more than peak capability
+
 ## When to use
 
 - Any task involving Claude models (Haiku, Sonnet, Opus)
-- Long-context tasks (up to 200K tokens)
+- Long-context tasks (up to 1M tokens with Opus, 200K with Sonnet/Haiku)
 - Complex multi-step instructions requiring clear structure
 - Tasks needing tool use or function calling
 - Projects requiring extended thinking for complex reasoning

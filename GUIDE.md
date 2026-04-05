@@ -122,16 +122,73 @@ prompt-lib random
 
 ## Using Prompts in Practice
 
-### Step 1: Find the Right Prompt
+### The quick way: `use` command
+
+The `use` command walks you through filling in a prompt interactively:
+
+```bash
+prompt-lib use email-campaign
+```
+
+It finds all `{{placeholders}}` in the template, asks you for each value,
+renders the final prompt, and copies it to your clipboard. No manual
+find-and-replace needed.
+
+### Copy a template directly
+
+If you just want the raw template on your clipboard:
+
+```bash
+prompt-lib copy chain-of-thought
+```
+
+This extracts the Template section and copies it. You can then paste it
+into any editor and fill in the placeholders yourself.
+
+### Compose: combine multiple prompts
+
+The `compose` command lets you build a composite prompt from three layers:
+
+```bash
+prompt-lib compose
+```
+
+It walks you through:
+1. Picking a system prompt (optional) -- sets the persona and behavioral rules
+2. Picking a reasoning framework (optional) -- adds a technique like Chain-of-Thought
+3. Picking a domain template -- the actual task template (marketing, dev, data, etc.)
+
+The three pieces get combined into a single prompt, placeholders are filled
+in interactively, and the result is copied to clipboard. This is useful when
+you want, say, a "Data Analyst" persona using "Chain-of-Thought" reasoning
+to work through a "SQL Query Builder" template.
+
+### Visual browser
+
+For a graphical overview of the whole library:
+
+```bash
+prompt-lib viewer
+```
+
+This opens a single-page web viewer in your browser with search, category
+filters, tag filters, dark/light mode, and copy buttons. Works offline --
+everything is embedded in one HTML file.
+
+### The manual way
+
+If you prefer to do it step by step:
+
+#### Step 1: Find the right prompt
 
 Use `search` or `list` to find a prompt that matches your task.
 
-### Step 2: Read the Template
+#### Step 2: Read the template
 
 Every prompt contains a **Template** section with `{{placeholders}}` that
 you fill in with your specific details.
 
-### Step 3: Fill in Placeholders
+#### Step 3: Fill in placeholders
 
 Replace `{{placeholders}}` with your actual content. For example:
 
@@ -151,12 +208,12 @@ Audience: Marketing directors at mid-size B2B companies
 Goal: Drive free trial signups
 ```
 
-### Step 4: Paste into Your Preferred Model
+#### Step 4: Paste into your preferred model
 
 Copy the filled-in prompt and paste it into Claude, ChatGPT, Gemini, or
 whichever model the prompt supports.
 
-### Step 5: Iterate
+#### Step 5: Iterate
 
 Use the **Tips** and **Common Mistakes** sections to refine your results.
 
