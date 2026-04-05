@@ -1,51 +1,31 @@
 ---
 title: Llama Prompting Best Practices
 category: model-specific
-tags: [meta, llama, open-source, instruction-format, quantization]
+tags: [meta, llama, open-source, instruction-format, quantization, tool-use, llama-guard]
 difficulty: intermediate
-models: [llama-2, llama-3, llama-3.1]
+models: [llama-3.1, llama-3.2, llama-3.3]
 ---
 
-# Llama Prompting Best Practices
+# Llama prompting best practices
 
-Meta's Llama models are open-weight models with specific instruction formats that
-vary by version. Using the correct template is critical for optimal performance.
-This guide covers Llama 2 and Llama 3 formats, quantization-aware prompting,
-and best practices for self-hosted deployments.
+Meta's Llama models are open-weight models with specific instruction formats that vary by version. Using the correct template is critical. This guide covers format differences across Llama 3.x versions, quantization-aware prompting, tool use, Llama Guard, and strategies for different model sizes.
 
-## When to Use
+## When to use
 
 - Self-hosted or private deployments where data cannot leave your infrastructure
 - Cost-sensitive applications with high volume
 - Custom fine-tuning workflows
-- Edge deployment or on-device inference
+- Edge deployment or on-device inference (Llama 3.2 1B/3B)
 - When you need full control over the model pipeline
+- Applications requiring safety classification (Llama Guard)
 
-## The Technique
+## The technique
 
-### Llama 2 Instruction Format
+### Llama 3.1 vs. 3.2 vs. 3.3 prompt format differences
 
-```
-<s>[INST] <<SYS>>
-{{system_prompt}}
-<</SYS>>
+All Llama 3.x models share the same base template, but capabilities differ:
 
-{{user_message}} [/INST]
-```
-
-Multi-turn conversation:
-```
-<s>[INST] <<SYS>>
-You are a helpful assistant.
-<</SYS>>
-
-What is the capital of France? [/INST] The capital of France is Paris. </s>
-<s>[INST] What about Germany? [/INST]
-```
-
-### Llama 3 Instruction Format
-
-Llama 3 uses a completely different template:
+**Base format (all Llama 3.x):**
 
 ```
 <|begin_of_text|><|start_header_id|>system<|end_header_id|>
@@ -56,67 +36,262 @@ Llama 3 uses a completely different template:
 
 ```
 
-Multi-turn:
+**Multi-turn:**
+
 ```
 <|begin_of_text|><|start_header_id|>system<|end_header_id|>
 
 You are a helpful coding assistant.<|eot_id|><|start_header_id|>user<|end_header_id|>
 
-Write a Python function to sort a list.<|eot_id|><|start_header_id|>assistant<|end_header_id|>
+Write a Python sort function.<|eot_id|><|start_header_id|>assistant<|end_header_id|>
 
-Here is a sorting function:
+Here's a sorting function:
 ```python
 def sort_list(items):
     return sorted(items)
 ```<|eot_id|><|start_header_id|>user<|end_header_id|>
 
-Now make it sort in descending order.<|eot_id|><|start_header_id|>assistant<|end_header_id|>
+Make it descending.<|eot_id|><|start_header_id|>assistant<|end_header_id|>
 
 ```
 
-### Llama 3.1 with Tool Use
+**Key differences between versions:**
+
+| Feature | 3.1 (8B/70B/405B) | 3.2 (1B/3B/11B/90B) | 3.3 (70B) |
+|---------|-------------------|-----------------------|-----------|
+| Context window | 128K | 128K | 128K |
+| Tool use | Yes (all sizes) | Yes (11B+ only) | Yes |
+| Vision | No | Yes (11B/90B only) | No |
+| Multilingual | 8 languages | Same + more | Same |
+| On-device | No | Yes (1B/3B) | No |
+| Instruction following | Baseline | Improved for small models | Best at 70B class |
+
+### How to handle the BOS token correctly
+
+The `<|begin_of_text|>` token (BOS) should appear exactly once at the start of the conversation. Common mistakes:
+
+```
+# WRONG: BOS token on every turn
+<|begin_of_text|><|start_header_id|>user<|end_header_id|>
+First message<|eot_id|>
+<|begin_of_text|><|start_header_id|>user<|end_header_id|>  # WRONG: second BOS
+Second message<|eot_id|>
+
+# CORRECT: BOS only at the start
+<|begin_of_text|><|start_header_id|>system<|end_header_id|>
+System prompt<|eot_id|><|start_header_id|>user<|end_header_id|>
+First message<|eot_id|><|start_header_id|>assistant<|end_header_id|>
+Response<|eot_id|><|start_header_id|>user<|end_header_id|>
+Second message<|eot_id|><|start_header_id|>assistant<|end_header_id|>
+```
+
+If you are using Hugging Face `transformers`, `vLLM`, or `llama.cpp`, the chat template handles this automatically. Only worry about manual BOS handling if you are building your own tokenization pipeline.
+
+### Quantization impact on prompt following
+
+Different quantization methods affect how well the model follows instructions. This matters for production deployments.
+
+**GGUF (llama.cpp, Ollama):**
+
+| Quantization | Size (70B) | Quality impact | Recommended for |
+|-------------|------------|----------------|-----------------|
+| Q8_0 | ~70GB | Minimal loss | When you have the VRAM |
+| Q6_K | ~54GB | Very slight loss | Good balance |
+| Q5_K_M | ~48GB | Noticeable on complex reasoning | General use |
+| Q4_K_M | ~40GB | Degraded instruction following | Simple tasks, chat |
+| Q3_K_M | ~30GB | Significant quality loss | Only if hardware-constrained |
+| Q2_K | ~25GB | Severe degradation | Not recommended |
+
+**GPTQ vs. GGUF vs. AWQ:**
+
+| Method | Best for | Key trade-off |
+|--------|----------|---------------|
+| GGUF | CPU + GPU mixed inference (llama.cpp) | Flexible but slower on pure GPU |
+| GPTQ | Pure GPU inference (transformers, vLLM) | Fast on GPU, no CPU offloading |
+| AWQ | Pure GPU with activation-aware quantization | Better quality than GPTQ at same bit width |
+
+**Prompting adjustments for quantized models:**
+
+```
+# For Q4 and below, these strategies help:
+
+1. Use explicit few-shot examples instead of complex instructions
+2. Reduce system prompt length (under 200 tokens)
+3. Use temperature 0.1-0.3 (lower than full precision)
+4. Break complex tasks into multiple simpler turns
+5. Add format enforcement: "Output ONLY a JSON object, nothing else"
+```
+
+### Llama Guard for safety
+
+Llama Guard is a separate model that classifies inputs and outputs for safety. Use it as a filter before and after your main model:
+
+```python
+# Llama Guard 3 prompt format
+guard_prompt = """<|begin_of_text|><|start_header_id|>user<|end_header_id|>
+
+Task: Check if there is unsafe content in 'User' messages in conversations
+according to our safety policy with the below categories.
+
+<BEGIN UNSAFE CONTENT CATEGORIES>
+S1: Violent Crimes
+S2: Non-Violent Crimes
+S3: Sex-Related Crimes
+S4: Child Sexual Exploitation
+S5: Defamation
+S6: Specialized Advice
+S7: Privacy
+S8: Intellectual Property
+S9: Indiscriminate Weapons
+S10: Hate
+S11: Suicide & Self-Harm
+S12: Sexual Content
+S13: Elections
+<END UNSAFE CONTENT CATEGORIES>
+
+<BEGIN CONVERSATION>
+
+User: {{user_message}}
+
+<END CONVERSATION>
+
+Provide your safety assessment for the above conversation:
+- First line must read 'safe' or 'unsafe'.
+- If unsafe, a second line must include a comma-separated list of violated categories.<|eot_id|><|start_header_id|>assistant<|end_header_id|>
+
+"""
+# Response will be "safe" or "unsafe\nS1,S6" etc.
+```
+
+Deploy Llama Guard as a lightweight filter (the 8B variant is fast enough for real-time filtering) before sending user input to your main model and after generating a response.
+
+### Tool use format for Llama 3.1+
 
 ```
 <|begin_of_text|><|start_header_id|>system<|end_header_id|>
 
 Environment: ipython
-Tools: brave_search, wolfram_alpha
+Tools: brave_search, wolfram_alpha, code_interpreter
 
-You are a helpful assistant with access to tools.
-When you need to use a tool, output a JSON function call.<|eot_id|>
+Cutting Knowledge Date: December 2023
+Today Date: 04 Apr 2026
+
+You are a helpful assistant with tool access. When you need current information
+or complex calculations, use the appropriate tool.<|eot_id|>
 <|start_header_id|>user<|end_header_id|>
 
-What is the weather in Tokyo today?<|eot_id|>
+What is the current price of Bitcoin?<|eot_id|>
 <|start_header_id|>assistant<|end_header_id|>
 
-<|python_tag|>brave_search.call(query="weather in Tokyo today")<|eot_id|>
+<|python_tag|>brave_search.call(query="bitcoin price today USD")<|eot_id|>
+<|start_header_id|>ipython<|end_header_id|>
+
+{"results": [{"title": "Bitcoin Price", "snippet": "BTC: $67,432.15 USD"}]}<|eot_id|>
+<|start_header_id|>assistant<|end_header_id|>
+
+Based on current data, Bitcoin is trading at approximately $67,432 USD.<|eot_id|>
 ```
 
-### Quantization-Aware Prompting
-
-When running quantized models (4-bit, 8-bit), adjust your expectations:
+**Custom tool definitions:**
 
 ```
-# For quantized models, use these strategies:
+<|begin_of_text|><|start_header_id|>system<|end_header_id|>
 
-1. Simpler instructions — Break complex tasks into steps
-2. Shorter prompts — Quantized models handle long contexts less well
-3. More explicit formatting — Be very specific about output format
-4. Lower temperature — Reduce randomness to compensate for quality loss
-5. Stronger few-shot examples — Quantized models rely more on examples
+Environment: ipython
+
+You have access to the following functions:
+
+def get_weather(location: str, units: str = "celsius") -> dict:
+    """Get current weather for a location.
+
+    Args:
+        location: City name or coordinates
+        units: Temperature units - "celsius" or "fahrenheit"
+
+    Returns:
+        dict with temperature, conditions, humidity
+    """
+    ...
+
+Use functions by writing Python-style calls inside <|python_tag|> tags.<|eot_id|>
 ```
 
-Example for quantized deployment:
+### Context window management for 128K
+
+Llama 3.x supports 128K tokens, but quality degrades beyond certain thresholds:
+
+| Model size | Sweet spot | Usable | Quality drops |
+|------------|-----------|--------|---------------|
+| 8B | 0-8K | 8K-32K | 32K+ |
+| 70B | 0-32K | 32K-64K | 64K+ |
+| 405B | 0-64K | 64K-100K | 100K+ |
+
+**Strategies for long context:**
+- Place the question/instruction both at the beginning and end of long prompts
+- Use explicit markers: "The most relevant section is labeled CRITICAL below"
+- For RAG, retrieve and place the most relevant chunks first
+- If you must use the full window, add periodic reminders of the task
+
+### Prompting by model size
+
+**Llama 3.2 1B/3B (on-device):**
+
 ```
-System: You extract product info from text. Return JSON only.
+# Keep it dead simple. No elaborate system prompts.
+<|begin_of_text|><|start_header_id|>system<|end_header_id|>
+
+You classify customer messages. Respond with exactly one word: positive, negative, or neutral.<|eot_id|><|start_header_id|>user<|end_header_id|>
+
+Great product, fast shipping!<|eot_id|><|start_header_id|>assistant<|end_header_id|>
+
+```
+
+**Llama 3.1/3.3 8B (server, moderate tasks):**
+
+```
+# Can handle structured output with examples
+<|begin_of_text|><|start_header_id|>system<|end_header_id|>
+
+Extract entities from text. Return JSON only.
 
 Example:
-Text: "Nike Air Max 90, $120, size 10, black"
-Output: {"brand": "Nike", "model": "Air Max 90", "price": 120, "size": "10", "color": "black"}
+Input: "Apple CEO Tim Cook visited Tokyo"
+Output: {"people": ["Tim Cook"], "orgs": ["Apple"], "locations": ["Tokyo"]}
 
-Text: "{{input}}"
-Output:
+Input: "No entities here"
+Output: {"people": [], "orgs": [], "locations": []}<|eot_id|>
 ```
+
+**Llama 3.1 70B / 3.3 70B (server, complex tasks):**
+
+```
+# Can handle nuanced multi-step instructions
+<|begin_of_text|><|start_header_id|>system<|end_header_id|>
+
+You are a senior code reviewer. For each code submission:
+1. Identify bugs and security issues (categorize as Critical/High/Medium/Low)
+2. Suggest performance improvements with Big-O analysis
+3. Evaluate readability and suggest refactoring
+4. Provide the corrected code
+
+Be thorough but concise. Reference specific line numbers.<|eot_id|>
+```
+
+**Llama 3.1 405B (maximum capability):**
+
+Full-complexity prompts work here, comparable to GPT-4 class prompts. This is where you can use elaborate system prompts, multi-step reasoning, and complex output schemas.
+
+### Common failure modes and workarounds
+
+| Failure | Cause | Fix |
+|---------|-------|-----|
+| Repeating text endlessly | Repetition penalty too low or missing | Set `repetition_penalty: 1.1-1.2` |
+| Ignoring system prompt | System prompt too long for model size | Shorten to under 200 tokens for 8B |
+| Wrong output format | Instruction not explicit enough | Add a few-shot example of the exact format |
+| Hallucinating function names | Tools not defined in system prompt | List available tools explicitly |
+| Mixing languages | Multilingual training data bleeding through | Add "Respond only in English" to system prompt |
+| Cutting off mid-response | `max_tokens` too low | Increase max_tokens, check context length |
+| Garbled special tokens | Wrong chat template applied | Use the library's built-in chat template |
 
 ## Template
 
@@ -128,7 +303,11 @@ Output:
 Rules:
 - {{rule_1}}
 - {{rule_2}}
-- {{rule_3}}<|eot_id|><|start_header_id|>user<|end_header_id|>
+
+{{#if tools}}
+Environment: ipython
+Tools: {{tool_list}}
+{{/if}}<|eot_id|><|start_header_id|>user<|end_header_id|>
 
 {{task_description}}
 
@@ -136,76 +315,30 @@ Rules:
 
 ```
 
-## Examples
-
-### Code Generation (Llama 3)
-
-```
-<|begin_of_text|><|start_header_id|>system<|end_header_id|>
-
-You are a senior Python developer. Write clean, well-documented code.
-Include type hints and docstrings. Handle edge cases.
-Do not include explanations outside the code block.<|eot_id|>
-<|start_header_id|>user<|end_header_id|>
-
-Write a function that finds the longest palindromic substring
-in a given string. Optimize for O(n^2) time complexity.<|eot_id|>
-<|start_header_id|>assistant<|end_header_id|>
-
-```
-
-### Data Analysis (Llama 2)
-
-```
-<s>[INST] <<SYS>>
-You are a data analyst. Given CSV data, provide statistical summaries
-and insights. Use markdown tables for presentation. Identify outliers
-and trends. Keep analysis concise and actionable.
-<</SYS>>
-
-Analyze this sales data and identify the top performing regions:
-
-Region,Q1,Q2,Q3,Q4
-North,450000,520000,480000,610000
-South,380000,390000,410000,420000
-East,290000,310000,350000,380000
-West,510000,490000,530000,580000
-[/INST]
-```
-
 ## Tips
 
-1. **Use the correct template for your version** — Llama 2 and Llama 3 have
-   incompatible formats. Using the wrong one severely degrades performance.
+1. **Use the library's chat template** -- Hugging Face transformers and llama.cpp handle template formatting automatically. Manual formatting invites bugs.
 
-2. **Keep system prompts concise for Llama 2** — Llama 2's system prompt area
-   works best with 2-5 sentences. Long system prompts reduce quality.
+2. **Match prompt complexity to model size** -- an 8B model cannot follow 500-word system prompts reliably. Scale complexity with model capacity.
 
-3. **Llama 3 handles longer contexts better** — Llama 3.1 supports 128K tokens,
-   but quality is best within the first 32K.
+3. **Test at your quantization level** -- a prompt that works at FP16 may need simplification at Q4. Always test at deployment precision.
 
-4. **Test with your quantization level** — A prompt that works at FP16 may need
-   adjustment at 4-bit quantization. Always test at your deployment precision.
+4. **Llama Guard for safety-critical applications** -- running Llama Guard as a classifier before and after your main model is cheaper and more reliable than trying to embed all safety rules in the system prompt.
 
-5. **Use chat templates from libraries** — Hugging Face transformers and
-   llama.cpp have built-in template handling. Use them instead of manual formatting.
+5. **Repetition penalty is essential** -- unlike API models that handle this internally, self-hosted Llama models need explicit `repetition_penalty` (1.1-1.15) to avoid loops.
 
-6. **Fine-tune for specific domains** — Llama's open weights allow fine-tuning.
-   For production, fine-tuned models often outperform prompting alone.
+6. **Fine-tune for production** -- for specific domains, a fine-tuned 8B model often outperforms a prompted 70B model at a fraction of the cost.
 
-## Common Mistakes
+## Common mistakes
 
-1. **Wrong instruction format** — The most common error. Llama 2's [INST] tags
-   and Llama 3's header tags are not interchangeable.
+1. **Wrong template version** -- Llama 2's `[INST]` format and Llama 3's header tags are completely incompatible. Using the wrong one produces garbled output.
 
-2. **Missing special tokens** — Forgetting `<s>`, `</s>`, `<|begin_of_text|>`,
-   or `<|eot_id|>` causes the model to produce garbled output.
+2. **Multiple BOS tokens** -- adding `<|begin_of_text|>` on every turn instead of only at the start confuses the model.
 
-3. **Treating Llama like a cloud API model** — Llama models are generally less
-   instruction-following than GPT-4 or Claude. Use simpler, more direct prompts.
+3. **Treating Llama like a cloud API model** -- Llama models, especially smaller variants, are less instruction-following than GPT-4 or Claude. Use simpler, more direct prompts with examples.
 
-4. **Ignoring context window limits** — Llama 2 has 4K context. Exceeding it
-   causes silent truncation and degraded responses.
+4. **Ignoring quantization effects** -- complex reasoning tasks at Q4 may need the full-precision model. Test critical prompts at your deployment precision.
 
-5. **Not testing quantized performance** — 4-bit models lose capability.
-   Complex reasoning tasks may need the full-precision model.
+5. **Over-relying on the context window** -- 128K is supported but 8B models lose coherence well before that limit. Use RAG to keep prompts focused.
+
+6. **Not setting stop tokens** -- without proper stop sequences (`<|eot_id|>`, `<|end_of_text|>`), the model may generate multi-turn conversations with itself.
