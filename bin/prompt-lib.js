@@ -217,22 +217,30 @@ async function composeCommand(prompts) {
 }
 
 function viewerCommand(prompts) {
-  const templatePath = join(__dirname, '..', 'viewer.html');
+  const viewerPath = join(__dirname, '..', 'viewer.html');
   let html;
   try {
-    html = readFileSync(templatePath, 'utf-8');
+    html = readFileSync(viewerPath, 'utf-8');
   } catch {
-    console.error('viewer.html template not found. Expected at:', templatePath);
+    console.error('viewer.html not found. Expected at:', viewerPath);
     process.exit(1);
   }
 
+  // If viewer.html already has embedded data, regenerate with fresh data
+  // If it has the placeholder, inject data into it
   const data = JSON.stringify(prompts, null, 0);
-  html = html.replace('/*__PROMPT_DATA__*/', `const PROMPTS = ${data};`);
+  const injection = `var PROMPTS = ${data};`;
+
+  if (html.includes('/*__PROMPT_DATA__*/')) {
+    html = html.replace('/*__PROMPT_DATA__*/', injection);
+  } else {
+    // Replace existing embedded data (between the script tag and the if check)
+    html = html.replace(/var PROMPTS = \[.*?\];/s, injection);
+  }
 
   const outPath = join(tmpdir(), 'prompt-library-viewer.html');
   writeFileSync(outPath, html, 'utf-8');
-  console.log(`  Viewer written to ${outPath}`);
-  console.log('  Opening in browser...');
+  console.log(`  Viewer opened with ${prompts.length} prompts`);
 
   try {
     execSync(`open "${outPath}"`, { stdio: 'ignore' });

@@ -165,15 +165,34 @@ to work through a "SQL Query Builder" template.
 
 ### Visual browser
 
-For a graphical overview of the whole library:
+There are two ways to use the visual prompt browser:
+
+**Option 1: open viewer.html directly**
+
+Just open `viewer.html` from the repo in any browser — double-click it or
+drag it into a browser window. All 52 prompts are embedded directly in the
+file, so it works offline with no server needed. You can bookmark it, share
+it with your team, or host it on any static site.
+
+**Option 2: use the CLI command**
 
 ```bash
 prompt-lib viewer
 ```
 
-This opens a single-page web viewer in your browser with search, category
-filters, tag filters, dark/light mode, and copy buttons. Works offline --
-everything is embedded in one HTML file.
+This generates a fresh version with the latest prompts (including any you've
+added yourself) and opens it in your default browser automatically.
+
+**What the viewer gives you:**
+
+- a searchable sidebar with all prompts grouped by category
+- real-time filtering as you type — results update instantly
+- clickable tag pills to filter by topic (reasoning, copywriting, sql, etc.)
+- full prompt content rendered in the main panel with formatted markdown
+- "copy template" and "copy full" buttons that put the content on your clipboard
+- dark/light mode toggle
+- responsive design — works on phones and tablets too
+- everything in a single HTML file, no dependencies, no server
 
 ### The manual way
 
