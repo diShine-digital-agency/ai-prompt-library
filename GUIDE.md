@@ -48,7 +48,7 @@ prompt-lib --help
 prompt-lib list
 ```
 
-This shows all 42 prompts organized by category. Each entry shows the slug
+This shows all 52 prompts organized by category. Each entry shows the slug
 (the name you use to reference it), the title, and the difficulty level.
 
 ### View Categories

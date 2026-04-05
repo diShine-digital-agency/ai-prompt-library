@@ -1,6 +1,6 @@
 # prompt-library
 
-**42 expert-level prompt templates with a CLI to search, browse, and use them.**
+**52 expert-level prompt templates with a CLI to search, browse, and use them.**
 
 If you work with LLMs regularly, you've probably got prompts scattered across Notion docs, Slack messages, and random text files. This library collects the prompting techniques, system prompts, and templates we actually use in client work -- organized, searchable, and ready to copy-paste. It covers everything from Chain-of-Thought fundamentals to production system prompts for specific use cases like code review, SEO briefs, and data analysis.
 
@@ -14,17 +14,17 @@ Built by [diShine](https://dishine.it)
 
 ## What's in here
 
-42 prompts across 7 categories:
+52 prompts across 7 categories:
 
 | Category | Count | What's covered |
 |----------|-------|----------------|
-| **frameworks** | 6 | core prompting techniques -- Chain-of-Thought, Few-Shot, ReAct, Tree-of-Thought, Role-Based, Meta-prompting |
-| **model-specific** | 6 | optimized patterns for Claude, GPT, Gemini, Llama, Mistral, plus a comparison guide |
-| **system-prompts** | 6 | production-ready system prompts for coding, writing, data analysis, research, executive assistant, support |
-| **marketing** | 6 | SEO briefs, email campaigns, social calendars, competitor analysis, ad copy, brand voice |
-| **development** | 6 | code review, API design, database schema, testing strategy, refactoring, architecture decisions |
-| **data** | 6 | SQL builder, data pipelines, dashboards, quality audits, statistics, visualization |
-| **business** | 6 | proposals, meeting summaries, OKRs, stakeholder updates, risk assessment, pitch decks |
+| **frameworks** | 9 | Chain-of-Thought, Few-Shot, ReAct, Tree-of-Thought, Role-Based, Meta-prompting, Constitutional AI, Prompt Chaining, Structured Extraction |
+| **model-specific** | 6 | deep technique guides for Claude, GPT, Gemini, Llama, Mistral, plus a side-by-side comparison |
+| **system-prompts** | 6 | production-ready system prompts for coding, writing, data analysis, research, executive advisor, support |
+| **marketing** | 8 | SEO briefs, email campaigns, social calendars, competitor analysis, ad copy, brand voice, conversion copywriting, LinkedIn content |
+| **development** | 8 | code review, API design, database schema, testing, refactoring, architecture decisions, prompt-as-code, debugging |
+| **data** | 7 | SQL builder, data pipelines, dashboards, quality audits, statistics, visualization, ETL automation |
+| **business** | 8 | proposals, meeting summaries, OKRs, stakeholder updates, risk assessment, pitch decks, client communication, competitive intelligence |
 
 These aren't generic "write me a blog post" prompts. They're structured templates with placeholders, examples, tips, and common mistakes -- the kind of thing you'd build up over months of actual use.
 
