@@ -1,5 +1,8 @@
-import { loadPrompts } from '../src/index.js';
+import { loadPrompts, findPlaceholders, extractTemplate, saveCustomPrompt, loadCustomPrompts, USER_DATA_DIR } from '../src/index.js';
 import { searchPrompts } from '../src/search.js';
+import { getFrameworks, getFramework, generatePrompt } from '../src/generator.js';
+import { existsSync, mkdirSync, writeFileSync, unlinkSync, rmSync } from 'fs';
+import { join } from 'path';
 
 let passed = 0;
 let failed = 0;
@@ -16,12 +19,12 @@ function assert(condition, msg) {
 
 console.log('Running tests...\n');
 
-// Test: Load prompts
+// ── Core: Load prompts ──
 const prompts = loadPrompts();
 assert(prompts.length > 0, `Loaded ${prompts.length} prompts (expected > 0)`);
 assert(prompts.length >= 42, `Loaded at least 42 prompts (got ${prompts.length})`);
 
-// Test: Each prompt has required fields
+// ── Core: Required fields ──
 const first = prompts[0];
 assert(typeof first.slug === 'string' && first.slug.length > 0, 'Prompt has slug');
 assert(typeof first.title === 'string' && first.title.length > 0, 'Prompt has title');
@@ -29,20 +32,68 @@ assert(typeof first.category === 'string', 'Prompt has category');
 assert(Array.isArray(first.tags), 'Prompt tags is an array');
 assert(typeof first.content === 'string' && first.content.length > 0, 'Prompt has content');
 
-// Test: Search returns results
+// ── Search ──
 const results = searchPrompts(prompts, 'chain of thought');
 assert(results.length > 0, `Search "chain of thought" returned ${results.length} results`);
 assert(results[0].score > 0, 'Top result has positive score');
 
-// Test: Search ranking — title match ranks higher
 const cot = results.find(r => r.slug === 'chain-of-thought');
 if (cot) {
   assert(cot.score >= 100, 'chain-of-thought prompt scores >= 100 for its own title');
 }
 
-// Test: Categories exist
+// ── Categories ──
 const categories = [...new Set(prompts.map(p => p.category))];
 assert(categories.length >= 7, `Found ${categories.length} categories (expected >= 7)`);
+
+// ── findPlaceholders ──
+const phs = findPlaceholders('Hello {{name}}, your {{task}} is {{name}} again');
+assert(phs.length === 2, `findPlaceholders found ${phs.length} unique placeholders (expected 2)`);
+assert(phs.includes('{{name}}'), 'findPlaceholders found {{name}}');
+assert(phs.includes('{{task}}'), 'findPlaceholders found {{task}}');
+
+const noPhs = findPlaceholders('No placeholders here');
+assert(noPhs.length === 0, 'findPlaceholders returns empty for no placeholders');
+
+// ── extractTemplate ──
+const sampleContent = `# Title\n\n## Template\n\n\`\`\`\nHello {{name}}\n\`\`\`\n\n## Tips`;
+const tpl = extractTemplate(sampleContent);
+assert(tpl !== null, 'extractTemplate extracts template section');
+assert(tpl.includes('{{name}}'), 'extractTemplate preserves placeholders');
+
+const noTplContent = '# Title\n\nNo template section here';
+assert(extractTemplate(noTplContent) === null, 'extractTemplate returns null when no template');
+
+// ── Generator: Framework listing ──
+const frameworks = getFrameworks();
+assert(frameworks.length >= 5, `Generator has ${frameworks.length} frameworks (expected >= 5)`);
+assert(frameworks.every(f => f.key && f.name && f.description), 'All frameworks have key, name, description');
+assert(frameworks.every(f => Array.isArray(f.questions)), 'All frameworks have questions array');
+
+// ── Generator: Prompt generation ──
+const expertResult = generatePrompt('expert-role', {
+  role: 'data analyst',
+  domain: 'business intelligence',
+  task: 'Build SQL queries from natural language',
+});
+assert(typeof expertResult === 'string' && expertResult.length > 100, 'expert-role generates a prompt');
+assert(expertResult.includes('data analyst'), 'Generated prompt includes the role');
+
+const cotResult = generatePrompt('chain-of-thought', {
+  task: 'Solve math problems',
+  domain: 'mathematics',
+  output: 'Step-by-step solution with final answer',
+});
+assert(typeof cotResult === 'string' && cotResult.length > 100, 'chain-of-thought generates a prompt');
+
+// ── Generator: Error handling ──
+let errorCaught = false;
+try {
+  generatePrompt('nonexistent-framework', {});
+} catch {
+  errorCaught = true;
+}
+assert(errorCaught, 'generatePrompt throws for unknown framework');
 
 console.log(`\nResults: ${passed} passed, ${failed} failed`);
 process.exit(failed > 0 ? 1 : 0);

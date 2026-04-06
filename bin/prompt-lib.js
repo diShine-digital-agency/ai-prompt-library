@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
-import { loadPrompts } from '../src/index.js';
+import { loadPrompts, saveCustomPrompt, loadSavedCompositions, saveComposition, findPlaceholders, extractTemplate } from '../src/index.js';
 import { searchPrompts } from '../src/search.js';
+import { getFrameworks, getFramework, generatePrompt } from '../src/generator.js';
 import {
   formatPromptList,
   formatPromptDetail,
@@ -19,10 +20,10 @@ import { tmpdir } from 'os';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const VERSION = '1.0.0';
+const VERSION = '2.0.0';
 
 const HELP = `
-  prompt-lib — Expert Prompt Engineering Library
+  prompt-lib — Expert Prompt Engineering Library v${VERSION}
   by diShine Digital Agency (https://dishine.it)
 
   Usage:
@@ -35,6 +36,9 @@ const HELP = `
     use <slug>            Build a prompt interactively (fill placeholders)
     copy <slug>           Copy a prompt template to clipboard
     compose               Combine system prompt + framework + template
+    create                Create a new system prompt with custom fields
+    generate              Dynamically generate a prompt from a framework
+    saved                 List saved compositions and custom prompts
     viewer                Open the visual prompt browser
     categories            List all categories with counts
     random                Show a random prompt
@@ -52,15 +56,6 @@ function copyToClipboard(text) {
   } catch {
     console.log('\n  (clipboard not available — copy manually from above)');
   }
-}
-
-function extractTemplate(content) {
-  const templateMatch = content.match(/## Template\s*\n+```[^\n]*\n([\s\S]*?)```/);
-  return templateMatch ? templateMatch[1] : null;
-}
-
-function findPlaceholders(text) {
-  return [...new Set(text.match(/\{\{[\w_-]+\}\}/g) || [])];
 }
 
 async function interactiveUse(slug, prompts) {
@@ -179,16 +174,20 @@ async function composeCommand(prompts) {
 
   // Build composite
   let composite = '';
+  const layers = [];
   if (selectedSystem) {
     const sysTemplate = extractTemplate(selectedSystem.content) || selectedSystem.content;
     composite += '# SYSTEM PROMPT\n\n' + sysTemplate.trim() + '\n\n';
+    layers.push(selectedSystem.title);
   }
   if (selectedFramework) {
     const fwTemplate = extractTemplate(selectedFramework.content) || selectedFramework.content;
     composite += '# REASONING FRAMEWORK\n\n' + fwTemplate.trim() + '\n\n';
+    layers.push(selectedFramework.title);
   }
   const domTemplate = extractTemplate(selectedDomain.content) || selectedDomain.content;
   composite += '# TASK TEMPLATE\n\n' + domTemplate.trim();
+  layers.push(selectedDomain.title);
 
   // Fill placeholders
   const placeholders = findPlaceholders(composite);
@@ -205,8 +204,6 @@ async function composeCommand(prompts) {
     }
   }
 
-  rl.close();
-
   console.log('\n' + line);
   console.log('  COMPOSED PROMPT');
   console.log(line + '\n');
@@ -214,6 +211,234 @@ async function composeCommand(prompts) {
   console.log('\n' + line);
 
   copyToClipboard(composite.trim());
+
+  // Ask to save
+  const doSave = await ask('\n  Save this composition? [y/N]: ');
+  if (doSave.toLowerCase() === 'y') {
+    saveComposition({
+      title: 'Composed: ' + layers.join(' + '),
+      result: composite.trim(),
+      layers,
+      type: 'composed',
+    });
+    console.log('  Saved to ~/.prompt-library/saved-prompts.json');
+  }
+
+  rl.close();
+}
+
+async function createCommand() {
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  const ask = (q) => new Promise(resolve => rl.question(q, resolve));
+
+  const line = '\u2500'.repeat(70);
+  console.log('\n' + line);
+  console.log('  CREATE — build a new system prompt with custom fields');
+  console.log(line);
+
+  // Gather metadata
+  const title = await ask('\n  Prompt title: ');
+  if (!title.trim()) { console.error('  Title is required.'); rl.close(); process.exit(1); }
+  const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+  const category = await ask('  Category (e.g., system-prompts, marketing, development): ');
+  const tagsRaw = await ask('  Tags (comma-separated): ');
+  const tags = tagsRaw.split(',').map(t => t.trim()).filter(Boolean);
+  const difficulty = await ask('  Difficulty (beginner/intermediate/advanced) [intermediate]: ') || 'intermediate';
+  const modelsRaw = await ask('  Models (comma-separated) [claude, gpt-4, gemini]: ') || 'claude, gpt-4, gemini';
+  const models = modelsRaw.split(',').map(m => m.trim()).filter(Boolean);
+
+  // Gather fields
+  console.log('\n  Now define the dynamic fields for this prompt.');
+  console.log('  These become {{field_name}} placeholders in the template.');
+  console.log('  Enter field names one per line. Empty line to finish.\n');
+
+  const fields = [];
+  while (true) {
+    const field = await ask('  Field name (empty to finish): ');
+    if (!field.trim()) break;
+    const fieldSlug = field.trim().replace(/\s+/g, '_').toLowerCase();
+    const description = await ask(`    Description for "${fieldSlug}": `);
+    fields.push({ name: fieldSlug, description: description || fieldSlug });
+  }
+
+  // Build the prompt content
+  console.log('\n  Now write the prompt body.');
+  console.log('  Use {{field_name}} to reference your fields.');
+  console.log('  Available fields: ' + fields.map(f => `{{${f.name}}}`).join(', '));
+  console.log('  Type your prompt (multi-line). Enter an empty line twice to finish.\n');
+
+  let body = '';
+  let emptyCount = 0;
+  while (true) {
+    const bodyLine = await ask('  > ');
+    if (bodyLine === '') {
+      emptyCount++;
+      if (emptyCount >= 2) break;
+      body += '\n';
+    } else {
+      emptyCount = 0;
+      body += bodyLine + '\n';
+    }
+  }
+  body = body.trim();
+
+  // Build full content with template section
+  let content = `# ${title}\n\n`;
+  if (fields.length > 0) {
+    content += `## Fields\n\n`;
+    for (const f of fields) {
+      content += `- **${f.name}**: ${f.description}\n`;
+    }
+    content += `\n`;
+  }
+  content += `## Template\n\n\`\`\`\n${body}\n\`\`\``;
+
+  const prompt = {
+    slug,
+    title,
+    category: category.trim() || 'custom',
+    tags,
+    difficulty,
+    models,
+    content,
+    path: 'custom/' + slug + '.md',
+    fields,
+    custom: true,
+  };
+
+  saveCustomPrompt(prompt);
+
+  console.log('\n' + line);
+  console.log(`  Created prompt: ${title}`);
+  console.log(`  Slug: ${slug}`);
+  console.log(`  Fields: ${fields.map(f => '{{' + f.name + '}}').join(', ') || '(none)'}`);
+  console.log(`  Saved to: ~/.prompt-library/custom-prompts.json`);
+  console.log(line);
+
+  // Offer to use it immediately
+  const doUse = await ask('\n  Fill and use this prompt now? [y/N]: ');
+  if (doUse.toLowerCase() === 'y') {
+    rl.close();
+    const prompts = loadPrompts();
+    await interactiveUse(slug, prompts);
+  } else {
+    console.log(`  Use it anytime with: prompt-lib use ${slug}`);
+    rl.close();
+  }
+}
+
+async function generateCommand() {
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  const ask = (q) => new Promise(resolve => rl.question(q, resolve));
+
+  const line = '\u2500'.repeat(70);
+  console.log('\n' + line);
+  console.log('  GENERATE — dynamically create a prompt from a framework');
+  console.log(line);
+
+  const frameworks = getFrameworks();
+  console.log('\n  Available frameworks:\n');
+  frameworks.forEach((fw, i) => {
+    console.log(`    ${i + 1}. ${fw.name}`);
+    console.log(`       ${fw.description}\n`);
+  });
+
+  const fwChoice = await ask('  Pick a framework: ');
+  const fwIdx = parseInt(fwChoice, 10) - 1;
+  if (fwIdx < 0 || fwIdx >= frameworks.length) {
+    console.error('  Invalid selection.');
+    rl.close();
+    process.exit(1);
+  }
+
+  const fw = frameworks[fwIdx];
+  const fwDetail = getFramework(fw.key);
+  console.log(`\n  Using: ${fw.name}`);
+  console.log(`  Answer the following questions:\n`);
+
+  const answers = {};
+  for (const q of fwDetail.questions) {
+    const required = q.required ? ' (required)' : ` [${q.default || 'optional'}]`;
+    const answer = await ask(`  ${q.label}${required}: `);
+    if (answer.trim()) {
+      answers[q.key] = answer.trim();
+    } else if (q.default !== undefined) {
+      answers[q.key] = q.default;
+    }
+  }
+
+  let result;
+  try {
+    result = generatePrompt(fw.key, answers);
+  } catch (err) {
+    console.error(`\n  Error: ${err.message}`);
+    rl.close();
+    process.exit(1);
+  }
+
+  console.log('\n' + line);
+  console.log('  GENERATED PROMPT');
+  console.log(line + '\n');
+  console.log(result);
+  console.log('\n' + line);
+
+  copyToClipboard(result);
+
+  // Offer to save
+  const doSave = await ask('\n  Save as a custom prompt? [y/N]: ');
+  if (doSave.toLowerCase() === 'y') {
+    const title = await ask('  Prompt title: ') || `Generated ${fw.name} prompt`;
+    const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+    const placeholders = findPlaceholders(result);
+    const fields = placeholders.map(ph => ({
+      name: ph.replace(/[{}]/g, ''),
+      description: ph.replace(/[{}]/g, '').replace(/[_-]/g, ' '),
+    }));
+
+    const content = `# ${title}\n\n## Template\n\n\`\`\`\n${result}\n\`\`\``;
+
+    saveCustomPrompt({
+      slug,
+      title,
+      category: 'custom',
+      tags: [fw.name.toLowerCase(), 'generated'],
+      difficulty: 'intermediate',
+      models: ['claude', 'gpt-4', 'gemini'],
+      content,
+      path: 'custom/' + slug + '.md',
+      fields,
+      custom: true,
+    });
+
+    console.log(`  Saved as "${slug}". Use it with: prompt-lib use ${slug}`);
+  }
+
+  rl.close();
+}
+
+function savedCommand() {
+  const line = '\u2500'.repeat(70);
+  const saved = loadSavedCompositions();
+
+  console.log('\n' + line);
+  console.log('  SAVED — your compositions and custom prompts');
+  console.log(line);
+
+  if (saved.length === 0) {
+    console.log('\n  No saved compositions yet.');
+    console.log('  Use "prompt-lib compose" or "prompt-lib create" to get started.\n');
+    return;
+  }
+
+  console.log(`\n  ${saved.length} saved item(s):\n`);
+  saved.forEach((s, i) => {
+    console.log(`    ${i + 1}. ${s.title}`);
+    console.log(`       Type: ${s.type} | Saved: ${new Date(s.date).toLocaleDateString()}`);
+    if (s.layers) console.log(`       Layers: ${s.layers.join(' + ')}`);
+    console.log();
+  });
 }
 
 function viewerCommand(prompts) {
@@ -314,6 +539,18 @@ async function main() {
     }
     case 'compose': {
       await composeCommand(prompts);
+      break;
+    }
+    case 'create': {
+      await createCommand();
+      break;
+    }
+    case 'generate': {
+      await generateCommand();
+      break;
+    }
+    case 'saved': {
+      savedCommand();
       break;
     }
     case 'viewer': {
