@@ -17,33 +17,51 @@ All notable changes to this project will be documented in this file.
   - `D` to toggle dark mode
   - `Esc` to clear search
 
-- **12 new expert prompt templates** (64 total):
+- **Image generation category** — New `prompts/image-generation/` category with 8 templates for AI image creation:
+  - Product photography, portraits & headshots, social media visuals
+  - Infographic layouts, character design, logo & branding
+  - Cinematic scene composition, art style transfer
+  - All with `{{fieldname}}` placeholders for easy customization
+
+- **18 new curated prompt templates** (82 total), inspired by proven community prompts:
   - `frameworks/mega-prompt` — Multi-section system prompt framework
   - `frameworks/prompt-evaluation` — Prompt quality evaluation and improvement
-  - `development/code-documentation` — Auto-generating code docs from source
-  - `development/git-commit-messages` — Writing conventional commit messages from diffs
+  - `frameworks/self-consistency` — Multi-path reasoning with voting
+  - `system-prompts/agentic-coder` — AI coding agent with planning and security
+  - `system-prompts/deep-researcher` — Multi-step research with citations
+  - `system-prompts/socratic-tutor` — Socratic method teaching assistant
+  - `system-prompts/technical-writer` — Technical writing assistant
+  - `development/code-documentation` — Auto-generating code docs
+  - `development/git-commit-messages` — Conventional commit messages from diffs
   - `development/code-refactoring-review` — Deep code refactoring analysis
-  - `marketing/landing-page-copy` — High-converting landing page copywriting
+  - `development/incident-response` — Incident response and post-mortems
+  - `development/system-design` — System design and architecture
+  - `marketing/landing-page-copy` — Landing page copywriting
   - `marketing/product-description` — E-commerce product descriptions
-  - `business/executive-summary` — Distilling documents for stakeholders
-  - `business/job-description` — Creating effective job listings
-  - `data/data-cleaning` — Data cleaning and transformation instructions
-  - `data/report-generator` — Structured reports from raw data
-  - `system-prompts/technical-writer` — Technical writing assistant system prompt
+  - `marketing/growth-experiment` — Growth experiment design
+  - `business/executive-summary` — Executive summaries from documents
+  - `business/job-description` — Job listing creation
+  - `business/sales-battlecard` — Competitive sales battlecards
+  - `business/investor-pitch` — Investor pitch deck outlines
+  - `data/data-cleaning` — Data cleaning instructions
+  - `data/report-generator` — Structured reports from data
+  - `data/ml-model-evaluation` — ML model evaluation and improvement
 
-- **UI animations** — Smooth fade-in, slide-in, and hover transitions for prompts, steps, and panels
+- **UI animations** — Smooth fade-in, slide-in, and hover transitions
 
-- **Fieldname badges** — Prompts with fillable fields show a ✎ badge with the field count. Clicking it opens Quick Fill.
+- **Fieldname badges** — Prompts with fillable fields show a ✎ badge with the field count
 
-- **Progress bar** — Quick Fill shows a visual progress bar tracking how many fields have been completed
+- **Progress bar** — Quick Fill shows a visual progress bar tracking completion
 
-- **Button feedback** — Copy and Save buttons show ✅ confirmation state after clicking
+- **Button feedback** — Copy and Save buttons show ✅ confirmation state
 
 ### Changed
 
-- README expanded with detailed Prompt Workshop documentation, keyboard shortcut reference, and beginner mode description
-- Tag display in HTML viewer now deduplicates — category no longer appears twice as both category label and tag
+- README expanded with detailed Prompt Workshop documentation, keyboard shortcut reference, beginner mode description, and image generation category
+- Tag display in HTML viewer now deduplicates — category no longer appears twice
 - Compose sidebar includes expanded guidance for beginners
+- Prompt count increased from 52 to 82 (30 new templates)
+- Categories increased from 7 to 8 (added image-generation)
 - Version bumped to 2.1.0
 
 ### Fixed

@@ -1,6 +1,6 @@
 # prompt-library
 
-**64+ expert-level prompt templates with a CLI and visual Prompt Workshop to search, browse, compose, create, and generate prompts.**
+**82+ expert-level prompt templates with a CLI and visual Prompt Workshop to search, browse, compose, create, and generate prompts.**
 
 If you work with LLMs regularly, you've probably got prompts scattered across Notion docs, Slack messages, and random text files. This library collects the prompting techniques, system prompts, and templates we actually use in client work — organized, searchable, and ready to copy-paste. It covers everything from Chain-of-Thought fundamentals to production system prompts for specific use cases like code review, SEO briefs, and data analysis.
 
@@ -56,17 +56,18 @@ Click the **?** button (top-right) to toggle beginner help tips. When enabled, e
 
 ## What's in here
 
-64+ prompts across 7 categories:
+82+ prompts across 8 categories:
 
 | Category | Count | What's covered |
 |----------|-------|----------------|
-| **frameworks** | 11 | Chain-of-Thought, Few-Shot, ReAct, Tree-of-Thought, Role-Based, Meta-prompting, Constitutional AI, Prompt Chaining, Structured Extraction, Mega-Prompt, Prompt Evaluation |
+| **frameworks** | 12 | Chain-of-Thought, Few-Shot, ReAct, Tree-of-Thought, Role-Based, Meta-prompting, Constitutional AI, Prompt Chaining, Structured Extraction, Mega-Prompt, Prompt Evaluation, Self-Consistency |
 | **model-specific** | 6 | deep technique guides for Claude, GPT, Gemini, Llama, Mistral, plus a side-by-side comparison |
-| **system-prompts** | 7 | production-ready system prompts for coding, writing, data analysis, research, executive advisor, support, technical writer |
-| **marketing** | 10 | SEO briefs, email campaigns, social calendars, competitor analysis, ad copy, brand voice, conversion copywriting, LinkedIn content, landing page copy, product descriptions |
-| **development** | 11 | code review, API design, database schema, testing, refactoring, architecture decisions, prompt-as-code, debugging, code documentation, git commits, code refactoring review |
-| **data** | 9 | SQL builder, data pipelines, dashboards, quality audits, statistics, visualization, ETL automation, data cleaning, report generation |
-| **business** | 10 | proposals, meeting summaries, OKRs, stakeholder updates, risk assessment, pitch decks, client communication, competitive intelligence, executive summaries, job descriptions |
+| **system-prompts** | 10 | production-ready system prompts for coding, writing, data analysis, research, executive advisor, support, technical writer, agentic coder, deep researcher, Socratic tutor |
+| **marketing** | 11 | SEO briefs, email campaigns, social calendars, competitor analysis, ad copy, brand voice, conversion copywriting, LinkedIn content, landing page copy, product descriptions, growth experiments |
+| **development** | 13 | code review, API design, database schema, testing, refactoring, architecture decisions, prompt-as-code, debugging, code documentation, git commits, code refactoring review, incident response, system design |
+| **data** | 10 | SQL builder, data pipelines, dashboards, quality audits, statistics, visualization, ETL automation, data cleaning, report generation, ML model evaluation |
+| **business** | 12 | proposals, meeting summaries, OKRs, stakeholder updates, risk assessment, pitch decks, client communication, competitive intelligence, executive summaries, job descriptions, sales battlecards, investor pitches |
+| **image-generation** | 8 | product photography, portraits, social media visuals, infographics, character design, logo & branding, cinematic scenes, art style transfer |
 | **custom** | ∞ | your own prompts created with `create` or `generate` |
 
 These aren't generic "write me a blog post" prompts. They're structured templates with placeholders, examples, tips, and common mistakes -- the kind of thing you'd build up over months of actual use.
@@ -151,9 +152,9 @@ Toggle the **?** button to enable contextual help banners in every tab. Each ban
 
 Navigate the Workshop with your keyboard: `1`–`5` to switch tabs, `Ctrl+K` to search, `H` for help, `D` for dark mode, `Esc` to clear search.
 
-### 12 new expert prompts
+### 30 new expert prompts (82 total)
 
-Added 12 new production-ready prompt templates with fieldnames: Mega-Prompt framework, Prompt Evaluation, Code Documentation, Git Commit Messages, Landing Page Copy, Executive Summary, Data Cleaning, Technical Writer, Product Description, Job Description, Code Refactoring Review, and Report Generator.
+Added 30 new production-ready prompt templates with fieldnames, including a new **image-generation** category with 8 templates for AI image creation (product photography, portraits, social media visuals, infographics, character design, logos, cinematic scenes, style transfer). Also added system prompts for agentic coding, deep research, and Socratic tutoring; business prompts for sales battlecards and investor pitches; development prompts for incident response and system design; and frameworks like self-consistency prompting. Curated from proven community prompt patterns.
 
 ### Earlier: v2.0.0
 
@@ -287,6 +288,7 @@ ai-prompt-library/
     development/           development templates
     data/                  data & analytics templates
     business/              business templates
+    image-generation/      image & visual AI prompt templates
   viewer.html              interactive Prompt Workshop (standalone, works offline)
   test/run.js              test suite
   CHANGELOG.md             version history
