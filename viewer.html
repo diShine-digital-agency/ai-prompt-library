@@ -125,12 +125,16 @@
     flex: 1;
     padding: 10px 4px;
     text-align: center;
-    font-size: 11px;
+    font-size: 0.75rem;
     font-weight: 600;
     cursor: pointer;
     border-bottom: 2px solid transparent;
     color: var(--text-dim);
     transition: all 0.15s;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   .nav-tab:hover { color: var(--text); }
   .nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
@@ -616,9 +620,22 @@ var storage = {
   }
 };
 
+var _cachedAllPrompts = null;
+var _cachedCustomVersion = null;
 function getAllPrompts() {
   var custom = storage.get('custom_prompts', []);
-  return PROMPTS.concat(custom);
+  var customVersion = JSON.stringify(custom);
+  if (_cachedAllPrompts && _cachedCustomVersion === customVersion) {
+    return _cachedAllPrompts;
+  }
+  _cachedCustomVersion = customVersion;
+  _cachedAllPrompts = PROMPTS.concat(custom);
+  return _cachedAllPrompts;
+}
+
+function invalidatePromptsCache() {
+  _cachedAllPrompts = null;
+  _cachedCustomVersion = null;
 }
 
 // ── startup ──
@@ -1911,6 +1928,7 @@ function saveCreatedPrompt() {
   if (idx !== -1) { custom[idx] = prompt; }
   else { custom.push(prompt); }
   storage.set('custom_prompts', custom);
+  invalidatePromptsCache();
 
   // Also save as a saved item
   var saved = storage.get('saved', []);
@@ -2138,6 +2156,7 @@ function executeGenerate(fwKey) {
     if (idx !== -1) custom[idx] = customPrompt;
     else custom.push(customPrompt);
     storage.set('custom_prompts', custom);
+    invalidatePromptsCache();
 
     var saved = storage.get('saved', []);
     saved.push({
