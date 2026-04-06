@@ -1,6 +1,6 @@
 # Prompt Library -- User Guide
 
-A practical, non-technical guide to getting started with the diShine Prompt Library.
+A practical, non-technical guide to getting started with the diShine Prompt Library v2.0.
 
 ---
 
@@ -48,8 +48,9 @@ prompt-lib --help
 prompt-lib list
 ```
 
-This shows all 52 prompts organized by category. Each entry shows the slug
+This shows all prompts organized by category. Each entry shows the slug
 (the name you use to reference it), the title, and the difficulty level.
+Custom prompts you've created also appear here.
 
 ### View Categories
 
@@ -159,11 +160,153 @@ It walks you through:
 3. Picking a domain template -- the actual task template (marketing, dev, data, etc.)
 
 The three pieces get combined into a single prompt, placeholders are filled
-in interactively, and the result is copied to clipboard. This is useful when
-you want, say, a "Data Analyst" persona using "Chain-of-Thought" reasoning
-to work through a "SQL Query Builder" template.
+in interactively, and the result is copied to clipboard. You can also save
+the composed prompt for later use.
 
-### Prompt Workshop (viewer.html)
+---
+
+## Creating Custom Prompts (New in v2.0)
+
+### CLI: `create` command
+
+Build a custom system prompt with dynamic fields:
+
+```bash
+prompt-lib create
+```
+
+You'll be guided through:
+1. **Metadata** — title, category, tags, difficulty, models
+2. **Dynamic fields** — define {{field_name}} placeholders with descriptions
+3. **Prompt body** — write the prompt using your fields
+4. **Save** — stored in `~/.prompt-library/custom-prompts.json`
+
+Custom prompts appear in `prompt-lib list`, `prompt-lib search`, and can be
+used with `prompt-lib use <slug>`.
+
+#### Example workflow
+
+```
+$ prompt-lib create
+
+  Title: Sales Objection Handler
+  Category: sales
+  Tags: sales, objections, responses
+  Difficulty: intermediate
+  Models: claude, gpt-4, gemini
+
+  Field name: objection
+    Description: The specific objection raised by the prospect
+  Field name: product
+    Description: Your product or service name
+  Field name: value_prop
+    Description: Key value proposition to emphasize
+
+  > You are a sales expert. A prospect has raised this objection:
+  > "{{objection}}"
+  >
+  > Product: {{product}}
+  > Key value: {{value_prop}}
+  >
+  > Provide 3 response strategies...
+```
+
+### HTML: Create tab
+
+The Prompt Workshop includes a **Create** tab with:
+- Form fields for all metadata
+- Interactive field builder (add/remove fields with descriptions)
+- Live preview showing how the prompt looks with fields highlighted
+- Save button that adds the prompt to your local library
+
+---
+
+## Generating Prompts from Frameworks (New in v2.0)
+
+### CLI: `generate` command
+
+Choose a proven framework, answer guided questions, and get a complete prompt:
+
+```bash
+prompt-lib generate
+```
+
+Available frameworks:
+
+| Framework | What it creates |
+|-----------|----------------|
+| **Expert Role-Based** | Expert persona with rules, constraints, output format |
+| **Chain-of-Thought** | Step-by-step reasoning enforcer |
+| **Structured Output** | Consistent, formatted output producer |
+| **Task Decomposition** | Complex task breaker-downer |
+| **Guardrails & Safety** | Safety-first prompt with topic boundaries |
+
+#### Example
+
+```
+$ prompt-lib generate
+
+  1. Expert Role-Based
+  2. Chain-of-Thought
+  3. Structured Output
+  4. Task Decomposition
+  5. Guardrails & Safety
+
+  Pick a framework: 1
+
+  Expert role: senior data analyst
+  Domain: business intelligence
+  Primary task: Build SQL queries from natural language descriptions
+  ...
+
+  ── GENERATED PROMPT ──
+  You are a senior data analyst with 10+ years of experience...
+```
+
+### HTML: Generate tab
+
+The Prompt Workshop includes a **Generate** tab with:
+- Visual framework selector with descriptions
+- Dynamic question forms based on the selected framework
+- One-click generation with instant preview
+- Save to library or download as `.md`
+
+---
+
+## Persistence and Data Storage
+
+### CLI storage
+
+All custom data is stored in `~/.prompt-library/`:
+
+| File | Contents |
+|------|----------|
+| `custom-prompts.json` | Your created prompts with fields and metadata |
+| `saved-prompts.json` | Saved compositions and generated prompts |
+
+### HTML storage
+
+The Prompt Workshop stores everything in browser localStorage:
+
+| Key | Contents |
+|-----|----------|
+| `pl_saved` | Favorites, filled prompts, composed prompts, custom prompts |
+| `pl_custom_prompts` | Custom prompts created in the Create tab |
+| `pl_dark` | Dark mode preference |
+
+You can export your library as JSON and import it on another device.
+
+### View saved items
+
+```bash
+prompt-lib saved
+```
+
+Shows all your saved compositions and custom prompts.
+
+---
+
+## Prompt Workshop (viewer.html)
 
 The Prompt Workshop is a full interactive web app that turns the library into
 something genuinely useful -- not just a reader, but a builder.
@@ -171,40 +314,36 @@ something genuinely useful -- not just a reader, but a builder.
 **How to open it:**
 
 - **Option 1**: open `viewer.html` from the repo directly in any browser.
-  All 52 prompts are embedded in the file, so it works offline.
+  All 52+ prompts are embedded in the file, so it works offline.
 - **Option 2**: run `prompt-lib viewer` to generate a fresh version with any
   prompts you've added, and open it in your default browser automatically.
 
-**Three tabs:**
+**Five tabs:**
 
 1. **Browse** -- the default. Shows all prompts in a searchable sidebar with
-   filters for category, difficulty, and model family (claude, gpt, gemini,
-   llama, mistral). Click a prompt to read it. Each prompt has:
-   - **Build this prompt** -- opens an interactive workshop with form fields
-     for every `{{placeholder}}`. A live preview updates as you type. Copy
-     the filled result, save it to My Library, or download it as `.md`.
-   - **Copy template** -- copies the template section to clipboard.
-   - **Copy all** -- copies the entire prompt content.
-   - **Save** -- bookmarks the prompt to your personal library.
-   - **Export** -- downloads the prompt as a `.md` file with frontmatter.
+   filters for category, difficulty, and model family. Click a prompt to read it.
+   Each prompt has Build, Copy, Save, and Export actions.
 
 2. **Compose** -- the layered prompt builder. Pick up to three layers:
-   - a system prompt (persona and rules)
-   - a reasoning framework (chain-of-thought, tree-of-thought, etc.)
-   - a task template (marketing, dev, data, business)
+   a system prompt, a reasoning framework, and a task template.
+   Fill in placeholders and save or copy the result.
 
-   Steps 1 and 2 are optional. The layers combine into one prompt, and you
-   fill in all the placeholders in an interactive form before copying.
+3. **Create** -- build custom system prompts with dynamic fields.
+   Define {{field_name}} placeholders, write the prompt body with a live
+   preview, and save to your library.
 
-3. **My Library** -- everything you've saved, stored in your browser's
-   localStorage (nothing leaves your machine). This includes:
-   - **Favorites** -- prompts you bookmarked from Browse.
-   - **Filled prompts** -- prompts you built with the Workshop, with all
-     your inputs preserved.
-   - **Composed prompts** -- multi-layer prompts from the Compose tab.
+4. **Generate** -- choose a framework, answer guided questions, and get
+   a production-ready prompt generated automatically. Save it as a custom
+   prompt for reuse.
 
-   You can export your entire library as JSON, import it on another device,
-   or download individual saved prompts as `.md`.
+5. **My Library** -- everything you've saved:
+   - **Favorites** -- prompts you bookmarked from Browse
+   - **Filled prompts** -- prompts you built with the Workshop
+   - **Composed prompts** -- multi-layer prompts from the Compose tab
+   - **Custom prompts** -- prompts you created or generated
+
+   Export your library as JSON, import on another device, or download
+   individual saved prompts as `.md`.
 
 **Other features:**
 
