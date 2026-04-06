@@ -1,10 +1,10 @@
 # prompt-library
 
-**52+ expert-level prompt templates with a CLI to search, browse, compose, create, and generate prompts.**
+**64+ expert-level prompt templates with a CLI and visual Prompt Workshop to search, browse, compose, create, and generate prompts.**
 
-If you work with LLMs regularly, you've probably got prompts scattered across Notion docs, Slack messages, and random text files. This library collects the prompting techniques, system prompts, and templates we actually use in client work -- organized, searchable, and ready to copy-paste. It covers everything from Chain-of-Thought fundamentals to production system prompts for specific use cases like code review, SEO briefs, and data analysis.
+If you work with LLMs regularly, you've probably got prompts scattered across Notion docs, Slack messages, and random text files. This library collects the prompting techniques, system prompts, and templates we actually use in client work — organized, searchable, and ready to copy-paste. It covers everything from Chain-of-Thought fundamentals to production system prompts for specific use cases like code review, SEO briefs, and data analysis.
 
-There's a CLI so you can search and read prompts from your terminal, **create custom system prompts** with dynamic fields, **generate prompts from frameworks**, and compose multi-layer prompts — all with persistence. There's also a standalone Prompt Workshop (just open `viewer.html`) with the same features in a visual interface, including field building, prompt generation, and a personal library.
+There's a CLI so you can search and read prompts from your terminal, **create custom system prompts** with dynamic fields, **generate prompts from frameworks**, and compose multi-layer prompts — all with persistence. There's also a standalone **Prompt Workshop** (just open `viewer.html`) with the same features in a visual interface, including field building, prompt generation, and a personal library.
 
 Zero npm dependencies. Just Node.js built-in modules.
 
@@ -12,19 +12,61 @@ Built by [diShine](https://dishine.it)
 
 ---
 
+## ⚡ Prompt Workshop (viewer.html)
+
+The **Prompt Workshop** is a standalone HTML file — no server, no build step, no internet required. Just open `viewer.html` in any browser and you get the full prompt library with an interactive interface.
+
+### What it does
+
+| Tab | Description |
+|-----|-------------|
+| **Browse** | Search and filter all 64+ prompts by category, difficulty, model, or keyword. Click any prompt to read the full content, copy it, or build it interactively. |
+| **Compose** | Build layered prompts by combining a **system prompt** (persona) + **reasoning framework** (technique) + **task template** (the work). All three combine into one powerful prompt. |
+| **Create** | Build your own custom prompts with dynamic `{{field_name}}` placeholders. Define fields, write the body, and save to your personal library. |
+| **Generate** | Pick a proven framework, answer guided questions, and get a production-ready system prompt generated automatically — no prompt engineering experience needed. |
+| **My Library** | All your saved prompts, filled templates, and compositions. Stored in your browser's localStorage — persists across sessions. |
+
+### Quick Fill & Compose
+
+Many prompts include `{{field_name}}` placeholders. When you open one, you'll see a **⚡ Quick Fill** button that gives you a streamlined experience:
+
+1. **Only the fields appear** — no distraction, just the inputs you need to fill
+2. **Field descriptions** tell you exactly what each placeholder expects
+3. **Live preview** updates as you type — see the assembled prompt in real time
+4. **Progress bar** tracks how many fields you've completed
+5. **One-click copy** — paste the filled prompt directly into your AI tool
+
+This is the fastest way to use templates from the library. No prompt engineering knowledge required.
+
+### Keyboard shortcuts
+
+| Key | Action |
+|-----|--------|
+| `1`–`5` | Switch between tabs (Browse, Compose, Create, Generate, My Library) |
+| `Ctrl+K` | Focus the search box |
+| `H` | Toggle beginner help tips on/off |
+| `D` | Toggle dark mode |
+| `Esc` | Clear search |
+
+### Beginner mode
+
+Click the **?** button (top-right) to toggle beginner help tips. When enabled, each tab shows contextual guidance explaining what the feature does, how to use it, and pro tips for better results. Perfect for people new to prompt engineering.
+
+---
+
 ## What's in here
 
-52+ prompts across 7+ categories:
+64+ prompts across 7 categories:
 
 | Category | Count | What's covered |
 |----------|-------|----------------|
-| **frameworks** | 9 | Chain-of-Thought, Few-Shot, ReAct, Tree-of-Thought, Role-Based, Meta-prompting, Constitutional AI, Prompt Chaining, Structured Extraction |
+| **frameworks** | 11 | Chain-of-Thought, Few-Shot, ReAct, Tree-of-Thought, Role-Based, Meta-prompting, Constitutional AI, Prompt Chaining, Structured Extraction, Mega-Prompt, Prompt Evaluation |
 | **model-specific** | 6 | deep technique guides for Claude, GPT, Gemini, Llama, Mistral, plus a side-by-side comparison |
-| **system-prompts** | 6 | production-ready system prompts for coding, writing, data analysis, research, executive advisor, support |
-| **marketing** | 8 | SEO briefs, email campaigns, social calendars, competitor analysis, ad copy, brand voice, conversion copywriting, LinkedIn content |
-| **development** | 8 | code review, API design, database schema, testing, refactoring, architecture decisions, prompt-as-code, debugging |
-| **data** | 7 | SQL builder, data pipelines, dashboards, quality audits, statistics, visualization, ETL automation |
-| **business** | 8 | proposals, meeting summaries, OKRs, stakeholder updates, risk assessment, pitch decks, client communication, competitive intelligence |
+| **system-prompts** | 7 | production-ready system prompts for coding, writing, data analysis, research, executive advisor, support, technical writer |
+| **marketing** | 10 | SEO briefs, email campaigns, social calendars, competitor analysis, ad copy, brand voice, conversion copywriting, LinkedIn content, landing page copy, product descriptions |
+| **development** | 11 | code review, API design, database schema, testing, refactoring, architecture decisions, prompt-as-code, debugging, code documentation, git commits, code refactoring review |
+| **data** | 9 | SQL builder, data pipelines, dashboards, quality audits, statistics, visualization, ETL automation, data cleaning, report generation |
+| **business** | 10 | proposals, meeting summaries, OKRs, stakeholder updates, risk assessment, pitch decks, client communication, competitive intelligence, executive summaries, job descriptions |
 | **custom** | ∞ | your own prompts created with `create` or `generate` |
 
 These aren't generic "write me a blog post" prompts. They're structured templates with placeholders, examples, tips, and common mistakes -- the kind of thing you'd build up over months of actual use.
@@ -95,7 +137,25 @@ prompt-lib --version
 
 ---
 
-## New in v2.0.0
+## New in v2.1.0
+
+### Quick Fill & Compose
+
+Prompts with `{{field_name}}` placeholders now have a **⚡ Quick Fill** button in the Prompt Workshop. This gives you a simplified, distraction-free flow: only the field inputs appear, with descriptions, a progress bar, and a live preview. Fill in your details and copy the assembled prompt — no prompt engineering experience needed.
+
+### Beginner mode
+
+Toggle the **?** button to enable contextual help banners in every tab. Each banner explains what the feature does, how to use it, and includes pro tips. Designed for people new to prompt engineering.
+
+### Keyboard shortcuts
+
+Navigate the Workshop with your keyboard: `1`–`5` to switch tabs, `Ctrl+K` to search, `H` for help, `D` for dark mode, `Esc` to clear search.
+
+### 12 new expert prompts
+
+Added 12 new production-ready prompt templates with fieldnames: Mega-Prompt framework, Prompt Evaluation, Code Documentation, Git Commit Messages, Landing Page Copy, Executive Summary, Data Cleaning, Technical Writer, Product Description, Job Description, Code Refactoring Review, and Report Generator.
+
+### Earlier: v2.0.0
 
 ### Create custom system prompts
 
