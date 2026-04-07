@@ -28,7 +28,7 @@ All notable changes to this project will be documented in this file.
   - Persistent data storage independent of browser
   - One-click install: double-click `.zip` → drag `.app` to Applications
   - Requires macOS 11+ and Xcode Command Line Tools to build
-  - Falls back to browser-wrapper version when built on Linux
+  - Falls back to Chrome/Edge/Chromium/Brave app mode when built without `swiftc`
 
 - **Linux Native App** — Native Linux application built with Python3 + GTK + WebKitGTK:
   - Runs in its own window — no browser needed (on most desktop Linux distros)
@@ -63,6 +63,13 @@ All notable changes to this project will be documented in this file.
 - Windows launcher now uses Edge app mode instead of opening in default browser
 - Linux launcher tries native GTK → browser app mode → regular browser (in that order)
 - Version bumped to 2.3.0
+
+### Fixed
+
+- **macOS app icon not showing in Dock** — The native macOS app now explicitly loads and sets the Dock icon from the bundle's `.icns` file using `NSApp.applicationIconImage`, fixing blank/generic icons on systems where the automatic `CFBundleIconFile` lookup doesn't work for `swiftc`-compiled apps
+- **macOS fallback app opening in default browser** — The non-native macOS build now tries Chrome, Chromium, Edge, and Brave in app mode (own window, no address bar) before falling back to the default browser. Previously it always opened `viewer.html` in the default browser with full browser chrome
+- **Build script messaging** — The macOS build script now shows clear warnings when building the fallback version instead of the native app, and tells you exactly how to get the native version (`xcode-select --install`)
+- **Desktop documentation** — Added troubleshooting entries for "app opens in browser" and "app icon missing", clarified the distinction between native and app-mode fallback builds, updated comparison table
 
 ## [2.2.1] — 2026-04-07
 

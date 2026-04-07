@@ -72,14 +72,50 @@ if $NATIVE; then
 
   echo "  → Native app compiled (runs in its own window, no browser needed)"
 else
-  # ── Fallback: browser-wrapper launcher ──
-  echo "  → Building browser-wrapper (not on macOS or swiftc unavailable)"
-  echo "  → For the native app, build on macOS with Xcode Command Line Tools"
+  # ── Fallback: app-mode launcher ──
+  echo ""
+  echo "  ⚠  swiftc not found — building app-mode fallback instead of native."
+  echo "  ⚠  The app will open in Chrome/Edge app mode (own window, no browser chrome)."
+  echo "  ⚠  For the fully native app, install Xcode Command Line Tools:"
+  echo "     xcode-select --install"
+  echo ""
   cat > "$OUTPUT_DIR/$APP_NAME.app/Contents/MacOS/$APP_NAME" << 'LAUNCHER'
 #!/bin/bash
-# Prompt Workshop launcher — opens the embedded HTML in the default browser
+# Prompt Workshop — app-mode launcher
+# Tries Chrome/Edge app mode (own window, no address bar) before falling back
+# to the default browser. For the fully native version, build on macOS with
+# Xcode Command Line Tools (xcode-select --install).
+
 DIR="$(cd "$(dirname "$0")/../Resources" && pwd)"
-open "$DIR/viewer.html"
+HTML="$DIR/viewer.html"
+DATA_DIR="${HOME:-/tmp}/.prompt-workshop-app"
+
+# Try Google Chrome app mode (own window, no browser chrome)
+CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+if [ -x "$CHROME" ]; then
+  exec "$CHROME" --app="file://$HTML" --user-data-dir="$DATA_DIR"
+fi
+
+# Try Chromium
+CHROMIUM="/Applications/Chromium.app/Contents/MacOS/Chromium"
+if [ -x "$CHROMIUM" ]; then
+  exec "$CHROMIUM" --app="file://$HTML" --user-data-dir="$DATA_DIR"
+fi
+
+# Try Microsoft Edge app mode
+EDGE="/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge"
+if [ -x "$EDGE" ]; then
+  exec "$EDGE" --app="file://$HTML" --user-data-dir="$DATA_DIR"
+fi
+
+# Try Brave app mode
+BRAVE="/Applications/Brave Browser.app/Contents/MacOS/Brave Browser"
+if [ -x "$BRAVE" ]; then
+  exec "$BRAVE" --app="file://$HTML" --user-data-dir="$DATA_DIR"
+fi
+
+# Fallback: default browser
+open "$HTML"
 LAUNCHER
   chmod +x "$OUTPUT_DIR/$APP_NAME.app/Contents/MacOS/$APP_NAME"
 fi
@@ -116,6 +152,13 @@ if $NATIVE; then
   echo "  ★ Native build — runs in its own window (no browser needed)"
   echo "  ★ Full macOS integration: menu bar, ⌘C/V, zoom, full screen"
   echo "  ★ Your saved data persists in the app's own storage"
+else
+  echo ""
+  echo "  ⚠ App-mode fallback build — requires Chrome, Edge, or Brave for own window"
+  echo "  ⚠ Falls back to default browser if none are installed"
+  echo "  ⚠ To get the fully native app, build on macOS with Xcode CLI Tools:"
+  echo "    xcode-select --install"
+  echo "    ./desktop/build-macos.sh"
 fi
 
 echo ""
