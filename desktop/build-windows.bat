@@ -21,8 +21,8 @@ REM Copy the HTML
 copy "%REPO_DIR%\viewer.html" "%INSTALL_DIR%\viewer.html" > nul
 
 REM Copy the icon
-if exist "%SCRIPT_DIR%icons\PromptWorkshop.ico" (
-    copy "%SCRIPT_DIR%icons\PromptWorkshop.ico" "%INSTALL_DIR%\PromptWorkshop.ico" > nul
+if exist "%SCRIPT_DIR%\icons\PromptWorkshop.ico" (
+    copy "%SCRIPT_DIR%\icons\PromptWorkshop.ico" "%INSTALL_DIR%\PromptWorkshop.ico" > nul
 )
 
 REM Create native VBS launcher — opens in Edge/Chrome app mode

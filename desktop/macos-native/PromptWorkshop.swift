@@ -36,7 +36,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         webView.autoresizingMask = [.width, .height]
 
         // Custom user agent so the page knows it's running in the native app
-        webView.customUserAgent = "PromptWorkshop-NativeApp/1.0"
+        if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
+            webView.customUserAgent = "PromptWorkshop-NativeApp/\(version)"
+        } else {
+            webView.customUserAgent = "PromptWorkshop-NativeApp"
+        }
 
         window.contentView!.addSubview(webView)
 

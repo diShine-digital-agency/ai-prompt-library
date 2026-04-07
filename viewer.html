@@ -3026,7 +3026,7 @@ function browserLintPrompt(text) {
 
 var DOMAIN_SIGNALS = {
   coding: {
-    keywords: /\b(code|programming|developer|software|api|debug|refactor|test|function|class|module|deploy|git|bug|feature|backend|frontend|fullstack|algorithm|database|sql|javascript|python|typescript|java|html|css|react|node|docker|pull request|commit|repository)\b/i,
+    keywords: /\b(code|programming|developer|software|api|debug|refactor|test|function|class|module|deploy|git|bug|feature|backend|frontend|fullstack|algorithm|database|sql|javascript|python|typescript|java|c\+\+|rust|go|html|css|react|node|docker|ci\/cd|pull request|commit|repository)\b/i,
     role: 'senior software engineer with deep expertise in software architecture and clean code practices',
     constraints: ['Follow established coding conventions and style guides','Prioritize readability, maintainability, and testability','Include error handling and edge cases','Suggest relevant design patterns when applicable'],
     outputFormat: 'Respond with well-commented code blocks. Use markdown code fences with the appropriate language tag. Explain key decisions briefly above each code block.',
