@@ -3,6 +3,9 @@
 import { loadPrompts, saveCustomPrompt, loadSavedCompositions, saveComposition, findPlaceholders, extractTemplate } from '../src/index.js';
 import { searchPrompts } from '../src/search.js';
 import { getFrameworks, getFramework, generatePrompt } from '../src/generator.js';
+import { lintPrompt, formatLintResult } from '../src/linter.js';
+import { optimizePrompt } from '../src/optimizer.js';
+import { buildRecommendation } from '../src/recommender.js';
 import {
   formatPromptList,
   formatPromptDetail,
@@ -20,7 +23,7 @@ import { tmpdir } from 'os';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const VERSION = '2.0.0';
+const VERSION = '2.2.0';
 
 const HELP = `
   prompt-lib — Expert Prompt Engineering Library v${VERSION}
@@ -38,6 +41,9 @@ const HELP = `
     compose               Combine system prompt + framework + template
     create                Create a new system prompt with custom fields
     generate              Dynamically generate a prompt from a framework
+    lint                  Analyze a prompt for quality issues (0-100 score)
+    optimize              Rewrite a prompt with best practices
+    recommend <query>     Get smart prompt suggestions for your use case
     saved                 List saved compositions and custom prompts
     viewer                Open the visual prompt browser
     categories            List all categories with counts
@@ -441,6 +447,136 @@ function savedCommand() {
   });
 }
 
+async function lintCommand() {
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  const ask = (q) => new Promise(resolve => rl.question(q, resolve));
+
+  const line = '\u2500'.repeat(70);
+  console.log('\n' + line);
+  console.log('  LINT — analyze your prompt for quality issues');
+  console.log(line);
+  console.log('\n  Paste your prompt below (multi-line). Enter an empty line twice to finish.\n');
+
+  let text = '';
+  let emptyCount = 0;
+  while (true) {
+    const inputLine = await ask('  > ');
+    if (inputLine === '') {
+      emptyCount++;
+      if (emptyCount >= 2) break;
+      text += '\n';
+    } else {
+      emptyCount = 0;
+      text += inputLine + '\n';
+    }
+  }
+  rl.close();
+
+  text = text.trim();
+  if (!text) {
+    console.error('  No prompt provided.');
+    process.exit(1);
+  }
+
+  const result = lintPrompt(text);
+  console.log('\n' + line);
+  console.log('  LINT RESULTS');
+  console.log(line);
+  console.log(formatLintResult(result));
+}
+
+async function optimizeCommand() {
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  const ask = (q) => new Promise(resolve => rl.question(q, resolve));
+
+  const line = '\u2500'.repeat(70);
+  console.log('\n' + line);
+  console.log('  OPTIMIZE — rewrite your prompt with best practices');
+  console.log(line);
+  console.log('\n  Paste your prompt below (multi-line). Enter an empty line twice to finish.\n');
+
+  let text = '';
+  let emptyCount = 0;
+  while (true) {
+    const inputLine = await ask('  > ');
+    if (inputLine === '') {
+      emptyCount++;
+      if (emptyCount >= 2) break;
+      text += '\n';
+    } else {
+      emptyCount = 0;
+      text += inputLine + '\n';
+    }
+  }
+
+  text = text.trim();
+  if (!text) {
+    console.error('  No prompt provided.');
+    rl.close();
+    process.exit(1);
+  }
+
+  const result = optimizePrompt(text);
+
+  console.log('\n' + line);
+  console.log('  OPTIMIZED PROMPT');
+  console.log(line + '\n');
+  console.log(result.optimized);
+  console.log('\n' + line);
+
+  console.log(`\n  Score: ${result.scoreBefore} → ${result.scoreAfter} (+${result.improvement})`);
+  if (result.changes.length > 0) {
+    console.log('  Changes made:');
+    for (const c of result.changes) {
+      console.log(`    • ${c}`);
+    }
+  }
+
+  copyToClipboard(result.optimized);
+  rl.close();
+}
+
+function recommendCommand(prompts, query) {
+  const line = '\u2500'.repeat(70);
+
+  if (!query) {
+    console.log('\n  Usage: prompt-lib recommend <describe what you need>');
+    console.log('  Example: prompt-lib recommend "I need to write a landing page for a SaaS product"');
+    return;
+  }
+
+  console.log('\n' + line);
+  console.log(`  RECOMMENDATIONS for: "${query}"`);
+  console.log(line);
+
+  const rec = buildRecommendation(prompts, query);
+
+  if (!rec.suggestedCombo) {
+    console.log('\n  ' + rec.message);
+    return;
+  }
+
+  console.log('\n  Suggested combination:\n');
+  if (rec.suggestedCombo.systemPrompt) {
+    console.log(`    🧠 System prompt:  ${rec.suggestedCombo.systemPrompt.title} (${rec.suggestedCombo.systemPrompt.slug})`);
+  }
+  if (rec.suggestedCombo.framework) {
+    console.log(`    🔧 Framework:      ${rec.suggestedCombo.framework.title} (${rec.suggestedCombo.framework.slug})`);
+  }
+  if (rec.suggestedCombo.template) {
+    console.log(`    📝 Template:       ${rec.suggestedCombo.template.title} (${rec.suggestedCombo.template.slug})`);
+  }
+
+  console.log('\n  Top matching prompts:\n');
+  for (const p of rec.topPrompts.slice(0, 8)) {
+    console.log(`    ${p.title}`);
+    console.log(`      slug: ${p.slug} | category: ${p.category} | score: ${p.relevanceScore}`);
+  }
+
+  console.log(`\n  Use "prompt-lib use <slug>" to build any prompt interactively.`);
+  console.log(`  Use "prompt-lib compose" to combine multiple layers.\n`);
+}
+
 function viewerCommand(prompts) {
   const viewerPath = join(__dirname, '..', 'viewer.html');
   let html;
@@ -551,6 +687,19 @@ async function main() {
     }
     case 'saved': {
       savedCommand();
+      break;
+    }
+    case 'lint': {
+      await lintCommand();
+      break;
+    }
+    case 'optimize': {
+      await optimizeCommand();
+      break;
+    }
+    case 'recommend': {
+      const query = args.slice(1).join(' ');
+      recommendCommand(prompts, query);
       break;
     }
     case 'viewer': {

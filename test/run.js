@@ -95,5 +95,58 @@ try {
 }
 assert(errorCaught, 'generatePrompt throws for unknown framework');
 
+// ── Linter ──
+import { lintPrompt, LINT_RULES } from '../src/linter.js';
+
+const goodPrompt = `You are a senior data analyst with 10 years of experience.
+
+TASK:
+Your task is to analyze the provided dataset and generate insights.
+
+CONTEXT:
+Given the following sales data for Q4 2025.
+
+OUTPUT FORMAT:
+Respond in structured markdown with headings.
+
+RULES:
+- Always provide specific numbers
+- Never guess — acknowledge uncertainty
+- Be professional and concise
+
+Before responding, verify that your analysis is complete and accurate.
+
+For example, if you see a spike in December, explain possible seasonal factors.`;
+
+const lintGood = lintPrompt(goodPrompt);
+assert(lintGood.score >= 70, `Linter scores good prompt at ${lintGood.score} (expected >= 70)`);
+assert(lintGood.grade === 'A' || lintGood.grade === 'B', `Linter grades good prompt as ${lintGood.grade}`);
+assert(lintGood.passedCount > lintGood.failedCount, 'Good prompt has more passes than fails');
+
+const badPrompt = 'please help me write something good and nice';
+const lintBad = lintPrompt(badPrompt);
+assert(lintBad.score < 40, `Linter scores bad prompt at ${lintBad.score} (expected < 40)`);
+assert(lintBad.suggestions.length > 3, `Bad prompt gets ${lintBad.suggestions.length} suggestions (expected > 3)`);
+
+assert(LINT_RULES.length >= 10, `Linter has ${LINT_RULES.length} rules (expected >= 10)`);
+
+// ── Optimizer ──
+import { optimizePrompt } from '../src/optimizer.js';
+
+const optimized = optimizePrompt('please please please write me a nice blog post about AI');
+assert(optimized.scoreAfter > optimized.scoreBefore, `Optimizer improves score: ${optimized.scoreBefore} → ${optimized.scoreAfter}`);
+assert(optimized.changes.length > 0, `Optimizer made ${optimized.changes.length} changes`);
+assert(optimized.optimized.length > optimized.original.length, 'Optimized prompt is more detailed');
+
+// ── Recommender ──
+import { recommendPrompts, buildRecommendation } from '../src/recommender.js';
+
+const recs = recommendPrompts(prompts, 'write marketing copy for a landing page');
+assert(recs.length > 0, `Recommender found ${recs.length} matches for marketing query`);
+assert(recs[0].relevanceScore > 0, 'Top recommendation has positive score');
+
+const combo = buildRecommendation(prompts, 'I need to review code for security issues');
+assert(combo.topPrompts.length > 0, `Recommendation combo has ${combo.topPrompts.length} prompts`);
+
 console.log(`\nResults: ${passed} passed, ${failed} failed`);
 process.exit(failed > 0 ? 1 : 0);
