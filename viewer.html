@@ -3021,66 +3021,314 @@ function browserLintPrompt(text) {
   return { score:score, grade:grade, passed:passed, failed:failed, suggestions:failed.sort(function(a,b){return b.weight-a.weight;}).map(function(r){return r.suggestion;}), wordCount:text.split(/\s+/).length };
 }
 
-// ── PROMPT OPTIMIZER (browser version) ──
+// ── PROMPT OPTIMIZER (browser version — dynamic, content-aware) ──
+
+var DOMAIN_SIGNALS = {
+  coding: {
+    keywords: /\b(code|programming|developer|software|api|debug|refactor|test|function|class|module|deploy|git|bug|feature|backend|frontend|fullstack|algorithm|database|sql|javascript|python|typescript|java|html|css|react|node|docker|pull request|commit|repository)\b/i,
+    role: 'senior software engineer with deep expertise in software architecture and clean code practices',
+    constraints: ['Follow established coding conventions and style guides','Prioritize readability, maintainability, and testability','Include error handling and edge cases','Suggest relevant design patterns when applicable'],
+    outputFormat: 'Respond with well-commented code blocks. Use markdown code fences with the appropriate language tag. Explain key decisions briefly above each code block.',
+    qualityCheck: 'Before responding, verify that the code compiles/runs correctly, handles edge cases, follows best practices, and includes appropriate error handling.',
+    tone: 'technical, precise, and practical',
+    exampleHint: 'Example input:\n```\n// Paste a sample input here\n```\n\nExpected output:\n```\n// Describe the expected result\n```'
+  },
+  writing: {
+    keywords: /\b(write|blog|article|copy|content|essay|email|letter|documentation|story|narrative|draft|publish|headline|paragraph|outline|creative writing|copywriting|technical writing|editing|proofread)\b/i,
+    role: 'experienced content strategist and professional writer with expertise in clear, engaging communication',
+    constraints: ['Use clear, concise language appropriate to the target audience','Maintain a consistent tone and voice throughout','Structure content with logical flow and smooth transitions','Support claims with specific details or examples'],
+    outputFormat: 'Respond in well-structured prose with clear headings, short paragraphs, and a logical narrative flow. Use markdown formatting.',
+    qualityCheck: 'Before responding, verify that the writing is clear, free of jargon (unless appropriate), logically structured, and engaging for the target audience.',
+    tone: 'clear, engaging, and well-paced',
+    exampleHint: 'Example of desired style:\n> Paste a paragraph in the tone/style you want here.'
+  },
+  marketing: {
+    keywords: /\b(marketing|seo|social media|campaign|ads|brand|landing page|conversion|funnel|audience|engagement|roi|analytics|growth|lead|cta|value proposition|positioning|competitor|market research)\b/i,
+    role: 'senior marketing strategist with expertise in digital marketing, brand positioning, and conversion optimization',
+    constraints: ['Ground recommendations in data and measurable outcomes','Consider the target audience demographics and psychographics','Align suggestions with brand voice and positioning','Include specific, actionable next steps with expected impact'],
+    outputFormat: 'Respond with clear sections covering strategy, tactics, and metrics. Use bullet points for actionable items. Include specific KPIs to track success.',
+    qualityCheck: 'Before responding, verify that recommendations are actionable, measurable, aligned with the stated goals, and realistic for the described context.',
+    tone: 'persuasive, data-driven, and actionable',
+    exampleHint: 'Example campaign brief or reference:\n> Describe a successful campaign you want to emulate.'
+  },
+  data: {
+    keywords: /\b(data|analysis|sql|database|dashboard|report|statistics|visualization|csv|excel|analytics|metrics|dataset|query|aggregate|trend|forecast|machine learning|ml|ai model|prediction|regression|classification|etl|pipeline)\b/i,
+    role: 'senior data analyst with expertise in statistical analysis, data visualization, and deriving actionable insights from complex datasets',
+    constraints: ['Cite specific data points and statistical measures','Distinguish between correlation and causation','Acknowledge data limitations and confidence levels','Present findings with appropriate precision — avoid false accuracy'],
+    outputFormat: 'Respond with structured analysis including: summary of findings, methodology, key insights (with supporting data), and recommended actions. Use tables for comparative data.',
+    qualityCheck: 'Before responding, verify that the analysis is statistically sound, conclusions are supported by the data, limitations are acknowledged, and recommendations are actionable.',
+    tone: 'analytical, precise, and objective',
+    exampleHint: 'Sample data:\n```\n| Column1 | Column2 |\n|---------|----------|\n| value   | value    |\n```'
+  },
+  business: {
+    keywords: /\b(business|proposal|meeting|stakeholder|strategy|okr|pitch|client|budget|revenue|profit|operations|management|leadership|negotiation|contract|vendor|project plan|risk assessment|swot|kpi|quarterly|annual)\b/i,
+    role: 'experienced business consultant with expertise in strategic planning, operations management, and stakeholder communication',
+    constraints: ['Frame recommendations in terms of business impact and ROI','Consider risks, dependencies, and resource constraints','Use concrete numbers and timelines where possible','Address stakeholder concerns and alignment'],
+    outputFormat: 'Respond with an executive summary followed by detailed analysis. Use bullet points for recommendations. Include timeline, resource requirements, and risk considerations.',
+    qualityCheck: 'Before responding, verify that recommendations are financially sound, risks are addressed, timelines are realistic, and the proposal is ready for stakeholder review.',
+    tone: 'professional, strategic, and concise',
+    exampleHint: 'Example deliverable:\n> Describe or paste a sample of the output format you expect.'
+  },
+  education: {
+    keywords: /\b(teach|explain|tutor|learn|student|course|education|lesson|curriculum|quiz|assessment|pedagogy|simplify|break down|step by step|beginner|concept|understand)\b/i,
+    role: 'experienced educator and subject matter expert skilled at breaking down complex concepts into clear, digestible explanations',
+    constraints: ['Build from foundational concepts to advanced topics','Use analogies and real-world examples to illustrate abstract ideas','Check for understanding with questions or summaries','Adapt complexity to the learner\'s stated level'],
+    outputFormat: 'Respond with a clear explanation structured from simple to complex. Use numbered steps for processes, include examples for each concept, and end with a brief summary.',
+    qualityCheck: 'Before responding, verify that the explanation is accurate, accessible to the target audience, logically ordered, and includes helpful examples.',
+    tone: 'clear, encouraging, and accessible',
+    exampleHint: 'Example explanation level:\n> "Explain it like I\'m a college freshman studying computer science."'
+  },
+  image: {
+    keywords: /\b(image|photo|visual|design|logo|illustration|portrait|scene|art|render|drawing|graphic|aesthetic|composition|lighting|style|midjourney|dall-e|stable diffusion|photorealistic|cinematic)\b/i,
+    role: 'expert visual artist and AI image prompt engineer with deep knowledge of art styles, composition, lighting, and how to translate visual concepts into effective AI image prompts',
+    constraints: ['Include specific details about composition, lighting, and mood','Reference concrete art styles or artists for clarity','Specify aspect ratio, resolution, and technical parameters','Use descriptive, sensory language rather than abstract terms'],
+    outputFormat: 'Respond with a detailed image prompt that includes: subject, style, composition, lighting, mood, color palette, and any technical parameters. Separate negative prompts if applicable.',
+    qualityCheck: 'Before responding, verify that the image description is specific enough to produce consistent results, includes all necessary visual parameters, and avoids ambiguous language.',
+    tone: 'descriptive, vivid, and specific',
+    exampleHint: 'Example reference:\n> "Style similar to Studio Ghibli backgrounds — soft lighting, pastel colors, detailed nature."'
+  }
+};
+
+var VAGUE_REPLACEMENTS = [
+  { pattern: /\b(a |the )?good (way|approach|method|solution)\b/gi, replacement: 'an effective, well-reasoned $2' },
+  { pattern: /\bmake it good\b/gi, replacement: 'ensure it is clear, thorough, and well-structured' },
+  { pattern: /\bdo a good job\b/gi, replacement: 'produce high-quality, accurate work' },
+  { pattern: /\bsomething good\b/gi, replacement: 'a well-crafted, effective result' },
+  { pattern: /\bsomething nice\b/gi, replacement: 'a polished, professional result' },
+  { pattern: /\bnice (\w+)\b/gi, replacement: 'well-crafted, polished $1' },
+  { pattern: /\bgood (\w+)\b/gi, replacement: 'high-quality $1' },
+  { pattern: /\bproper(ly)?\b/gi, replacement: 'correct$1 and following established standards' },
+  { pattern: /\bappropriate\b/gi, replacement: 'suitable for the stated context and audience' },
+  { pattern: /\binteresting\b/gi, replacement: 'insightful and thought-provoking' },
+  { pattern: /\bas much as possible\b/gi, replacement: 'comprehensively, covering all key aspects' },
+  { pattern: /\betc\.?\b/gi, replacement: 'and related items' },
+  { pattern: /\bstuff\b/gi, replacement: 'components' },
+  { pattern: /\bthings\b/gi, replacement: 'elements' }
+];
+
+var WEAK_VERB_PATTERNS = [
+  { pattern: /\b(can you|could you) /gi, replacement: '' },
+  { pattern: /\bi want you to /gi, replacement: '' },
+  { pattern: /\bi need you to /gi, replacement: '' },
+  { pattern: /\bi would like you to /gi, replacement: '' },
+  { pattern: /\btry to /gi, replacement: '' },
+  { pattern: /\bmaybe /gi, replacement: '' },
+  { pattern: /\bif possible,? /gi, replacement: '' },
+  { pattern: /\bkind of /gi, replacement: '' },
+  { pattern: /\bsort of /gi, replacement: '' },
+  { pattern: /\bjust /gi, replacement: '' }
+];
+
+var FILLER_PATTERNS = [
+  /\b(basically|essentially|actually|literally|honestly|obviously|clearly|simply put|in other words|as you know|it goes without saying|needless to say)\b,?\s*/gi,
+  /\b(I think|I believe|I feel like|in my opinion|from my perspective)\s+/gi
+];
+
+function detectDomainBrowser(text) {
+  var lower = text.toLowerCase();
+  var best = { domain: null, score: 0, config: null };
+  var domains = Object.keys(DOMAIN_SIGNALS);
+  for (var i = 0; i < domains.length; i++) {
+    var d = domains[i];
+    var matches = lower.match(DOMAIN_SIGNALS[d].keywords);
+    var score = matches ? matches.length : 0;
+    if (score > best.score) {
+      best = { domain: d, score: score, config: DOMAIN_SIGNALS[d] };
+    }
+  }
+  return best.score > 0 ? best : { domain: 'general', score: 0, config: null };
+}
+
+function detectAudienceBrowser(text) {
+  var map = [
+    { pattern: /\b(beginner|newbie|novice|introductory|basic|simple)\b/i, audience: 'beginners', tone: 'approachable and jargon-free' },
+    { pattern: /\b(expert|advanced|senior|experienced|deep dive|in-depth)\b/i, audience: 'experts', tone: 'technical and detailed' },
+    { pattern: /\b(executive|c-suite|leadership|board|stakeholder|ceo|cfo|cto)\b/i, audience: 'executives', tone: 'concise, strategic, and results-focused' },
+    { pattern: /\b(student|learner|class|course|assignment|homework)\b/i, audience: 'students', tone: 'clear, educational, and encouraging' },
+    { pattern: /\b(client|customer|user|end.user|consumer)\b/i, audience: 'clients', tone: 'professional and clear' },
+    { pattern: /\b(developer|engineer|programmer|tech team)\b/i, audience: 'developers', tone: 'technical and precise' }
+  ];
+  for (var i = 0; i < map.length; i++) {
+    if (map[i].pattern.test(text)) return { audience: map[i].audience, tone: map[i].tone };
+  }
+  return null;
+}
+
 function browserOptimizePrompt(text) {
   if (!text || text.trim().length < 10) return { optimized: text, changes: [], scoreBefore: 0, scoreAfter: 0 };
   var lint = browserLintPrompt(text);
   var changes = [];
-  var sections = [];
-  var cleaned = text.trim();
+  var working = text.trim();
+
+  // Detect domain and context
+  var domain = detectDomainBrowser(working);
+  var audience = detectAudienceBrowser(working);
+
+  // Remove filler words
+  var fillerCount = 0;
+  for (var fi = 0; fi < FILLER_PATTERNS.length; fi++) {
+    var before = working;
+    working = working.replace(FILLER_PATTERNS[fi], '');
+    if (working !== before) fillerCount++;
+  }
+  if (fillerCount > 0) {
+    working = working.replace(/\s{2,}/g, ' ').trim();
+    changes.push('Removed filler words and redundant phrases for clarity');
+  }
 
   // Remove excessive please
-  var pleaseCount = (cleaned.match(/\bplease\b/gi)||[]).length;
+  var pleaseCount = (working.match(/\bplease\b/gi)||[]).length;
   if (pleaseCount > 2) {
     var ct = 0;
-    cleaned = cleaned.replace(/\bplease\b/gi, function(m) { ct++; return ct<=1?m:''; });
-    cleaned = cleaned.replace(/\s{2,}/g, ' ');
-    changes.push('Reduced excessive "please" usage');
+    working = working.replace(/\bplease\b/gi, function(m) { ct++; return ct<=1?m:''; });
+    working = working.replace(/\s{2,}/g, ' ');
+    changes.push('Reduced excessive "please" usage (direct instructions work better)');
   }
 
-  // Check if role is missing
-  var hasRole = /you are|act as|role:|persona:|as a/i.test(cleaned);
-  if (!hasRole) {
-    sections.push('You are an expert assistant specialized in the following task.');
-    changes.push('Added role definition');
+  // Strengthen weak verbs
+  var verbCount = 0;
+  for (var wi = 0; wi < WEAK_VERB_PATTERNS.length; wi++) {
+    var bef = working;
+    working = working.replace(WEAK_VERB_PATTERNS[wi].pattern, WEAK_VERB_PATTERNS[wi].replacement);
+    if (working !== bef) verbCount++;
+  }
+  if (verbCount > 0) {
+    working = working.replace(/(^|[.!?]\s+)([a-z])/g, function(_, pre, letter) { return pre + letter.toUpperCase(); });
+    changes.push('Replaced weak/hedging language with direct instructions');
   }
 
-  // Check if already structured
-  var hasHeaders = /^(#{1,3} |[A-Z][A-Z ]+:)/m.test(cleaned);
-  if (!hasHeaders) {
-    // Extract role if present
-    var roleMatch = cleaned.match(/you are (?:a |an )?(.+?)(?:\.|,)/i);
-    if (roleMatch) {
-      sections.push('ROLE:\n' + roleMatch[1].trim());
-      cleaned = cleaned.replace(roleMatch[0], '').trim();
+  // Replace vague language
+  var vagueCount = 0;
+  for (var vi = 0; vi < VAGUE_REPLACEMENTS.length; vi++) {
+    var bv = working;
+    working = working.replace(VAGUE_REPLACEMENTS[vi].pattern, VAGUE_REPLACEMENTS[vi].replacement);
+    if (working !== bv) vagueCount++;
+  }
+  if (vagueCount > 0) {
+    changes.push('Replaced vague language with specific, measurable terms');
+  }
+
+  // Build structured sections
+  var sections = [];
+  var hasHeaders = /^(#{1,3} |[A-Z][A-Z ]+:)/m.test(working);
+  var existingRole = working.match(/you are (?:a |an )?(.+?)(?:\.|,|$)/i);
+  var hasRoleRule = lint.passed.find(function(r){return r.id==='has-role';});
+
+  // Domain-specific role
+  if (!hasRoleRule) {
+    if (domain.config) {
+      sections.push('You are a ' + domain.config.role + '.');
+      changes.push('Added domain-specific role (' + domain.domain + ')');
+    } else {
+      var intentMatch = working.match(/(?:write|create|generate|analyze|review|build|design|explain|summarize) (.+?)(?:\.|$)/i);
+      if (intentMatch) {
+        sections.push('You are an expert assistant specialized in: ' + intentMatch[1].trim() + '.');
+        changes.push('Added role definition based on detected task');
+      }
     }
-    sections.push('TASK:\n' + cleaned);
-    changes.push('Organized into labeled sections');
+  }
+
+  // Task content — restructure
+  if (hasHeaders) {
+    sections.push(working);
   } else {
-    sections.push(cleaned);
+    var taskContent = working;
+    if (existingRole) {
+      sections.push('ROLE:\n' + existingRole[1].trim());
+      taskContent = taskContent.replace(/you are (?:a |an )?.+?(?:\.|,)/i, '').trim();
+      taskContent = taskContent.replace(/act as (?:a |an )?.+?(?:\.|,)/i, '').trim();
+    }
+
+    // Detect compound tasks
+    var verbPhrases = taskContent.match(/\b(write|create|generate|analyze|review|build|design|explain|summarize|compare|evaluate|implement|test|debug|optimize|format|translate|research|plan|organize|draft|edit)\b/gi);
+    var uniqueVerbs = verbPhrases ? verbPhrases.filter(function(v,i,a){return a.map(function(x){return x.toLowerCase();}).indexOf(v.toLowerCase())===i;}) : [];
+    if (uniqueVerbs.length >= 3) {
+      var parts = taskContent.split(/\s*(?:,\s*(?:and|then)\s+|\.\s+|;\s*|\s+and\s+then\s+|\s+then\s+)/i).map(function(p){return p.trim();}).filter(function(p){return p.length>10;});
+      if (parts.length >= 2) {
+        var decomposed = parts.map(function(p,i){return (i+1)+'. '+p.charAt(0).toUpperCase()+p.slice(1);}).join('\n');
+        sections.push('TASK:\n' + decomposed);
+        changes.push('Decomposed compound task into ' + parts.length + ' clear steps');
+      } else {
+        sections.push('TASK:\n' + taskContent);
+      }
+    } else {
+      sections.push('TASK:\n' + taskContent);
+    }
+    changes.push('Organized prompt into clear labeled sections');
   }
 
-  // Add output format if missing
-  if (!/output( format)?:|format:|respond (in|with|using)/i.test(cleaned)) {
-    sections.push('OUTPUT FORMAT:\nProvide your response in clear, structured format with headings where appropriate.');
-    changes.push('Added output format specification');
+  // Context placeholder if prompt references external data
+  var hasContext = lint.passed.find(function(r){return r.id==='has-context';});
+  if (!hasContext && /\b(this|these|the above|below|following data|attached|provided)\b/i.test(text)) {
+    sections.push('CONTEXT:\nProvide the relevant data, documents, or background information here.');
+    changes.push('Added context placeholder — fill in your specific background information');
   }
 
-  // Add constraints if missing
-  if (!/rule|constraint|never|always|do not|must not/i.test(cleaned)) {
-    sections.push('RULES:\n- Be accurate and specific\n- Acknowledge uncertainty rather than guessing\n- Provide actionable recommendations');
-    changes.push('Added quality constraints');
+  // Audience
+  var hasAudience = lint.passed.find(function(r){return r.id==='has-audience';});
+  if (!hasAudience && audience) {
+    sections.push('TARGET AUDIENCE:\nThis is for ' + audience.audience + '.');
+    changes.push('Added detected target audience: ' + audience.audience);
   }
 
-  // Add quality check if missing
-  if (!/verif|check your|review your|double.check|ensure (accuracy|quality)/i.test(cleaned)) {
-    sections.push('Before responding, verify that your answer is complete, accurate, and directly addresses the task.');
-    changes.push('Added quality verification step');
+  // Tone
+  var hasTone = lint.passed.find(function(r){return r.id==='has-tone';});
+  if (!hasTone) {
+    if (audience) {
+      sections.push('TONE:\nBe ' + audience.tone + '.');
+      changes.push('Added tone guidance: ' + audience.tone);
+    } else if (domain.config) {
+      sections.push('TONE:\nBe ' + domain.config.tone + '.');
+      changes.push('Added domain-appropriate tone guidance');
+    }
+  }
+
+  // Output format — domain-specific
+  var hasFormat = lint.passed.find(function(r){return r.id==='has-output-format';});
+  if (!hasFormat) {
+    if (domain.config) {
+      sections.push('OUTPUT FORMAT:\n' + domain.config.outputFormat);
+      changes.push('Added ' + domain.domain + '-specific output format');
+    } else {
+      sections.push('OUTPUT FORMAT:\nProvide your response in a clear, structured format with headings where appropriate.');
+      changes.push('Added output format specification');
+    }
+  }
+
+  // Constraints — domain-specific
+  var hasConstraints = lint.passed.find(function(r){return r.id==='has-constraints';});
+  if (!hasConstraints) {
+    if (domain.config) {
+      sections.push('RULES:\n' + domain.config.constraints.map(function(c){return '- '+c;}).join('\n'));
+      changes.push('Added ' + domain.domain + '-specific quality constraints');
+    } else {
+      sections.push('RULES:\n- Be accurate and specific\n- Acknowledge uncertainty rather than guessing\n- Provide actionable recommendations');
+      changes.push('Added quality constraints');
+    }
+  }
+
+  // Examples — domain-specific
+  var hasExamples = lint.passed.find(function(r){return r.id==='has-examples';});
+  if (!hasExamples && domain.config) {
+    sections.push('EXAMPLES:\n' + domain.config.exampleHint);
+    changes.push('Added ' + domain.domain + '-specific example placeholder');
+  }
+
+  // Quality check — domain-specific
+  var hasQuality = lint.passed.find(function(r){return r.id==='has-quality-check';});
+  if (!hasQuality) {
+    if (domain.config) {
+      sections.push(domain.config.qualityCheck);
+      changes.push('Added ' + domain.domain + '-specific quality verification step');
+    } else {
+      sections.push('Before responding, verify that your answer is complete, accurate, and directly addresses the task.');
+      changes.push('Added quality verification step');
+    }
   }
 
   var optimized = sections.join('\n\n');
   var newLint = browserLintPrompt(optimized);
-  return { original: text, optimized: optimized, changes: changes, scoreBefore: lint.score, scoreAfter: newLint.score, improvement: newLint.score - lint.score };
+  return { original: text, optimized: optimized, changes: changes, scoreBefore: lint.score, scoreAfter: newLint.score, improvement: newLint.score - lint.score, domain: domain.domain, audience: audience ? audience.audience : null };
 }
 
 // ── SMART RECOMMENDER (browser version) ──
