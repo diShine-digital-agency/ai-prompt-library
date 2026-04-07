@@ -2,6 +2,38 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.2.1] — 2026-04-07
+
+### Added
+
+- **Resizable sidebar** — Drag the right edge of the sidebar to adjust its width (260px–600px). Your preferred width is remembered across sessions via localStorage.
+
+- **Floating Library button** — A floating action button (📚) in the bottom-right corner provides one-click access to My Library from any tab. Shows a badge with the number of saved items.
+
+- **Edit saved prompts** — Every saved prompt (favorites, filled, composed, custom) now has an Edit button. Opens an inline editor with title and content fields. Changes are saved instantly to localStorage.
+
+- **Database prompt protection** — When you save/favorite a built-in prompt, it is stored as an editable copy. Your edits only affect the saved copy — the original prompt in the library remains unchanged. A notice is displayed in the editor for database-sourced prompts.
+
+- **macOS app** — Build a lightweight macOS application (724KB) with `./desktop/build-macos.sh`. Creates a `.app` bundle that opens the Prompt Workshop in your browser. No Electron, no compilation needed — builds on Linux or macOS.
+
+- **Linux app** — Build a Linux package with `.desktop` integration via `./desktop/build-linux.sh`. Includes installer script, application menu entry, and terminal launcher.
+
+- **Windows app** — Build a portable Windows package with `./desktop/build-all.sh`. Includes `.vbs` launcher (no console window), `.bat` fallback, and `viewer.html`. No installer or admin rights needed.
+
+- **Cross-platform build** — `./desktop/build-all.sh` builds all three platforms from any system with Bash and Node.js (~224KB per platform).
+
+### Changed
+
+- **Nav tabs wrap** — The navigation tabs now wrap to two rows when the sidebar is narrow, ensuring all 7 tabs (including My Library) are always visible regardless of sidebar width.
+
+- **Favorites show full actions** — Favorited prompts now show View, Copy, Edit, and Delete buttons (previously only Open and Delete). The "Open original" button is still available to jump to the source prompt.
+
+- CLI version bumped to 2.2.1
+
+### Fixed
+
+- **My Library visibility** — Fixed issue where My Library tab was not visible when sidebar was too narrow for all 7 tabs in a single row.
+
 ## [2.2.0] — 2026-04-06
 
 ### Added

@@ -23,7 +23,7 @@ import { tmpdir } from 'os';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const VERSION = '2.2.0';
+const VERSION = '2.2.1';
 
 const HELP = `
   prompt-lib — Expert Prompt Engineering Library v${VERSION}
