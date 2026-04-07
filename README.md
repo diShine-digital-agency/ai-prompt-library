@@ -60,6 +60,26 @@ Click the **⚙** button (top-right) to configure API keys for OpenAI, Anthropic
 
 ---
 
+## New in v2.2.1
+
+### Resizable Sidebar
+
+The sidebar is now **resizable** — drag its right edge to adjust the width (260px–600px). Your preferred width is remembered across sessions. The navigation tabs also wrap to two rows when the sidebar is narrow, so all 7 tabs (including My Library) are always visible.
+
+### Floating Library Button
+
+A **floating 📚 button** in the bottom-right corner gives you one-click access to My Library from any tab. It shows a badge with the count of saved items.
+
+### Edit & Delete Saved Prompts
+
+Every saved prompt now has an **Edit** button. Click it to open an inline editor where you can modify the title and content. Changes are saved instantly. The Delete button is also available on all prompt types.
+
+### Database Prompt Protection
+
+When you save a built-in prompt, it's stored as an **editable copy**. Your edits only affect the saved copy — the original prompt remains unchanged. A clear notice is shown in the editor for database-sourced prompts.
+
+---
+
 ## New in v2.2.0
 
 ### AI Playground

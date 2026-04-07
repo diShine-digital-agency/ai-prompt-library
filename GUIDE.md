@@ -293,6 +293,7 @@ The Prompt Workshop stores everything in browser localStorage:
 | `pl_saved` | Favorites, filled prompts, composed prompts, custom prompts |
 | `pl_custom_prompts` | Custom prompts created in the Create tab |
 | `pl_dark` | Dark mode preference |
+| `pl_sidebar_width` | Sidebar width preference (260–600px) |
 
 You can export your library as JSON and import it on another device.
 
@@ -337,16 +338,25 @@ something genuinely useful -- not just a reader, but a builder.
    prompt for reuse.
 
 5. **My Library** -- everything you've saved:
-   - **Favorites** -- prompts you bookmarked from Browse
+   - **Favorites** -- prompts you bookmarked from Browse (saved as editable copies)
    - **Filled prompts** -- prompts you built with the Workshop
    - **Composed prompts** -- multi-layer prompts from the Compose tab
    - **Custom prompts** -- prompts you created or generated
 
+   Each saved prompt has **Edit**, **Copy**, and **Delete** buttons.
+   When you edit a saved prompt, your changes only affect the saved copy —
+   the original built-in prompt remains unchanged.
+
    Export your library as JSON, import on another device, or download
    individual saved prompts as `.md`.
 
+   A **floating 📚 button** in the bottom-right corner gives you quick
+   access to My Library from any tab, with a badge showing saved item count.
+
 **Other features:**
 
+- **Resizable sidebar** — drag the right edge to adjust width (260–600px),
+  remembered across sessions
 - dark/light mode toggle (remembered across sessions)
 - full markdown rendering with tables, code blocks, and blockquotes
 - responsive -- works on phones and tablets

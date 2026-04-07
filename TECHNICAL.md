@@ -187,7 +187,8 @@ The `viewer.html` file is a self-contained single-page application:
 | Key | Type | Description |
 |-----|------|-------------|
 | `pl_dark` | boolean | Dark mode preference |
-| `pl_saved` | array | Saved prompts, filled templates, composed prompts, custom prompts |
+| `pl_saved` | array | Saved prompts, filled templates, composed prompts, custom prompts. Each saved item includes full content as an editable copy. Database-sourced items are marked with `source: 'database'` and can be edited without affecting the original prompt. |
+| `pl_sidebar_width` | number | User's preferred sidebar width in pixels (260–600). Persists across sessions. |
 
 ### Tab Structure
 
