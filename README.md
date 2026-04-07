@@ -367,11 +367,32 @@ ai-prompt-library/
     data/                  data & analytics templates
     business/              business templates
     image-generation/      image & visual AI prompt templates
+  desktop/
+    build-macos.sh         macOS .app build script
+    README.md              desktop & mobile distribution guide
   viewer.html              interactive Prompt Workshop (standalone, works offline)
   test/run.js              test suite
   CHANGELOG.md             version history
   TECHNICAL.md             architecture and technical documentation
 ```
+
+---
+
+## macOS & Mobile
+
+### macOS App
+
+Build a lightweight macOS application (724KB) that opens the Prompt Workshop in your browser:
+
+```bash
+./desktop/build-macos.sh
+```
+
+This creates `dist/PromptWorkshop.app` — just move it to `/Applications/` and launch. No Electron, no compilation, no bloat. See [`desktop/README.md`](desktop/README.md) for details.
+
+### Android / Mobile
+
+Open `viewer.html` directly in any mobile browser — it's fully responsive and works offline. In Chrome, use "Add to Home Screen" for an app-like experience.
 
 ---
 

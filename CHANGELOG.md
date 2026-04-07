@@ -14,6 +14,8 @@ All notable changes to this project will be documented in this file.
 
 - **Database prompt protection** — When you save/favorite a built-in prompt, it is stored as an editable copy. Your edits only affect the saved copy — the original prompt in the library remains unchanged. A notice is displayed in the editor for database-sourced prompts.
 
+- **macOS app** — Build a lightweight macOS application (724KB) with `./desktop/build-macos.sh`. Creates a `.app` bundle that opens the Prompt Workshop in your browser. No Electron, no compilation needed — builds on Linux or macOS.
+
 ### Changed
 
 - **Nav tabs wrap** — The navigation tabs now wrap to two rows when the sidebar is narrow, ensuring all 7 tabs (including My Library) are always visible regardless of sidebar width.
