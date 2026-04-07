@@ -1,4 +1,4 @@
-# prompt-library
+# prompt-library Powerhouse
 
 **82+ expert-level prompt templates — with a CLI, a browser-based Prompt Workshop, and a desktop app — to search, browse, compose, create, lint, optimize, and test prompts with AI models.**
 
