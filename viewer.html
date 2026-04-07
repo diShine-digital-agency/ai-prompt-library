@@ -452,6 +452,86 @@
 
   .hidden { display: none !important; }
 
+  /* ── API Settings modal ── */
+  .modal-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5); z-index: 100;
+    display: flex; align-items: center; justify-content: center;
+    animation: fadeIn 0.2s ease;
+  }
+  .modal {
+    background: var(--bg-card); border-radius: 12px; padding: 24px;
+    width: 520px; max-width: 90vw; max-height: 80vh; overflow-y: auto;
+    border: 1px solid var(--border); box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  }
+  .modal h3 { margin-bottom: 16px; font-size: 18px; }
+  .modal .field-group { margin-bottom: 16px; }
+  .modal .field-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .modal .field-group .hint { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+  .modal input[type=text], .modal input[type=password] {
+    width: 100%; padding: 8px 12px; border: 1px solid var(--border);
+    border-radius: var(--radius); background: var(--bg-input); color: var(--text);
+    font-size: 14px; font-family: monospace;
+  }
+  .modal select {
+    width: 100%; padding: 8px 12px; border: 1px solid var(--border);
+    border-radius: var(--radius); background: var(--bg-input); color: var(--text); font-size: 14px;
+  }
+  .modal .actions { display: flex; gap: 8px; margin-top: 20px; justify-content: flex-end; }
+
+  /* ── Playground ── */
+  .pg-response {
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px;
+    font-size: 13px; line-height: 1.7; white-space: pre-wrap;
+    word-wrap: break-word; max-height: 500px; overflow-y: auto;
+    margin-top: 12px;
+  }
+  .pg-meta {
+    font-size: 11px; color: var(--text-dim); margin-top: 8px;
+    display: flex; gap: 16px;
+  }
+  .pg-loading {
+    display: flex; align-items: center; gap: 8px;
+    padding: 20px; color: var(--text-secondary); font-size: 14px;
+  }
+  .pg-loading .spinner {
+    width: 18px; height: 18px; border: 2px solid var(--border);
+    border-top-color: var(--accent); border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Lint score ── */
+  .lint-score {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 64px; height: 64px; border-radius: 50%;
+    font-size: 22px; font-weight: 700;
+    border: 3px solid var(--border);
+  }
+  .lint-score.grade-a { border-color: var(--success); color: var(--success); }
+  .lint-score.grade-b { border-color: #22c55e; color: #22c55e; }
+  .lint-score.grade-c { border-color: var(--warning); color: var(--warning); }
+  .lint-score.grade-d { border-color: #f97316; color: #f97316; }
+  .lint-score.grade-f { border-color: var(--danger); color: var(--danger); }
+  .lint-rule { padding: 8px 12px; border-radius: var(--radius); margin: 4px 0; font-size: 13px; }
+  .lint-rule.pass { background: rgba(34,197,94,0.08); }
+  .lint-rule.fail { background: rgba(239,68,68,0.08); }
+  .lint-rule .icon { margin-right: 6px; }
+
+  /* ── tool-panel tabs ── */
+  .tool-tabs {
+    display: flex; gap: 4px; margin-bottom: 20px;
+    border-bottom: 1px solid var(--border); padding-bottom: 8px;
+  }
+  .tool-tab {
+    padding: 6px 14px; border-radius: var(--radius) var(--radius) 0 0;
+    font-size: 13px; cursor: pointer; border: 1px solid transparent;
+    color: var(--text-secondary);
+  }
+  .tool-tab:hover { color: var(--text); }
+  .tool-tab.active { color: var(--accent); border-color: var(--border); border-bottom-color: var(--bg); background: var(--bg); }
+
   /* ── animations ── */
   @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes slideIn { from { opacity: 0; transform: translateX(-12px); } to { opacity: 1; transform: translateX(0); } }
@@ -568,6 +648,8 @@
     <div class="nav-tab" data-tab="compose" onclick="switchTab('compose')">Compose</div>
     <div class="nav-tab" data-tab="create" onclick="switchTab('create')">Create</div>
     <div class="nav-tab" data-tab="generate" onclick="switchTab('generate')">Generate</div>
+    <div class="nav-tab" data-tab="tools" onclick="switchTab('tools')">Tools</div>
+    <div class="nav-tab" data-tab="playground" onclick="switchTab('playground')">Playground</div>
     <div class="nav-tab" data-tab="saved" onclick="switchTab('saved')">My Library</div>
   </div>
   <div id="filterBar" class="filter-bar">
@@ -597,6 +679,7 @@
 
 <div class="toolbar">
   <button onclick="toggleHelp()" title="Toggle beginner tips (H)" id="helpBtn">?</button>
+  <button onclick="showApiSettings()" title="API Settings" id="settingsBtn">&#9881;</button>
   <button onclick="toggleDark()" title="Toggle dark mode" id="darkBtn">&#9789;</button>
 </div>
 <div class="toast" id="toast"></div>
@@ -1004,6 +1087,16 @@ function switchTab(tab) {
     filterBar.classList.add('hidden');
     sidebarList.classList.remove('hidden');
     showSaved();
+  } else if (tab === 'tools') {
+    filterBar.classList.add('hidden');
+    sidebarList.classList.add('hidden');
+    renderToolsSidebar();
+    showTools();
+  } else if (tab === 'playground') {
+    filterBar.classList.add('hidden');
+    sidebarList.classList.add('hidden');
+    renderPlaygroundSidebar();
+    showPlayground();
   }
 }
 
@@ -2638,6 +2731,778 @@ showGenerate = function() {
   }
 };
 
+// ── API SETTINGS ──
+function getApiSettings() {
+  return storage.get('api_settings', { provider: 'openai', openai_key: '', anthropic_key: '', google_key: '', openai_model: 'gpt-4o-mini', anthropic_model: 'claude-sonnet-4-20250514', google_model: 'gemini-2.0-flash' });
+}
+function saveApiSettings(s) { storage.set('api_settings', s); }
+function hasApiKey() { var s = getApiSettings(); return !!(s.openai_key || s.anthropic_key || s.google_key); }
+function getActiveProvider() {
+  var s = getApiSettings();
+  if (s.provider === 'openai' && s.openai_key) return { provider: 'openai', key: s.openai_key, model: s.openai_model };
+  if (s.provider === 'anthropic' && s.anthropic_key) return { provider: 'anthropic', key: s.anthropic_key, model: s.anthropic_model };
+  if (s.provider === 'google' && s.google_key) return { provider: 'google', key: s.google_key, model: s.google_model };
+  // Try any available key
+  if (s.openai_key) return { provider: 'openai', key: s.openai_key, model: s.openai_model };
+  if (s.anthropic_key) return { provider: 'anthropic', key: s.anthropic_key, model: s.anthropic_model };
+  if (s.google_key) return { provider: 'google', key: s.google_key, model: s.google_model };
+  return null;
+}
+
+function showApiSettings() {
+  var s = getApiSettings();
+  var overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+
+  var modal = document.createElement('div');
+  modal.className = 'modal';
+  modal.innerHTML = '<h3>&#9881; API Settings</h3>' +
+    '<p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;">Configure API keys to use the AI Playground, AI-powered prompt optimization, and smart recommendations. Keys are stored locally in your browser — never sent anywhere except the API provider.</p>' +
+    '<div class="field-group"><label>Active Provider</label>' +
+    '<select id="apiProvider">' +
+    '<option value="openai"' + (s.provider==='openai'?' selected':'') + '>OpenAI (GPT)</option>' +
+    '<option value="anthropic"' + (s.provider==='anthropic'?' selected':'') + '>Anthropic (Claude)</option>' +
+    '<option value="google"' + (s.provider==='google'?' selected':'') + '>Google (Gemini)</option>' +
+    '</select></div>' +
+    '<div class="field-group"><label>OpenAI API Key</label>' +
+    '<input type="password" id="apiOpenai" value="' + escapeHtml(s.openai_key) + '" placeholder="sk-...">' +
+    '<div class="hint">Get from <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com</a></div></div>' +
+    '<div class="field-group"><label>OpenAI Model</label>' +
+    '<input type="text" id="apiOpenaiModel" value="' + escapeHtml(s.openai_model) + '" placeholder="gpt-4o-mini"></div>' +
+    '<div class="field-group"><label>Anthropic API Key</label>' +
+    '<input type="password" id="apiAnthropic" value="' + escapeHtml(s.anthropic_key) + '" placeholder="sk-ant-...">' +
+    '<div class="hint">Get from <a href="https://console.anthropic.com/" target="_blank">console.anthropic.com</a></div></div>' +
+    '<div class="field-group"><label>Anthropic Model</label>' +
+    '<input type="text" id="apiAnthropicModel" value="' + escapeHtml(s.anthropic_model) + '" placeholder="claude-sonnet-4-20250514"></div>' +
+    '<div class="field-group"><label>Google AI API Key</label>' +
+    '<input type="password" id="apiGoogle" value="' + escapeHtml(s.google_key) + '" placeholder="AI...">' +
+    '<div class="hint">Get from <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com</a></div></div>' +
+    '<div class="field-group"><label>Google Model</label>' +
+    '<input type="text" id="apiGoogleModel" value="' + escapeHtml(s.google_model) + '" placeholder="gemini-2.0-flash"></div>' +
+    '<div class="actions">' +
+    '<button class="btn" onclick="this.closest(\'.modal-overlay\').remove()">Cancel</button>' +
+    '<button class="btn primary" onclick="saveApiSettingsFromModal()">Save</button></div>';
+
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+}
+
+function saveApiSettingsFromModal() {
+  var s = {
+    provider: document.getElementById('apiProvider').value,
+    openai_key: document.getElementById('apiOpenai').value.trim(),
+    anthropic_key: document.getElementById('apiAnthropic').value.trim(),
+    google_key: document.getElementById('apiGoogle').value.trim(),
+    openai_model: document.getElementById('apiOpenaiModel').value.trim() || 'gpt-4o-mini',
+    anthropic_model: document.getElementById('apiAnthropicModel').value.trim() || 'claude-sonnet-4-20250514',
+    google_model: document.getElementById('apiGoogleModel').value.trim() || 'gemini-2.0-flash',
+  };
+  saveApiSettings(s);
+  document.querySelector('.modal-overlay').remove();
+  showToast('API settings saved');
+}
+
+// ── PROMPT LINTER (browser version) ──
+var LINT_RULES = [
+  { id:'has-role', name:'Role definition', weight:10, test:function(t){return /you are|act as|role:|persona:|as a/i.test(t);}, suggestion:'Add a role: "You are a senior [role] expert…"' },
+  { id:'has-task', name:'Clear task', weight:12, test:function(t){return /task:|your (job|goal|task)|objective:|you (will|should|must)|please (help|create|write|generate|analyze)/i.test(t);}, suggestion:'State the task: "Your task is to…"' },
+  { id:'has-context', name:'Context provided', weight:8, test:function(t){return /context:|background:|situation:|given (that|the)|here is|the following/i.test(t);}, suggestion:'Add context: "Context: …"' },
+  { id:'has-output-format', name:'Output format', weight:10, test:function(t){return /output( format)?:|format:|respond (in|with|using)|use (markdown|json|bullet|table|list)/i.test(t);}, suggestion:'Specify format: "Respond in [format]"' },
+  { id:'has-constraints', name:'Constraints', weight:8, test:function(t){return /rule|constraint|never|always|do not|must not|important:|don't|avoid|ensure/i.test(t);}, suggestion:'Add rules: "Never do X" / "Always do Y"' },
+  { id:'sufficient-length', name:'Sufficient detail', weight:8, test:function(t){return t.split(/\s+/).length>=50;}, suggestion:'Add more detail (aim for 50+ words).' },
+  { id:'not-too-long', name:'Not too long', weight:5, test:function(t){return t.split(/\s+/).length<=2000;}, suggestion:'Consider simplifying (under 2000 words).' },
+  { id:'has-examples', name:'Examples', weight:7, test:function(t){return /example:|for example|e\.g\.|such as|sample:/i.test(t);}, suggestion:'Add examples of expected output.' },
+  { id:'has-sections', name:'Structured', weight:7, test:function(t){var h=t.match(/^(#{1,3} |[A-Z][A-Z ]+:)/gm);return h&&h.length>=2;}, suggestion:'Add clear section headers.' },
+  { id:'no-vague', name:'Specific language', weight:7, test:function(t){var v=t.match(/\b(good|nice|proper|appropriate|best|great|interesting|relevant)\b/gi);return !v||v.length<=3;}, suggestion:'Replace vague words with specific criteria.' },
+  { id:'has-audience', name:'Target audience', weight:5, test:function(t){return /audience:|target:|for (a |an )?(beginner|expert|developer|manager|executive|student)/i.test(t);}, suggestion:'Specify audience: "This is for [audience]…"' },
+  { id:'has-tone', name:'Tone specified', weight:5, test:function(t){return /tone:|style:|voice:|be (professional|casual|formal|friendly|technical|concise)/i.test(t);}, suggestion:'Define tone: "Use a [tone] tone."' },
+  { id:'no-please-overuse', name:'Not overly polite', weight:3, test:function(t){return (t.match(/\bplease\b/gi)||[]).length<=2;}, suggestion:'Reduce "please" — direct instructions work better.' },
+  { id:'has-quality-check', name:'Quality step', weight:5, test:function(t){return /verif|check your|review your|double.check|ensure (accuracy|quality)|before (responding|answering)/i.test(t);}, suggestion:'Add: "Before responding, verify that…"' },
+];
+
+function browserLintPrompt(text) {
+  if (!text) return { score:0, grade:'F', passed:[], failed:LINT_RULES, suggestions:['Provide a prompt.'] };
+  var earned=0, total=0, passed=[], failed=[];
+  LINT_RULES.forEach(function(r) {
+    total += r.weight;
+    if (r.test(text)) { earned += r.weight; passed.push(r); }
+    else { failed.push(r); }
+  });
+  var score = Math.round((earned/total)*100);
+  var grade = score>=90?'A':score>=75?'B':score>=60?'C':score>=40?'D':'F';
+  return { score:score, grade:grade, passed:passed, failed:failed, suggestions:failed.sort(function(a,b){return b.weight-a.weight;}).map(function(r){return r.suggestion;}), wordCount:text.split(/\s+/).length };
+}
+
+// ── PROMPT OPTIMIZER (browser version) ──
+function browserOptimizePrompt(text) {
+  if (!text || text.trim().length < 10) return { optimized: text, changes: [], scoreBefore: 0, scoreAfter: 0 };
+  var lint = browserLintPrompt(text);
+  var changes = [];
+  var sections = [];
+  var cleaned = text.trim();
+
+  // Remove excessive please
+  var pleaseCount = (cleaned.match(/\bplease\b/gi)||[]).length;
+  if (pleaseCount > 2) {
+    var ct = 0;
+    cleaned = cleaned.replace(/\bplease\b/gi, function(m) { ct++; return ct<=1?m:''; });
+    cleaned = cleaned.replace(/\s{2,}/g, ' ');
+    changes.push('Reduced excessive "please" usage');
+  }
+
+  // Check if role is missing
+  var hasRole = /you are|act as|role:|persona:|as a/i.test(cleaned);
+  if (!hasRole) {
+    sections.push('You are an expert assistant specialized in the following task.');
+    changes.push('Added role definition');
+  }
+
+  // Check if already structured
+  var hasHeaders = /^(#{1,3} |[A-Z][A-Z ]+:)/m.test(cleaned);
+  if (!hasHeaders) {
+    // Extract role if present
+    var roleMatch = cleaned.match(/you are (?:a |an )?(.+?)(?:\.|,)/i);
+    if (roleMatch) {
+      sections.push('ROLE:\n' + roleMatch[1].trim());
+      cleaned = cleaned.replace(roleMatch[0], '').trim();
+    }
+    sections.push('TASK:\n' + cleaned);
+    changes.push('Organized into labeled sections');
+  } else {
+    sections.push(cleaned);
+  }
+
+  // Add output format if missing
+  if (!/output( format)?:|format:|respond (in|with|using)/i.test(cleaned)) {
+    sections.push('OUTPUT FORMAT:\nProvide your response in clear, structured format with headings where appropriate.');
+    changes.push('Added output format specification');
+  }
+
+  // Add constraints if missing
+  if (!/rule|constraint|never|always|do not|must not/i.test(cleaned)) {
+    sections.push('RULES:\n- Be accurate and specific\n- Acknowledge uncertainty rather than guessing\n- Provide actionable recommendations');
+    changes.push('Added quality constraints');
+  }
+
+  // Add quality check if missing
+  if (!/verif|check your|review your|double.check|ensure (accuracy|quality)/i.test(cleaned)) {
+    sections.push('Before responding, verify that your answer is complete, accurate, and directly addresses the task.');
+    changes.push('Added quality verification step');
+  }
+
+  var optimized = sections.join('\n\n');
+  var newLint = browserLintPrompt(optimized);
+  return { original: text, optimized: optimized, changes: changes, scoreBefore: lint.score, scoreAfter: newLint.score, improvement: newLint.score - lint.score };
+}
+
+// ── SMART RECOMMENDER (browser version) ──
+function browserRecommend(description) {
+  if (!description) return { topPrompts: [], suggestedCombo: null };
+  var terms = description.toLowerCase().split(/\s+/).filter(function(t){return t.length>2;});
+  var descLower = description.toLowerCase();
+  var intentMap = {
+    coding:['code','programming','developer','software','api','debug','refactor','test','git','deploy'],
+    writing:['write','blog','article','copy','content','essay','email','letter','documentation'],
+    marketing:['marketing','seo','social media','campaign','ads','brand','landing page','conversion'],
+    data:['data','analysis','sql','database','dashboard','report','statistics','visualization'],
+    business:['business','proposal','meeting','stakeholder','strategy','okr','pitch','client'],
+    image:['image','photo','visual','design','logo','illustration','portrait','scene','art'],
+    research:['research','analyze','investigate','study','compare','evaluate','review'],
+    teaching:['teach','explain','tutor','learn','student','course','education'],
+  };
+  var intentScores = {};
+  Object.keys(intentMap).forEach(function(intent) {
+    var score = 0;
+    intentMap[intent].forEach(function(kw) { if (descLower.indexOf(kw) >= 0) score += 10; });
+    if (score > 0) intentScores[intent] = score;
+  });
+  var catIntentMap = { development:'coding', marketing:'marketing', data:'data', business:'business', 'image-generation':'image' };
+  var allPrompts = getAllPrompts();
+  var scored = allPrompts.map(function(p) {
+    var score = 0;
+    var tl = p.title.toLowerCase();
+    var cl = p.category.toLowerCase();
+    var tags = (p.tags||[]).map(function(t){return t.toLowerCase();});
+    terms.forEach(function(term) {
+      if (tl.indexOf(term)>=0) score+=20;
+      if (tags.some(function(tag){return tag.indexOf(term)>=0;})) score+=15;
+      if (cl.indexOf(term)>=0) score+=10;
+    });
+    var mi = catIntentMap[cl];
+    if (mi && intentScores[mi]) score += intentScores[mi];
+    if ((cl==='system-prompts'||cl==='frameworks') && score>0) score+=5;
+    return { slug:p.slug, title:p.title, category:p.category, tags:p.tags, relevanceScore:score, content:p.content };
+  });
+  scored = scored.filter(function(p){return p.relevanceScore>0;}).sort(function(a,b){return b.relevanceScore-a.relevanceScore;});
+  var sys = scored.filter(function(p){return p.category==='system-prompts';});
+  var fw = scored.filter(function(p){return p.category==='frameworks';});
+  var tpl = scored.filter(function(p){return p.category!=='system-prompts'&&p.category!=='frameworks';});
+  return { topPrompts:scored.slice(0,8), suggestedCombo:{ systemPrompt:sys[0]||null, framework:fw[0]||null, template:tpl[0]||null } };
+}
+
+// ── SEND TO AI (Playground) ──
+async function sendToAI(prompt, systemPrompt, provider, apiKey, model) {
+  if (provider === 'openai') {
+    var messages = [];
+    if (systemPrompt) messages.push({ role: 'system', content: systemPrompt });
+    messages.push({ role: 'user', content: prompt });
+    var resp = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
+      body: JSON.stringify({ model: model || 'gpt-4o-mini', messages: messages, temperature: 0.7, max_tokens: 4000 }),
+    });
+    if (!resp.ok) { var err = await resp.json().catch(function(){return {};}); throw new Error('OpenAI: ' + (err.error ? err.error.message : resp.statusText)); }
+    var data = await resp.json();
+    return { text: data.choices[0].message.content, model: data.model, usage: data.usage };
+  }
+  if (provider === 'anthropic') {
+    var resp2 = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({ model: model || 'claude-sonnet-4-20250514', max_tokens: 4000, system: systemPrompt || undefined, messages: [{ role: 'user', content: prompt }] }),
+    });
+    if (!resp2.ok) { var err2 = await resp2.json().catch(function(){return {};}); throw new Error('Anthropic: ' + (err2.error ? err2.error.message : resp2.statusText)); }
+    var data2 = await resp2.json();
+    return { text: data2.content[0].text, model: data2.model, usage: data2.usage };
+  }
+  if (provider === 'google') {
+    var fullPrompt = systemPrompt ? (systemPrompt + '\n\n' + prompt) : prompt;
+    var resp3 = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + (model || 'gemini-2.0-flash') + ':generateContent?key=' + apiKey, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contents: [{ parts: [{ text: fullPrompt }] }], generationConfig: { temperature: 0.7, maxOutputTokens: 4000 } }),
+    });
+    if (!resp3.ok) { var err3 = await resp3.json().catch(function(){return {};}); throw new Error('Google: ' + (err3.error ? err3.error.message : resp3.statusText)); }
+    var data3 = await resp3.json();
+    return { text: data3.candidates[0].content.parts[0].text, model: model || 'gemini-2.0-flash', usage: null };
+  }
+  throw new Error('Unsupported provider: ' + provider);
+}
+
+// ── AI Optimize ──
+async function aiOptimize(text) {
+  var active = getActiveProvider();
+  if (!active) throw new Error('No API key configured');
+  var sysPrompt = 'You are an expert prompt engineer. Optimize the following prompt.\n\nRULES:\n1. Keep the original intent exactly the same\n2. Add structure with clear sections (ROLE, TASK, CONTEXT, OUTPUT FORMAT, RULES)\n3. Make instructions more specific and actionable\n4. Add constraints that prevent common AI mistakes\n5. Add a quality verification step\n6. Remove vague language\n\nReturn ONLY the optimized prompt.';
+  var result = await sendToAI('Optimize this prompt:\n\n' + text, sysPrompt, active.provider, active.key, active.model);
+  return result.text;
+}
+
+// ── TOOLS TAB ──
+var activeToolTab = 'lint';
+
+function renderToolsSidebar() {
+  var container = document.getElementById('promptList');
+  container.textContent = '';
+  container.innerHTML = '<div style="padding:16px;font-size:13px;color:var(--text-secondary);line-height:1.6;">' +
+    '<strong>\uD83D\uDEE0 Prompt Tools</strong><br><br>' +
+    '<strong>Linter</strong> — Analyze any prompt for quality issues. Get a 0-100 score and actionable suggestions.<br><br>' +
+    '<strong>Optimizer</strong> — Automatically rewrite your prompt following best practices. Works offline + optional AI enhancement.<br><br>' +
+    '<strong>Recommender</strong> — Describe what you need and get personalized prompt suggestions from the library.' +
+    '</div>';
+}
+
+function showTools() {
+  var main = document.getElementById('mainPanel');
+  main.className = 'main';
+  main.textContent = '';
+
+  var h2 = document.createElement('h2');
+  h2.textContent = '\uD83D\uDEE0 Prompt Engineering Tools';
+  h2.style.cssText = 'margin-bottom:8px;font-size:24px;';
+  main.appendChild(h2);
+
+  var desc = document.createElement('p');
+  desc.style.cssText = 'color:var(--text-secondary);margin-bottom:16px;font-size:14px;';
+  desc.textContent = 'Analyze, optimize, and get recommendations for your prompts.';
+  main.appendChild(desc);
+
+  if (showHelpBanners) {
+    var help = document.createElement('div');
+    help.className = 'help-banner';
+    help.innerHTML = '<h4>\uD83C\uDF93 What are these tools?</h4>' +
+      '<ul>' +
+      '<li><strong>Linter</strong> checks your prompt against 14 quality rules (like a spell-checker for prompts)</li>' +
+      '<li><strong>Optimizer</strong> rewrites your prompt with best-practice structure — no AI needed!</li>' +
+      '<li><strong>Recommender</strong> suggests the best prompts from our library for your use case</li>' +
+      '</ul>' +
+      '<div class="tip">\uD83D\uDC49 Pro tip: Paste any prompt into the Linter first to see what\'s missing, then use the Optimizer to fix it automatically.</div>';
+    main.appendChild(help);
+  }
+
+  // Sub-tabs
+  var tabs = document.createElement('div');
+  tabs.className = 'tool-tabs';
+  ['lint', 'optimize', 'recommend'].forEach(function(t) {
+    var tab = document.createElement('div');
+    tab.className = 'tool-tab' + (activeToolTab === t ? ' active' : '');
+    tab.textContent = t === 'lint' ? '\uD83D\uDD0D Linter' : t === 'optimize' ? '\u2728 Optimizer' : '\uD83C\uDFAF Recommender';
+    tab.onclick = function() { activeToolTab = t; showTools(); };
+    tabs.appendChild(tab);
+  });
+  main.appendChild(tabs);
+
+  if (activeToolTab === 'lint') showLintTool(main);
+  else if (activeToolTab === 'optimize') showOptimizeTool(main);
+  else showRecommendTool(main);
+}
+
+function showLintTool(main) {
+  var container = document.createElement('div');
+  container.className = 'animate-in';
+
+  var textarea = document.createElement('textarea');
+  textarea.id = 'lintInput';
+  textarea.rows = 8;
+  textarea.placeholder = 'Paste your prompt here to analyze it...\n\nExample: "Write me a blog post about AI"';
+  textarea.style.cssText = 'width:100%;padding:12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-input);color:var(--text);font-size:14px;line-height:1.6;resize:vertical;font-family:inherit;';
+  container.appendChild(textarea);
+
+  var btn = document.createElement('button');
+  btn.className = 'btn primary';
+  btn.textContent = '\uD83D\uDD0D Analyze Prompt';
+  btn.style.cssText = 'margin-top:12px;';
+  btn.onclick = function() {
+    var text = document.getElementById('lintInput').value.trim();
+    if (!text) { showToast('Paste a prompt first'); return; }
+    var result = browserLintPrompt(text);
+    renderLintResults(result);
+  };
+  container.appendChild(btn);
+
+  var results = document.createElement('div');
+  results.id = 'lintResults';
+  container.appendChild(results);
+  main.appendChild(container);
+}
+
+function renderLintResults(result) {
+  var el = document.getElementById('lintResults');
+  el.textContent = '';
+  el.className = 'animate-in';
+  el.style.marginTop = '20px';
+
+  // Score circle
+  var scoreRow = document.createElement('div');
+  scoreRow.style.cssText = 'display:flex;align-items:center;gap:20px;margin-bottom:20px;';
+  var scoreCircle = document.createElement('div');
+  scoreCircle.className = 'lint-score grade-' + result.grade.toLowerCase();
+  scoreCircle.textContent = result.score;
+  scoreRow.appendChild(scoreCircle);
+
+  var scoreInfo = document.createElement('div');
+  scoreInfo.innerHTML = '<div style="font-size:18px;font-weight:700;">Grade: ' + result.grade + '</div>' +
+    '<div style="font-size:13px;color:var(--text-secondary);">' + result.passed.length + '/' + (result.passed.length+result.failed.length) + ' rules passed · ' + result.wordCount + ' words</div>';
+  scoreRow.appendChild(scoreInfo);
+  el.appendChild(scoreRow);
+
+  // Rules
+  if (result.passed.length > 0) {
+    var passH = document.createElement('div');
+    passH.style.cssText = 'font-weight:600;margin-bottom:8px;color:var(--success);';
+    passH.textContent = '\u2705 Passing (' + result.passed.length + ')';
+    el.appendChild(passH);
+    result.passed.forEach(function(r) {
+      var rule = document.createElement('div');
+      rule.className = 'lint-rule pass';
+      rule.innerHTML = '<span class="icon">\u2713</span>' + escapeHtml(r.name);
+      el.appendChild(rule);
+    });
+  }
+
+  if (result.failed.length > 0) {
+    var failH = document.createElement('div');
+    failH.style.cssText = 'font-weight:600;margin:16px 0 8px;color:var(--danger);';
+    failH.textContent = '\uD83D\uDCA1 Suggestions (' + result.failed.length + ')';
+    el.appendChild(failH);
+    result.failed.forEach(function(r) {
+      var rule = document.createElement('div');
+      rule.className = 'lint-rule fail';
+      rule.innerHTML = '<span class="icon">\u2717</span><strong>' + escapeHtml(r.name) + '</strong>: ' + escapeHtml(r.suggestion);
+      el.appendChild(rule);
+    });
+  }
+}
+
+function showOptimizeTool(main) {
+  var container = document.createElement('div');
+  container.className = 'animate-in';
+
+  var textarea = document.createElement('textarea');
+  textarea.id = 'optimizeInput';
+  textarea.rows = 8;
+  textarea.placeholder = 'Paste your prompt here to optimize it...\n\nThe optimizer will restructure it with best practices: add role, sections, constraints, and quality checks.';
+  textarea.style.cssText = 'width:100%;padding:12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-input);color:var(--text);font-size:14px;line-height:1.6;resize:vertical;font-family:inherit;';
+  container.appendChild(textarea);
+
+  var btns = document.createElement('div');
+  btns.style.cssText = 'display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;';
+
+  var ruleBtn = document.createElement('button');
+  ruleBtn.className = 'btn primary';
+  ruleBtn.textContent = '\u2728 Optimize (instant, no API)';
+  ruleBtn.onclick = function() {
+    var text = document.getElementById('optimizeInput').value.trim();
+    if (!text) { showToast('Paste a prompt first'); return; }
+    var result = browserOptimizePrompt(text);
+    renderOptimizeResults(result, false);
+  };
+  btns.appendChild(ruleBtn);
+
+  if (hasApiKey()) {
+    var aiBtn = document.createElement('button');
+    aiBtn.className = 'btn success';
+    aiBtn.textContent = '\uD83E\uDD16 AI-Powered Optimize';
+    aiBtn.onclick = async function() {
+      var text = document.getElementById('optimizeInput').value.trim();
+      if (!text) { showToast('Paste a prompt first'); return; }
+      aiBtn.disabled = true;
+      aiBtn.textContent = '\u23F3 Optimizing with AI...';
+      try {
+        var aiResult = await aiOptimize(text);
+        var lint1 = browserLintPrompt(text);
+        var lint2 = browserLintPrompt(aiResult);
+        renderOptimizeResults({ original: text, optimized: aiResult, changes: ['AI-powered rewrite using ' + getActiveProvider().provider], scoreBefore: lint1.score, scoreAfter: lint2.score, improvement: lint2.score - lint1.score }, true);
+      } catch(err) {
+        showToast('Error: ' + err.message);
+      }
+      aiBtn.disabled = false;
+      aiBtn.textContent = '\uD83E\uDD16 AI-Powered Optimize';
+    };
+    btns.appendChild(aiBtn);
+  } else {
+    var keyHint = document.createElement('span');
+    keyHint.style.cssText = 'font-size:12px;color:var(--text-dim);align-self:center;';
+    keyHint.textContent = '(Set API key via \u2699 for AI-powered optimization)';
+    btns.appendChild(keyHint);
+  }
+
+  container.appendChild(btns);
+
+  var results = document.createElement('div');
+  results.id = 'optimizeResults';
+  container.appendChild(results);
+  main.appendChild(container);
+}
+
+function renderOptimizeResults(result, isAI) {
+  var el = document.getElementById('optimizeResults');
+  el.textContent = '';
+  el.className = 'animate-in';
+  el.style.marginTop = '20px';
+
+  // Score comparison
+  var scoreRow = document.createElement('div');
+  scoreRow.style.cssText = 'display:flex;align-items:center;gap:12px;margin-bottom:16px;font-size:15px;';
+  scoreRow.innerHTML = '<span style="color:var(--danger);font-weight:700;">' + result.scoreBefore + '</span>' +
+    ' <span style="color:var(--text-dim);">\u2192</span> ' +
+    '<span style="color:var(--success);font-weight:700;">' + result.scoreAfter + '</span>' +
+    ' <span style="color:var(--success);">(+' + (result.scoreAfter - result.scoreBefore) + ' improvement)</span>' +
+    (isAI ? ' <span class="tag" style="background:var(--accent-dim);color:var(--accent);">AI-Enhanced</span>' : '');
+  el.appendChild(scoreRow);
+
+  // Changes
+  if (result.changes.length > 0) {
+    var changesH = document.createElement('div');
+    changesH.style.cssText = 'font-weight:600;margin-bottom:8px;';
+    changesH.textContent = 'Changes made:';
+    el.appendChild(changesH);
+    result.changes.forEach(function(c) {
+      var ch = document.createElement('div');
+      ch.style.cssText = 'font-size:13px;color:var(--text-secondary);margin:2px 0;';
+      ch.textContent = '\u2022 ' + c;
+      el.appendChild(ch);
+    });
+  }
+
+  // Optimized prompt
+  var pre = document.createElement('pre');
+  pre.style.cssText = 'background:var(--code-bg);padding:16px;border-radius:var(--radius);font-size:13px;line-height:1.6;white-space:pre-wrap;word-wrap:break-word;border:1px solid var(--border);margin-top:16px;max-height:500px;overflow-y:auto;';
+  pre.textContent = result.optimized;
+  el.appendChild(pre);
+
+  // Actions
+  var actions = document.createElement('div');
+  actions.style.cssText = 'display:flex;gap:8px;margin-top:12px;';
+  var copyBtn = document.createElement('button');
+  copyBtn.className = 'btn primary';
+  copyBtn.textContent = '\uD83D\uDCCB Copy optimized prompt';
+  copyBtn.onclick = function() {
+    navigator.clipboard.writeText(result.optimized).then(function(){ showToast('Copied!'); copyBtn.textContent = '\u2705 Copied!'; setTimeout(function(){copyBtn.textContent='\uD83D\uDCCB Copy optimized prompt';},2000); });
+  };
+  actions.appendChild(copyBtn);
+
+  var useBtn = document.createElement('button');
+  useBtn.className = 'btn';
+  useBtn.textContent = '\u25B6 Use in Playground';
+  useBtn.onclick = function() {
+    storage.set('pg_prefill', result.optimized);
+    switchTab('playground');
+  };
+  actions.appendChild(useBtn);
+  el.appendChild(actions);
+}
+
+function showRecommendTool(main) {
+  var container = document.createElement('div');
+  container.className = 'animate-in';
+
+  var label = document.createElement('label');
+  label.style.cssText = 'font-weight:600;display:block;margin-bottom:8px;';
+  label.textContent = 'Describe what you need:';
+  container.appendChild(label);
+
+  var input = document.createElement('input');
+  input.type = 'text';
+  input.id = 'recommendInput';
+  input.placeholder = 'e.g., "I need to write marketing copy for a SaaS landing page"';
+  input.style.cssText = 'width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-input);color:var(--text);font-size:14px;';
+  input.onkeydown = function(e) { if (e.key === 'Enter') document.getElementById('recommendBtn').click(); };
+  container.appendChild(input);
+
+  var btn = document.createElement('button');
+  btn.className = 'btn primary';
+  btn.id = 'recommendBtn';
+  btn.textContent = '\uD83C\uDFAF Get Recommendations';
+  btn.style.cssText = 'margin-top:12px;';
+  btn.onclick = function() {
+    var text = document.getElementById('recommendInput').value.trim();
+    if (!text) { showToast('Describe your use case'); return; }
+    var rec = browserRecommend(text);
+    renderRecommendations(rec);
+  };
+  container.appendChild(btn);
+
+  var results = document.createElement('div');
+  results.id = 'recommendResults';
+  container.appendChild(results);
+  main.appendChild(container);
+}
+
+function renderRecommendations(rec) {
+  var el = document.getElementById('recommendResults');
+  el.textContent = '';
+  el.className = 'animate-in';
+  el.style.marginTop = '20px';
+
+  if (rec.topPrompts.length === 0) {
+    el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-secondary);">No matching prompts found. Try different keywords.</div>';
+    return;
+  }
+
+  // Suggested combination
+  if (rec.suggestedCombo) {
+    var combo = document.createElement('div');
+    combo.style.cssText = 'background:var(--accent-dim);border:1px solid var(--accent);border-radius:var(--radius);padding:16px;margin-bottom:20px;';
+    combo.innerHTML = '<div style="font-weight:600;margin-bottom:8px;">\uD83C\uDFAF Recommended Combination</div>';
+
+    if (rec.suggestedCombo.systemPrompt) {
+      var sp = document.createElement('div');
+      sp.style.cssText = 'font-size:13px;margin:4px 0;cursor:pointer;';
+      sp.innerHTML = '\uD83E\uDDE0 <strong>System prompt:</strong> ' + escapeHtml(rec.suggestedCombo.systemPrompt.title);
+      sp.onclick = function() { switchTab('browse'); showPrompt(rec.suggestedCombo.systemPrompt.slug); };
+      combo.appendChild(sp);
+    }
+    if (rec.suggestedCombo.framework) {
+      var fw = document.createElement('div');
+      fw.style.cssText = 'font-size:13px;margin:4px 0;cursor:pointer;';
+      fw.innerHTML = '\uD83D\uDD27 <strong>Framework:</strong> ' + escapeHtml(rec.suggestedCombo.framework.title);
+      fw.onclick = function() { switchTab('browse'); showPrompt(rec.suggestedCombo.framework.slug); };
+      combo.appendChild(fw);
+    }
+    if (rec.suggestedCombo.template) {
+      var tpl = document.createElement('div');
+      tpl.style.cssText = 'font-size:13px;margin:4px 0;cursor:pointer;';
+      tpl.innerHTML = '\uD83D\uDCDD <strong>Template:</strong> ' + escapeHtml(rec.suggestedCombo.template.title);
+      tpl.onclick = function() { switchTab('browse'); showPrompt(rec.suggestedCombo.template.slug); };
+      combo.appendChild(tpl);
+    }
+
+    el.appendChild(combo);
+  }
+
+  // Top prompts list
+  var listH = document.createElement('div');
+  listH.style.cssText = 'font-weight:600;margin-bottom:8px;';
+  listH.textContent = 'Top matches:';
+  el.appendChild(listH);
+
+  rec.topPrompts.forEach(function(p) {
+    var item = document.createElement('div');
+    item.style.cssText = 'padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius);margin:6px 0;cursor:pointer;transition:all 0.15s;';
+    item.innerHTML = '<div style="font-weight:600;">' + escapeHtml(p.title) + ' <span class="tag">' + escapeHtml(p.category) + '</span></div>' +
+      '<div style="font-size:12px;color:var(--text-dim);margin-top:4px;">Relevance: ' + p.relevanceScore + ' · ' + (p.tags||[]).slice(0,3).join(', ') + '</div>';
+    item.onmouseover = function() { item.style.borderColor = 'var(--accent)'; };
+    item.onmouseout = function() { item.style.borderColor = 'var(--border)'; };
+    item.onclick = function() { switchTab('browse'); showPrompt(p.slug); };
+    el.appendChild(item);
+  });
+}
+
+// ── PLAYGROUND TAB ──
+function renderPlaygroundSidebar() {
+  var container = document.getElementById('promptList');
+  container.textContent = '';
+  container.innerHTML = '<div style="padding:16px;font-size:13px;color:var(--text-secondary);line-height:1.6;">' +
+    '<strong>\uD83D\uDE80 AI Playground</strong><br><br>' +
+    'Send prompts directly to AI models and see responses in real time.<br><br>' +
+    '<strong>Supported models:</strong><br>' +
+    '\u2022 OpenAI (GPT-4o, GPT-4o-mini)<br>' +
+    '\u2022 Anthropic (Claude Sonnet, Opus, Haiku)<br>' +
+    '\u2022 Google (Gemini 2.0 Flash, Pro)<br><br>' +
+    '<em>Configure your API keys via the \u2699 button in the top-right corner.</em>' +
+    '</div>';
+}
+
+function showPlayground() {
+  var main = document.getElementById('mainPanel');
+  main.className = 'main';
+  main.textContent = '';
+
+  var h2 = document.createElement('h2');
+  h2.textContent = '\uD83D\uDE80 AI Playground';
+  h2.style.cssText = 'margin-bottom:8px;font-size:24px;';
+  main.appendChild(h2);
+
+  var desc = document.createElement('p');
+  desc.style.cssText = 'color:var(--text-secondary);margin-bottom:16px;font-size:14px;';
+  desc.textContent = 'Send prompts to AI models, see responses, iterate. Configure API keys via the \u2699 button.';
+  main.appendChild(desc);
+
+  if (showHelpBanners) {
+    var help = document.createElement('div');
+    help.className = 'help-banner';
+    help.innerHTML = '<h4>\uD83C\uDF93 How the Playground works</h4>' +
+      '<p>The Playground lets you test your prompts directly with AI models without leaving this tool.</p>' +
+      '<ul>' +
+      '<li><strong>System prompt</strong> (optional) — sets the AI\'s persona and rules (like the "You are a…" part)</li>' +
+      '<li><strong>User prompt</strong> — what you actually want the AI to do</li>' +
+      '<li><strong>Model</strong> — which AI to use (set in \u2699 API Settings)</li>' +
+      '</ul>' +
+      '<div class="tip">\uD83D\uDC49 Quick workflow: Browse \u2192 Quick Fill a template \u2192 Copy \u2192 Paste here \u2192 Send to AI</div>';
+    main.appendChild(help);
+  }
+
+  var active = getActiveProvider();
+  if (!active) {
+    var noKey = document.createElement('div');
+    noKey.style.cssText = 'padding:32px;text-align:center;background:var(--code-bg);border-radius:var(--radius);margin:20px 0;';
+    noKey.innerHTML = '<div style="font-size:24px;margin-bottom:12px;">\uD83D\uDD11</div>' +
+      '<div style="font-size:16px;font-weight:600;margin-bottom:8px;">API Key Required</div>' +
+      '<div style="font-size:14px;color:var(--text-secondary);margin-bottom:16px;">To use the Playground, you need an API key from at least one provider.</div>' +
+      '<button class="btn primary" onclick="showApiSettings()">\u2699 Configure API Keys</button>';
+    main.appendChild(noKey);
+    return;
+  }
+
+  // Provider indicator
+  var providerBadge = document.createElement('div');
+  providerBadge.style.cssText = 'font-size:12px;color:var(--text-dim);margin-bottom:16px;';
+  providerBadge.innerHTML = 'Active: <strong>' + active.provider + '</strong> (' + active.model + ') · <a href="#" onclick="showApiSettings();return false;">Change</a>';
+  main.appendChild(providerBadge);
+
+  // System prompt
+  var sysLabel = document.createElement('label');
+  sysLabel.style.cssText = 'font-weight:600;display:block;margin-bottom:4px;font-size:13px;';
+  sysLabel.textContent = 'System prompt (optional):';
+  main.appendChild(sysLabel);
+
+  var sysText = document.createElement('textarea');
+  sysText.id = 'pgSystemPrompt';
+  sysText.rows = 3;
+  sysText.placeholder = 'e.g., "You are a senior developer who writes clean, tested code..."';
+  sysText.style.cssText = 'width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-input);color:var(--text);font-size:13px;line-height:1.5;resize:vertical;font-family:inherit;margin-bottom:12px;';
+  main.appendChild(sysText);
+
+  // User prompt
+  var userLabel = document.createElement('label');
+  userLabel.style.cssText = 'font-weight:600;display:block;margin-bottom:4px;font-size:13px;';
+  userLabel.textContent = 'Your prompt:';
+  main.appendChild(userLabel);
+
+  var userText = document.createElement('textarea');
+  userText.id = 'pgUserPrompt';
+  userText.rows = 6;
+  userText.placeholder = 'Type or paste your prompt here...\n\nTip: Use the Browse tab to find a template, Quick Fill it, then paste it here.';
+  userText.style.cssText = 'width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-input);color:var(--text);font-size:14px;line-height:1.5;resize:vertical;font-family:inherit;';
+  main.appendChild(userText);
+
+  // Pre-fill from optimizer
+  var prefill = storage.get('pg_prefill', '');
+  if (prefill) {
+    userText.value = prefill;
+    storage.set('pg_prefill', '');
+  }
+
+  // Actions
+  var actions = document.createElement('div');
+  actions.style.cssText = 'display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;align-items:center;';
+
+  var sendBtn = document.createElement('button');
+  sendBtn.className = 'btn primary';
+  sendBtn.id = 'pgSendBtn';
+  sendBtn.textContent = '\u25B6 Send to ' + active.provider;
+  sendBtn.style.cssText = 'padding:10px 20px;font-size:15px;';
+  sendBtn.onclick = async function() {
+    var userPrompt = document.getElementById('pgUserPrompt').value.trim();
+    if (!userPrompt) { showToast('Enter a prompt first'); return; }
+    var sysPrompt = document.getElementById('pgSystemPrompt').value.trim();
+    sendBtn.disabled = true;
+    sendBtn.textContent = '\u23F3 Sending...';
+    var respArea = document.getElementById('pgResponseArea');
+    respArea.innerHTML = '<div class="pg-loading"><div class="spinner"></div>Waiting for ' + active.provider + '...</div>';
+    try {
+      var result = await sendToAI(userPrompt, sysPrompt, active.provider, active.key, active.model);
+      respArea.textContent = '';
+      var pre = document.createElement('div');
+      pre.className = 'pg-response';
+      pre.textContent = result.text;
+      respArea.appendChild(pre);
+      var meta = document.createElement('div');
+      meta.className = 'pg-meta';
+      meta.innerHTML = '<span>Model: ' + result.model + '</span>';
+      if (result.usage) {
+        meta.innerHTML += '<span>Tokens: ' + (result.usage.prompt_tokens || result.usage.input_tokens || '?') + ' in / ' + (result.usage.completion_tokens || result.usage.output_tokens || '?') + ' out</span>';
+      }
+      respArea.appendChild(meta);
+      // Copy button for response
+      var copyRespBtn = document.createElement('button');
+      copyRespBtn.className = 'btn';
+      copyRespBtn.textContent = '\uD83D\uDCCB Copy response';
+      copyRespBtn.style.marginTop = '8px';
+      copyRespBtn.onclick = function() {
+        navigator.clipboard.writeText(result.text).then(function(){ showToast('Response copied!'); });
+      };
+      respArea.appendChild(copyRespBtn);
+    } catch(err) {
+      respArea.innerHTML = '<div style="color:var(--danger);padding:12px;">\u274C Error: ' + escapeHtml(err.message) + '</div>';
+    }
+    sendBtn.disabled = false;
+    sendBtn.textContent = '\u25B6 Send to ' + active.provider;
+  };
+  actions.appendChild(sendBtn);
+
+  var lintBtn = document.createElement('button');
+  lintBtn.className = 'btn';
+  lintBtn.textContent = '\uD83D\uDD0D Lint this prompt';
+  lintBtn.onclick = function() {
+    var text = document.getElementById('pgUserPrompt').value.trim();
+    if (!text) { showToast('Enter a prompt first'); return; }
+    var result = browserLintPrompt(text);
+    showToast('Score: ' + result.score + '/100 (Grade ' + result.grade + ')');
+  };
+  actions.appendChild(lintBtn);
+
+  main.appendChild(actions);
+
+  // Response area
+  var respArea = document.createElement('div');
+  respArea.id = 'pgResponseArea';
+  respArea.style.marginTop = '20px';
+  main.appendChild(respArea);
+}
+
 // ── Keyboard shortcuts ──
 document.addEventListener('keydown', function(e) {
   // Don't trigger shortcuts when typing in inputs
@@ -2651,12 +3516,14 @@ document.addEventListener('keydown', function(e) {
   }
   // H = toggle help
   if (e.key === 'h' || e.key === 'H') { toggleHelp(); }
-  // 1-5 = switch tabs
+  // 1-7 = switch tabs
   if (e.key === '1') { switchTab('browse'); }
   if (e.key === '2') { switchTab('compose'); }
   if (e.key === '3') { switchTab('create'); }
   if (e.key === '4') { switchTab('generate'); }
-  if (e.key === '5') { switchTab('saved'); }
+  if (e.key === '5') { switchTab('tools'); }
+  if (e.key === '6') { switchTab('playground'); }
+  if (e.key === '7') { switchTab('saved'); }
   // D = toggle dark mode
   if (e.key === 'd' || e.key === 'D') { toggleDark(); }
   // Escape = clear search

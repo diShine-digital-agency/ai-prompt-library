@@ -1,10 +1,10 @@
 # prompt-library
 
-**82+ expert-level prompt templates with a CLI and visual Prompt Workshop to search, browse, compose, create, and generate prompts.**
+**82+ expert-level prompt templates with a CLI and visual Prompt Workshop to search, browse, compose, create, generate, lint, optimize, and test prompts with AI models.**
 
 If you work with LLMs regularly, you've probably got prompts scattered across Notion docs, Slack messages, and random text files. This library collects the prompting techniques, system prompts, and templates we actually use in client work — organized, searchable, and ready to copy-paste. It covers everything from Chain-of-Thought fundamentals to production system prompts for specific use cases like code review, SEO briefs, and data analysis.
 
-There's a CLI so you can search and read prompts from your terminal, **create custom system prompts** with dynamic fields, **generate prompts from frameworks**, and compose multi-layer prompts — all with persistence. There's also a standalone **Prompt Workshop** (just open `viewer.html`) with the same features in a visual interface, including field building, prompt generation, and a personal library.
+There's a CLI so you can search and read prompts from your terminal, **create custom system prompts** with dynamic fields, **generate prompts from frameworks**, compose multi-layer prompts, **lint prompts for quality**, **optimize them automatically**, and **get smart recommendations**. There's also a standalone **Prompt Workshop** (just open `viewer.html`) with the same features in a visual interface, plus an **AI Playground** to send prompts directly to GPT, Claude, or Gemini.
 
 Zero npm dependencies. Just Node.js built-in modules.
 
@@ -20,10 +20,12 @@ The **Prompt Workshop** is a standalone HTML file — no server, no build step, 
 
 | Tab | Description |
 |-----|-------------|
-| **Browse** | Search and filter all 64+ prompts by category, difficulty, model, or keyword. Click any prompt to read the full content, copy it, or build it interactively. |
+| **Browse** | Search and filter all 82+ prompts by category, difficulty, model, or keyword. Click any prompt to read the full content, copy it, or build it interactively. |
 | **Compose** | Build layered prompts by combining a **system prompt** (persona) + **reasoning framework** (technique) + **task template** (the work). All three combine into one powerful prompt. |
 | **Create** | Build your own custom prompts with dynamic `{{field_name}}` placeholders. Define fields, write the body, and save to your personal library. |
 | **Generate** | Pick a proven framework, answer guided questions, and get a production-ready system prompt generated automatically — no prompt engineering experience needed. |
+| **Tools** | **Prompt Linter** (14-rule quality analysis with 0–100 scoring), **Prompt Optimizer** (instant rule-based + optional AI-powered rewriting), and **Smart Recommender** (describe your use case, get personalized prompt suggestions). |
+| **Playground** | Send prompts directly to AI models (OpenAI GPT, Anthropic Claude, Google Gemini). Add a system prompt, see responses, track token usage — iterate without leaving the tool. |
 | **My Library** | All your saved prompts, filled templates, and compositions. Stored in your browser's localStorage — persists across sessions. |
 
 ### Quick Fill & Compose
@@ -42,7 +44,7 @@ This is the fastest way to use templates from the library. No prompt engineering
 
 | Key | Action |
 |-----|--------|
-| `1`–`5` | Switch between tabs (Browse, Compose, Create, Generate, My Library) |
+| `1`–`7` | Switch between tabs (Browse, Compose, Create, Generate, Tools, Playground, My Library) |
 | `Ctrl+K` | Focus the search box |
 | `H` | Toggle beginner help tips on/off |
 | `D` | Toggle dark mode |
@@ -51,6 +53,53 @@ This is the fastest way to use templates from the library. No prompt engineering
 ### Beginner mode
 
 Click the **?** button (top-right) to toggle beginner help tips. When enabled, each tab shows contextual guidance explaining what the feature does, how to use it, and pro tips for better results. Perfect for people new to prompt engineering.
+
+### API Settings (⚙)
+
+Click the **⚙** button (top-right) to configure API keys for OpenAI, Anthropic, and Google. Keys are stored locally in your browser — never sent anywhere except the API provider. Required for the Playground and AI-powered optimization.
+
+---
+
+## New in v2.2.0
+
+### AI Playground
+
+A new **Playground** tab lets you send prompts directly to AI models without leaving the tool. Add an optional system prompt, type or paste your user prompt, and hit Send. Responses display with model info and token usage. Supports OpenAI (GPT-4o, GPT-4o-mini), Anthropic (Claude Sonnet, Opus, Haiku), and Google (Gemini 2.0 Flash, Pro).
+
+Configure your API keys via the ⚙ settings button. Keys are stored locally in your browser's localStorage.
+
+### Prompt Linter
+
+Paste any prompt and get a **0–100 quality score** with a letter grade (A–F). The linter checks 14 rules including:
+- Role definition, clear task statement, context, output format
+- Constraints, examples, structured sections, specific language
+- Target audience, tone, quality verification step
+- Appropriate length and conciseness
+
+Each failed rule comes with a specific, actionable suggestion to improve.
+
+### Prompt Optimizer
+
+Two modes:
+- **Instant** (rule-based) — works offline with zero cost. Restructures your prompt with labeled sections, adds missing role/format/constraints, removes anti-patterns.
+- **AI-Powered** — sends your prompt to your configured AI model for a more nuanced rewrite.
+
+Shows a before/after quality score so you can see the improvement.
+
+### Smart Recommender
+
+Describe what you need in plain English (e.g., "I need to write marketing copy for a SaaS landing page") and get:
+- A **recommended combination** of system prompt + framework + template
+- **Top matching prompts** ranked by relevance score
+- Click any result to browse it directly
+
+### New CLI commands
+
+```bash
+prompt-lib lint         # Analyze a prompt for quality issues
+prompt-lib optimize     # Rewrite a prompt with best practices
+prompt-lib recommend "write marketing copy for SaaS"  # Smart suggestions
+```
 
 ---
 
@@ -119,6 +168,15 @@ prompt-lib generate
 # View saved compositions and custom prompts
 prompt-lib saved
 
+# Analyze a prompt for quality issues (0-100 score, A-F grade)
+prompt-lib lint
+
+# Rewrite a prompt with best practices (rule-based, offline)
+prompt-lib optimize
+
+# Get smart prompt suggestions for your use case
+prompt-lib recommend "write marketing copy for a SaaS landing page"
+
 # Open the Prompt Workshop in your default browser
 prompt-lib viewer
 
@@ -138,7 +196,7 @@ prompt-lib --version
 
 ---
 
-## New in v2.1.0
+## v2.1.0
 
 ### Quick Fill & Compose
 
@@ -150,7 +208,7 @@ Toggle the **?** button to enable contextual help banners in every tab. Each ban
 
 ### Keyboard shortcuts
 
-Navigate the Workshop with your keyboard: `1`–`5` to switch tabs, `Ctrl+K` to search, `H` for help, `D` for dark mode, `Esc` to clear search.
+Navigate the Workshop with your keyboard: `1`–`7` to switch tabs, `Ctrl+K` to search, `H` for help, `D` for dark mode, `Esc` to clear search.
 
 ### 30 new expert prompts (82 total)
 

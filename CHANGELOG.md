@@ -2,6 +2,37 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.2.0] — 2026-04-06
+
+### Added
+
+- **AI Playground** — New "Playground" tab in the Prompt Workshop lets you send prompts directly to AI models (OpenAI GPT, Anthropic Claude, Google Gemini) and see responses in real time. Supports system prompts, token usage tracking, and one-click response copying. Configure API keys via the ⚙ settings button.
+
+- **API Settings panel** — Securely store API keys for OpenAI, Anthropic, and Google in your browser's localStorage. Choose your preferred provider and model. Keys are never sent anywhere except the API provider.
+
+- **Prompt Linter** — Analyze any prompt against 14 quality rules covering role definition, task clarity, output format, constraints, structure, examples, audience, tone, and more. Get a 0–100 score, letter grade (A–F), and prioritized improvement suggestions. Available in both CLI (`prompt-lib lint`) and the Prompt Workshop Tools tab.
+
+- **Prompt Optimizer** — Automatically restructure prompts with best practices: adds role definition, labeled sections, output format, constraints, and quality verification steps. Two modes:
+  - **Instant** (rule-based, no API needed) — works offline with zero cost
+  - **AI-Powered** — uses your configured API key for LLM-based rewriting
+
+- **Smart Recommender** — Describe what you need in plain English and get personalized prompt suggestions from the library. Analyzes your description against all prompts using intent detection and multi-signal scoring. Suggests the optimal system prompt + framework + template combination. Available via `prompt-lib recommend <query>` and the Tools tab.
+
+- **New CLI commands**:
+  - `prompt-lib lint` — interactive prompt quality analysis
+  - `prompt-lib optimize` — automatic prompt rewriting
+  - `prompt-lib recommend <query>` — smart prompt suggestions
+
+- **Tools tab** — New tab in the Prompt Workshop with three sub-tools: Linter, Optimizer, and Recommender. Each has beginner-friendly help banners.
+
+- **12 new tests** (37 total) covering the linter, optimizer, and recommender modules.
+
+### Changed
+
+- Keyboard shortcuts updated: `1`–`7` for all tabs (added `5` Tools, `6` Playground, `7` My Library)
+- Toolbar now includes ⚙ settings button alongside ? help and 🌙 dark mode
+- CLI version bumped to 2.2.0
+
 ## [2.1.0] — 2026-04-06
 
 ### Added
