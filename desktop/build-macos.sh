@@ -92,29 +92,25 @@ HTML="$DIR/viewer.html"
 # Try Google Chrome app mode (own window, no browser chrome)
 CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 if [ -x "$CHROME" ]; then
-  exec "$CHROME" --app="file://$HTML" --user-data-dir="$HOME/.prompt-workshop-app" &
-  exit 0
+  exec "$CHROME" --app="file://$HTML" --user-data-dir="$HOME/.prompt-workshop-app"
 fi
 
 # Try Chromium
 CHROMIUM="/Applications/Chromium.app/Contents/MacOS/Chromium"
 if [ -x "$CHROMIUM" ]; then
-  exec "$CHROMIUM" --app="file://$HTML" --user-data-dir="$HOME/.prompt-workshop-app" &
-  exit 0
+  exec "$CHROMIUM" --app="file://$HTML" --user-data-dir="$HOME/.prompt-workshop-app"
 fi
 
 # Try Microsoft Edge app mode
 EDGE="/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge"
 if [ -x "$EDGE" ]; then
-  exec "$EDGE" --app="file://$HTML" --user-data-dir="$HOME/.prompt-workshop-app" &
-  exit 0
+  exec "$EDGE" --app="file://$HTML" --user-data-dir="$HOME/.prompt-workshop-app"
 fi
 
 # Try Brave app mode
 BRAVE="/Applications/Brave Browser.app/Contents/MacOS/Brave Browser"
 if [ -x "$BRAVE" ]; then
-  exec "$BRAVE" --app="file://$HTML" --user-data-dir="$HOME/.prompt-workshop-app" &
-  exit 0
+  exec "$BRAVE" --app="file://$HTML" --user-data-dir="$HOME/.prompt-workshop-app"
 fi
 
 # Fallback: default browser
