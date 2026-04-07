@@ -28,7 +28,7 @@ All notable changes to this project will be documented in this file.
   - Persistent data storage independent of browser
   - One-click install: double-click `.zip` → drag `.app` to Applications
   - Requires macOS 11+ and Xcode Command Line Tools to build
-  - Falls back to Chrome/Edge/Brave app mode when built without `swiftc`
+  - Falls back to Chrome/Edge/Chromium/Brave app mode when built without `swiftc`
 
 - **Linux Native App** — Native Linux application built with Python3 + GTK + WebKitGTK:
   - Runs in its own window — no browser needed (on most desktop Linux distros)

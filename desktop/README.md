@@ -142,6 +142,8 @@ mv dist/PromptWorkshop.app /Applications/
 
 If the app appears in the Dock with a blank/generic icon:
 
+> ⚠️ **These commands clear system icon caches.** Review them before running. They are safe but require `sudo` (administrator password).
+
 ```bash
 # Clear the macOS icon cache and restart Finder
 sudo rm -rf /Library/Caches/com.apple.iconservices.store

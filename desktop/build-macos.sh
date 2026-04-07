@@ -88,29 +88,30 @@ else
 
 DIR="$(cd "$(dirname "$0")/../Resources" && pwd)"
 HTML="$DIR/viewer.html"
+DATA_DIR="${HOME:-/tmp}/.prompt-workshop-app"
 
 # Try Google Chrome app mode (own window, no browser chrome)
 CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 if [ -x "$CHROME" ]; then
-  exec "$CHROME" --app="file://$HTML" --user-data-dir="$HOME/.prompt-workshop-app"
+  exec "$CHROME" --app="file://$HTML" --user-data-dir="$DATA_DIR"
 fi
 
 # Try Chromium
 CHROMIUM="/Applications/Chromium.app/Contents/MacOS/Chromium"
 if [ -x "$CHROMIUM" ]; then
-  exec "$CHROMIUM" --app="file://$HTML" --user-data-dir="$HOME/.prompt-workshop-app"
+  exec "$CHROMIUM" --app="file://$HTML" --user-data-dir="$DATA_DIR"
 fi
 
 # Try Microsoft Edge app mode
 EDGE="/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge"
 if [ -x "$EDGE" ]; then
-  exec "$EDGE" --app="file://$HTML" --user-data-dir="$HOME/.prompt-workshop-app"
+  exec "$EDGE" --app="file://$HTML" --user-data-dir="$DATA_DIR"
 fi
 
 # Try Brave app mode
 BRAVE="/Applications/Brave Browser.app/Contents/MacOS/Brave Browser"
 if [ -x "$BRAVE" ]; then
-  exec "$BRAVE" --app="file://$HTML" --user-data-dir="$HOME/.prompt-workshop-app"
+  exec "$BRAVE" --app="file://$HTML" --user-data-dir="$DATA_DIR"
 fi
 
 # Fallback: default browser
