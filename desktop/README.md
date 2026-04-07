@@ -2,7 +2,9 @@
 
 The Prompt Workshop can run as a **native macOS application** with its own window — no browser needed. On Linux and Windows, it opens in your browser as a lightweight, self-contained package.
 
-All build scripts run on any system with Bash and Node.js. The macOS native app requires building on a Mac.
+All build scripts run on any system with Bash and Node.js. The macOS native app requires building on a Mac with **Xcode Command Line Tools** installed (`xcode-select --install`).
+
+> ⚠️ **Important:** If you build on macOS without Xcode Command Line Tools (or on Linux), the build produces an **app-mode fallback** that opens in Chrome/Edge instead of a fully native window. To get the native app experience, install Xcode CLI Tools first — see [macOS Troubleshooting](#macos-troubleshooting).
 
 ### Quick Start
 
@@ -21,7 +23,8 @@ Output goes to `dist/`:
 | Platform | Archive | Type | How to install |
 |----------|---------|------|----------------|
 | **macOS** (on Mac) | `PromptWorkshop-macOS.zip` | Native app (own window) | Double-click zip → drag to Applications |
-| **macOS** (on Linux) | `PromptWorkshop.tar.gz` | Browser wrapper | Extract → drag to Applications |
+| **macOS** (on Mac, no Xcode CLI) | `PromptWorkshop.tar.gz` | App-mode (Chrome/Edge window) | Extract → drag to Applications |
+| **macOS** (on Linux) | `PromptWorkshop.tar.gz` | App-mode (Chrome/Edge window) | Extract → drag to Applications |
 | **Linux** | `prompt-workshop-linux.tar.gz` | Native GTK app (own window) | Extract → double-click `install.sh` |
 | **Windows** | `PromptWorkshop-win.zip` | Native-style app (Edge app mode) | Extract → double-click `Install.bat` |
 
@@ -46,17 +49,19 @@ A **real macOS application** that runs in its own window — just like any other
 
 #### Option A: Build from source (recommended)
 
-The desktop app is built from source — it takes about 30 seconds. You need a Mac with Xcode Command Line Tools.
+The desktop app is built from source — it takes about 30 seconds. You need a Mac with Xcode Command Line Tools (`swiftc` compiler).
+
+> ⚠️ **You must install Xcode Command Line Tools first.** Without it, the build script creates an app-mode fallback that opens in Chrome/Edge instead of a fully native window. If you skip this step and the app opens in your browser, see [Troubleshooting](#macos-troubleshooting).
 
 ```bash
-# 1. Install Xcode Command Line Tools (if you don't have them)
+# 1. Install Xcode Command Line Tools (REQUIRED for native app)
 xcode-select --install
 
 # 2. Clone the repository
 git clone https://github.com/diShine-digital-agency/ai-prompt-library.git
 cd ai-prompt-library
 
-# 3. Build the app
+# 3. Build the app — look for "★ Native build" in the output
 ./desktop/build-macos.sh
 
 # 4. Install
@@ -66,7 +71,7 @@ mv dist/PromptWorkshop.app /Applications/
 open /Applications/PromptWorkshop.app
 ```
 
-> 💡 **First launch:** macOS may show a security warning. See [Troubleshooting](#macos-troubleshooting) below.
+> 💡 **Verify the build:** After running `build-macos.sh`, look at the output. You should see `★ Native build — runs in its own window`. If you see `⚠ App-mode fallback build`, install Xcode CLI Tools and rebuild.
 
 ### What's inside the app
 
@@ -110,6 +115,43 @@ Plus all the in-app shortcuts (1-7 for tabs, Ctrl+K for search, H for help, D fo
 
 ### <a name="macos-troubleshooting"></a>Troubleshooting
 
+#### App opens in the browser instead of its own window
+
+This means the build script created the **app-mode fallback** instead of the native app. This happens when:
+- Xcode Command Line Tools are not installed (no `swiftc` compiler)
+- The app was built on Linux and transferred to macOS
+
+**Fix:**
+
+```bash
+# 1. Install Xcode Command Line Tools
+xcode-select --install
+
+# 2. Rebuild the app
+cd ai-prompt-library
+./desktop/build-macos.sh
+
+# 3. Look for "★ Native build" in the output — this confirms the native app was built
+# 4. Reinstall
+mv dist/PromptWorkshop.app /Applications/
+```
+
+**Quick workaround (no rebuild):** If you have Google Chrome, Microsoft Edge, or Brave installed, the fallback launcher will open the app in app mode (its own window, no address bar) instead of the default browser. Install one of these browsers and relaunch the app.
+
+#### App icon is missing or blank in the Dock
+
+If the app appears in the Dock with a blank/generic icon:
+
+```bash
+# Clear the macOS icon cache and restart Finder
+sudo rm -rf /Library/Caches/com.apple.iconservices.store
+sudo find /private/var/folders/ -name com.apple.dock.iconcache -exec rm -f {} \; 2>/dev/null
+sudo find /private/var/folders/ -name com.apple.iconservices -exec rm -rf {} \; 2>/dev/null
+killall Dock
+```
+
+Then reopen the app. macOS caches icons aggressively — rebuilding the cache forces it to re-read the icon from the app bundle.
+
 #### "PromptWorkshop.app is damaged and can't be opened"
 
 This is macOS Gatekeeper blocking unsigned apps. It's safe — the app is open source and you can inspect the code. Fix it with one of these methods:
@@ -142,7 +184,7 @@ Or wait a few minutes — it will appear automatically.
 
 #### Build error: "swiftc: command not found"
 
-You need Xcode Command Line Tools. Install them:
+You need Xcode Command Line Tools. Without them, the build script creates an app-mode fallback instead of the native app (see [App opens in the browser](#macos-troubleshooting) above). Install them:
 
 ```bash
 xcode-select --install
@@ -171,11 +213,18 @@ xcrun stapler staple PromptWorkshop.app
 
 ---
 
-## macOS — Browser version (fallback)
+## macOS — App-Mode Fallback
 
-If you build on Linux or don't have Xcode Command Line Tools, the build script creates a lighter version that opens in your default browser. It works identically but doesn't have its own window.
+If you build on Linux or don't have Xcode Command Line Tools, the build script creates a lighter version that opens in **Chrome/Edge/Brave app mode** (own window, no address bar or tabs). If none of these browsers are installed, it falls back to your default browser.
 
-To use this version, simply run `./desktop/build-macos.sh` on Linux or on a Mac without `swiftc`. The resulting `.app` will open `viewer.html` in Safari/Chrome when launched.
+This version works identically to the native app in terms of features, but doesn't have macOS menu bar integration or its own data store (uses your browser's localStorage instead).
+
+To upgrade to the native app version, install Xcode Command Line Tools and rebuild:
+
+```bash
+xcode-select --install
+./desktop/build-macos.sh
+```
 
 ---
 
@@ -481,8 +530,8 @@ The Prompt Workshop is a standalone HTML file that works in any modern mobile br
 
 | Approach | Size | Deps | Offline | Native feel | Build on Linux |
 |----------|------|------|---------|-------------|----------------|
-| **This (macOS native)** | ~1MB | None (Swift built-in) | ✅ | ✅ Own window, menus, dock | ❌ (needs Mac) |
-| **This (browser wrapper)** | ~224KB | None | ✅ | Opens in browser | ✅ |
+| **This (macOS native)** | ~1MB | None (Swift built-in) | ✅ | ✅ Own window, menus, dock | ❌ (needs Mac + Xcode CLI) |
+| **This (macOS app-mode)** | ~224KB | Chrome/Edge/Brave | ✅ | ✅ Own window (app mode) | ✅ |
 | Electron / Nativefier | 200MB+ | Node.js | ✅ | Full native | ❌ |
 | Tauri | 50-80MB | Rust | ✅ | Full native | ❌ (cross-compile) |
 | PWA (hosted) | 0 | Web server | ✅ (after first load) | Partial | ✅ |

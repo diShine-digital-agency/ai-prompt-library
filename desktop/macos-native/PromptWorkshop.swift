@@ -8,6 +8,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var webView: WKWebView!
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        // Set the Dock / app icon from the bundle's .icns file
+        if let iconPath = Bundle.main.path(forResource: "AppIcon", ofType: "icns") {
+            NSApp.applicationIconImage = NSImage(contentsOfFile: iconPath)
+        }
+
         // Window
         let screenSize = NSScreen.main?.frame.size ?? NSSize(width: 1440, height: 900)
         let width: CGFloat = min(1280, screenSize.width * 0.85)
@@ -140,6 +145,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         alert.messageText = "Prompt Workshop"
         alert.informativeText = "82+ expert prompt templates — browse, compose, create, lint, optimize, and test prompts with AI models.\n\nBuilt by diShine Digital Agency\nhttps://dishine.it"
         alert.alertStyle = .informational
+        if let icon = NSApp.applicationIconImage {
+            alert.icon = icon
+        }
         alert.addButton(withTitle: "OK")
         alert.runModal()
     }
