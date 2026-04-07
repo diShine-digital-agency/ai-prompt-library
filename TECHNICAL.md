@@ -235,6 +235,19 @@ The framework will automatically appear in both the CLI (`prompt-lib generate`) 
 
 Add a new `case` in the `switch` statement in `bin/prompt-lib.js`, and add the command to the `HELP` string.
 
+### Desktop Distribution
+
+The `desktop/` directory contains build scripts for all platforms:
+
+| Script | Platform | Output |
+|--------|----------|--------|
+| `build-all.sh` | All | Builds macOS + Linux + Windows |
+| `build-macos.sh` | macOS | `.app` bundle (~724KB) |
+| `build-linux.sh` | Linux | Directory with `.desktop` file + installer |
+| `build-windows.bat` | Windows | Portable folder with `.vbs` / `.bat` launchers |
+
+All scripts can run on Linux (no cross-compilation needed). The app is a thin launcher that opens `viewer.html` in the system's default browser.
+
 ---
 
 ## Testing

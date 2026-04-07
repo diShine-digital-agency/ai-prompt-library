@@ -16,6 +16,12 @@ All notable changes to this project will be documented in this file.
 
 - **macOS app** — Build a lightweight macOS application (724KB) with `./desktop/build-macos.sh`. Creates a `.app` bundle that opens the Prompt Workshop in your browser. No Electron, no compilation needed — builds on Linux or macOS.
 
+- **Linux app** — Build a Linux package with `.desktop` integration via `./desktop/build-linux.sh`. Includes installer script, application menu entry, and terminal launcher.
+
+- **Windows app** — Build a portable Windows package with `./desktop/build-all.sh`. Includes `.vbs` launcher (no console window), `.bat` fallback, and `viewer.html`. No installer or admin rights needed.
+
+- **Cross-platform build** — `./desktop/build-all.sh` builds all three platforms from any system with Bash and Node.js (~224KB per platform).
+
 ### Changed
 
 - **Nav tabs wrap** — The navigation tabs now wrap to two rows when the sidebar is narrow, ensuring all 7 tabs (including My Library) are always visible regardless of sidebar width.

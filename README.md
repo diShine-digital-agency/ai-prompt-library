@@ -368,8 +368,11 @@ ai-prompt-library/
     business/              business templates
     image-generation/      image & visual AI prompt templates
   desktop/
+    build-all.sh           cross-platform build (macOS + Linux + Windows)
     build-macos.sh         macOS .app build script
-    README.md              desktop & mobile distribution guide
+    build-linux.sh         Linux .desktop build script
+    build-windows.bat      Windows build script (for use on Windows)
+    README.md              install guides, troubleshooting, platform notes
   viewer.html              interactive Prompt Workshop (standalone, works offline)
   test/run.js              test suite
   CHANGELOG.md             version history
@@ -378,21 +381,23 @@ ai-prompt-library/
 
 ---
 
-## macOS & Mobile
+## Desktop & Mobile Apps
 
-### macOS App
-
-Build a lightweight macOS application (724KB) that opens the Prompt Workshop in your browser:
+The Prompt Workshop runs as a native-feeling app on all platforms — no Electron, no heavy frameworks (~224KB per platform).
 
 ```bash
-./desktop/build-macos.sh
+# Build for all platforms at once
+./desktop/build-all.sh
 ```
 
-This creates `dist/PromptWorkshop.app` — just move it to `/Applications/` and launch. No Electron, no compilation, no bloat. See [`desktop/README.md`](desktop/README.md) for details.
+| Platform | Archive | Install |
+|----------|---------|---------|
+| **macOS** | `PromptWorkshop.tar.gz` | Extract → move `.app` to `/Applications/` |
+| **Linux** | `prompt-workshop-linux.tar.gz` | Extract → `./install.sh` → launch from app menu |
+| **Windows** | `PromptWorkshop-win.zip` | Extract → double-click `PromptWorkshop.vbs` |
+| **Android / iOS** | — | Open `viewer.html` in browser → "Add to Home Screen" |
 
-### Android / Mobile
-
-Open `viewer.html` directly in any mobile browser — it's fully responsive and works offline. In Chrome, use "Add to Home Screen" for an app-like experience.
+See [`desktop/README.md`](desktop/README.md) for detailed install instructions, troubleshooting, and platform-specific notes.
 
 ---
 

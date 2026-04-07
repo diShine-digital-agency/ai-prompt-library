@@ -1,6 +1,6 @@
 # Prompt Library -- User Guide
 
-A practical, non-technical guide to getting started with the diShine Prompt Library v2.0.
+A practical, non-technical guide to getting started with the diShine Prompt Library v2.2.
 
 ---
 
@@ -315,11 +315,13 @@ something genuinely useful -- not just a reader, but a builder.
 **How to open it:**
 
 - **Option 1**: open `viewer.html` from the repo directly in any browser.
-  All 52+ prompts are embedded in the file, so it works offline.
+  All 72+ prompts are embedded in the file, so it works offline.
 - **Option 2**: run `prompt-lib viewer` to generate a fresh version with any
   prompts you've added, and open it in your default browser automatically.
+- **Option 3**: install as a desktop app — see [`desktop/README.md`](desktop/README.md)
+  for macOS, Linux, and Windows packages.
 
-**Five tabs:**
+**Seven tabs:**
 
 1. **Browse** -- the default. Shows all prompts in a searchable sidebar with
    filters for category, difficulty, and model family. Click a prompt to read it.
@@ -337,7 +339,15 @@ something genuinely useful -- not just a reader, but a builder.
    a production-ready prompt generated automatically. Save it as a custom
    prompt for reuse.
 
-5. **My Library** -- everything you've saved:
+5. **Tools** -- Prompt Linter (14-rule quality scoring), Prompt Optimizer
+   (instant rule-based + AI-powered rewriting), and Smart Recommender
+   (describe your use case, get personalized suggestions).
+
+6. **Playground** -- send prompts directly to AI models (OpenAI GPT,
+   Anthropic Claude, Google Gemini). Add system prompts, track token
+   usage, iterate without leaving the tool.
+
+7. **My Library** -- everything you've saved:
    - **Favorites** -- prompts you bookmarked from Browse (saved as editable copies)
    - **Filled prompts** -- prompts you built with the Workshop
    - **Composed prompts** -- multi-layer prompts from the Compose tab
@@ -498,6 +508,16 @@ Templates for professional communication and planning:
 | Long documents | Gemini | 1M token context window |
 | Privacy-sensitive | Llama | Self-hosted, data stays on-premise |
 | High volume | Mistral | Fast inference, cost-efficient |
+
+---
+
+## Desktop Apps
+
+The Prompt Workshop can be installed as a desktop application on macOS, Linux, and Windows. See [`desktop/README.md`](desktop/README.md) for full install guides and troubleshooting.
+
+```bash
+./desktop/build-all.sh    # Build for all platforms
+```
 
 ---
 
