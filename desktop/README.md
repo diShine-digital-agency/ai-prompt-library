@@ -44,18 +44,9 @@ A **real macOS application** that runs in its own window — just like any other
 
 ### How to install (step by step)
 
-#### Option A: Download and install (easiest — no terminal needed)
+#### Option A: Build from source (recommended)
 
-1. **Download** `PromptWorkshop-macOS.zip` from the [Releases page](https://github.com/diShine-digital-agency/ai-prompt-library/releases)
-2. **Double-click** the `.zip` file — macOS extracts it automatically
-3. **Drag** `PromptWorkshop.app` into your **Applications** folder
-4. **Double-click** `PromptWorkshop.app` to launch — that's it!
-
-> 💡 **First launch:** macOS may show a security warning. See [Troubleshooting](#macos-troubleshooting) below.
-
-#### Option B: Build from source
-
-If you want to build it yourself (requires a Mac with Xcode Command Line Tools):
+The desktop app is built from source — it takes about 30 seconds. You need a Mac with Xcode Command Line Tools.
 
 ```bash
 # 1. Install Xcode Command Line Tools (if you don't have them)
@@ -74,6 +65,8 @@ mv dist/PromptWorkshop.app /Applications/
 # 5. Launch
 open /Applications/PromptWorkshop.app
 ```
+
+> 💡 **First launch:** macOS may show a security warning. See [Troubleshooting](#macos-troubleshooting) below.
 
 ### What's inside the app
 
@@ -200,40 +193,36 @@ A **native Linux application** that runs in its own window — just like any oth
 
 The native window uses GTK + WebKitGTK (pre-installed on most GNOME/Ubuntu/Fedora desktops). If those libraries aren't available, it falls back to Chrome/Edge app mode or your regular browser.
 
-### How to install (step by step — no terminal needed)
+### How to install (step by step)
 
-#### Option A: Double-click install (easiest)
-
-1. **Download** `prompt-workshop-linux.tar.gz` from the [Releases page](https://github.com/diShine-digital-agency/ai-prompt-library/releases)
-2. **Right-click** the file → **Extract Here** (or double-click to open in Archive Manager)
-3. **Open** the `prompt-workshop` folder
-4. **Double-click** `install.sh`
-   - On GNOME: a dialog shows progress and a "✅ Installed!" message
-   - On KDE: a similar dialog appears
-   - On other desktops: a terminal window opens briefly with install status
-5. **Done!** Search "Prompt Workshop" in your application menu to launch
-
-> 💡 If `install.sh` opens as a text file instead of running, right-click it → **Properties** → **Permissions** → check **"Allow executing file as program"** → then double-click again.
-
-#### Option B: Install from terminal
+#### Option A: Build from source (recommended)
 
 ```bash
-# 1. Extract
-tar -xzf prompt-workshop-linux.tar.gz
+# 1. Clone the repository
+git clone https://github.com/diShine-digital-agency/ai-prompt-library.git
+cd ai-prompt-library
 
-# 2. Run installer
+# 2. Build the Linux package
+./desktop/build-linux.sh
+
+# 3. Extract and install
+cd dist
+tar -xzf prompt-workshop-linux.tar.gz
 cd prompt-workshop
 ./install.sh
 
-# 3. Launch
+# 4. Launch
 prompt-workshop
 ```
 
-#### Option C: Run directly (no install)
+You can also double-click `install.sh` from your file manager — on GNOME, a dialog shows progress and a "✅ Installed!" message.
+
+> 💡 If `install.sh` opens as a text file instead of running, right-click it → **Properties** → **Permissions** → check **"Allow executing file as program"** → then double-click again.
+
+#### Option B: Run directly (no install)
 
 ```bash
-tar -xzf prompt-workshop-linux.tar.gz
-cd prompt-workshop
+cd dist/prompt-workshop
 ./prompt-workshop
 ```
 
@@ -314,17 +303,34 @@ A **native-style Windows application** that runs in its own window using Microso
 - ✅ No admin rights needed
 - ✅ No registry changes
 
-### How to install (step by step — no terminal needed)
+### How to install (step by step)
 
-1. **Download** `PromptWorkshop-win.zip` from the [Releases page](https://github.com/diShine-digital-agency/ai-prompt-library/releases)
-2. **Right-click** the `.zip` file → **Extract All…** → click **Extract**
-3. **Open** the `PromptWorkshop-win` folder
-4. **Double-click** `Install.bat`
-5. **Done!** You now have:
-   - A **Desktop shortcut** (Prompt Workshop icon on your desktop)
-   - A **Start Menu entry** (search "Prompt Workshop")
+#### Option A: Build from source
+
+You need Bash (Git Bash or WSL) and Node.js 18+.
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/diShine-digital-agency/ai-prompt-library.git
+cd ai-prompt-library
+
+# 2. Build (from Git Bash or WSL)
+./desktop/build-all.sh
+
+# 3. Extract and install
+# The output is in dist/PromptWorkshop-win.zip (or dist/PromptWorkshop-win/)
+# Extract the zip, then double-click Install.bat
+```
+
+After running `Install.bat`, you get:
+- A **Desktop shortcut** (Prompt Workshop icon on your desktop)
+- A **Start Menu entry** (search "Prompt Workshop")
 
 > 💡 **First time only:** Windows SmartScreen may show "Windows protected your PC". Click **More info** → **Run anyway**. This is normal for unsigned scripts.
+
+#### Option B: Run without building (browser only)
+
+If you don't want to build anything, just open `viewer.html` directly in your browser. You get the full Prompt Workshop, no build step needed.
 
 ### What's inside the package
 

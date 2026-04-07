@@ -1,6 +1,8 @@
 # Technical Documentation
 
-Architecture, data flow, and extension guide for the diShine Prompt Library.
+Architecture, data flow, and extension guide for the diShine Prompt Library v2.3.
+
+> **Looking for how to use the tools?** See [FUNCTIONS.md](FUNCTIONS.md) for detailed usage docs on each function.
 
 ---
 
@@ -13,17 +15,29 @@ Architecture, data flow, and extension guide for the diShine Prompt Library.
 │   CLI (bin/prompt-lib.js)    HTML (viewer.html)          │
 │   ├── list, search, show     ├── Browse tab              │
 │   ├── use, copy              ├── Compose tab             │
-│   ├── compose                ├── Create tab (v2.0)       │
-│   ├── create (v2.0)          ├── Generate tab (v2.0)     │
-│   ├── generate (v2.0)        └── My Library tab          │
-│   └── saved (v2.0)                                       │
+│   ├── compose                ├── Create tab              │
+│   ├── create                 ├── Generate tab            │
+│   ├── generate               ├── Tools tab               │
+│   ├── lint                   │   ├── Linter              │
+│   ├── optimize               │   ├── Optimizer           │
+│   ├── recommend              │   └── Recommender         │
+│   ├── saved                  ├── Playground tab          │
+│   └── viewer                 └── My Library tab          │
+│                                                         │
+│   Desktop apps (desktop/)                               │
+│   ├── macOS native (Swift + WebKit)                     │
+│   ├── Linux native (Python + GTK + WebKitGTK)           │
+│   └── Windows (Edge/Chrome app mode)                    │
 ├─────────────────────────────────────────────────────────┤
 │                    Core Modules                          │
 │                                                         │
 │   src/index.js     — Prompt loader, persistence          │
 │   src/search.js    — Scored search algorithm             │
 │   src/formatter.js — ANSI terminal formatting            │
-│   src/generator.js — Dynamic prompt generation (v2.0)    │
+│   src/generator.js — Dynamic prompt generation           │
+│   src/linter.js    — 14-rule prompt quality scorer       │
+│   src/optimizer.js — Content-aware prompt optimizer      │
+│   src/recommender.js — Intent-based prompt matcher       │
 ├─────────────────────────────────────────────────────────┤
 │                    Data Layer                            │
 │                                                         │
@@ -105,6 +119,49 @@ Provides ANSI color formatting for CLI output. Respects `NO_COLOR` environment v
 | `task-decomposition` | Task Decomposition | Breaks complex tasks into sub-tasks |
 | `guardrails` | Guardrails & Safety | Built-in safety rules and output constraints |
 
+### `src/linter.js` — Prompt Quality Scorer
+
+**Exports:**
+
+| Function | Description |
+|----------|-------------|
+| `lintPrompt(text)` | Analyzes a prompt against 14 rules. Returns score (0–100), grade (A–F), passed/failed rules, and prioritized suggestions. |
+| `formatLintResult(result)` | Formats a lint result as a human-readable string for CLI/display. |
+| `LINT_RULES` | Array of all 14 rule objects with id, name, weight, test function, and suggestion. |
+
+**Scoring:** `score = (sum of passed rule weights / total weight) × 100`. Total weight: 100.
+
+See [FUNCTIONS.md](FUNCTIONS.md#prompt-linter) for the full rule list and scoring details.
+
+### `src/optimizer.js` — Content-Aware Prompt Optimizer
+
+**Exports:**
+
+| Function | Description |
+|----------|-------------|
+| `optimizePrompt(text)` | Offline, rule-based optimization. Detects domain, replaces vague language, strengthens verbs, removes filler, adds structured sections. Returns original, optimized, changes, before/after scores, detected domain. |
+| `optimizeWithAI(text, provider, apiKey, model)` | Sends prompt to an LLM for AI-powered rewriting. Supports `openai`, `anthropic`, `google` providers. |
+| `sendToAI(prompt, systemPrompt, provider, apiKey, model)` | Sends a prompt to an AI model (used by the Playground). Returns response text, model, and token usage. |
+
+**Domain detection:** Scans for keywords matching 7 domains (coding, writing, marketing, data, business, education, image). Each domain has its own role, constraints, output format, and quality check.
+
+**Optimization pipeline:** filler removal → politeness reduction → weak verb strengthening → vague language replacement → domain-specific role → task decomposition → audience/tone detection → output format → constraints → examples → quality check.
+
+See [FUNCTIONS.md](FUNCTIONS.md#prompt-optimizer) for the full pipeline breakdown.
+
+### `src/recommender.js` — Intent-Based Prompt Matcher
+
+**Exports:**
+
+| Function | Description |
+|----------|-------------|
+| `recommendPrompts(prompts, description)` | Scores all prompts by relevance to a natural-language description. Returns scored array sorted by relevance. |
+| `buildRecommendation(prompts, description)` | Builds a full recommendation with top prompts, suggested combo (system prompt + framework + template), and categorized results. |
+
+**Intent detection:** Maps description keywords to 8 intents (coding, writing, marketing, data, business, image, research, teaching). Prompts in matching categories get a bonus.
+
+See [FUNCTIONS.md](FUNCTIONS.md#smart-recommender) for scoring details.
+
 ---
 
 ## Data Formats
@@ -177,7 +234,7 @@ Your prompt template with {{placeholders}} here
 The `viewer.html` file is a self-contained single-page application:
 
 - **No external dependencies** — pure HTML, CSS, and vanilla JavaScript
-- **Prompt data embedded** — all 52+ prompts are serialized as JSON in a `<script>` tag
+- **Prompt data embedded** — all 82+ prompts are serialized as JSON in a `<script>` tag
 - **localStorage for persistence** — custom prompts, saved compositions, favorites, and preferences
 - **Responsive design** — works on desktop, tablet, and mobile
 - **Dark/light mode** — togglable with preference saved in localStorage
@@ -189,6 +246,7 @@ The `viewer.html` file is a self-contained single-page application:
 | `pl_dark` | boolean | Dark mode preference |
 | `pl_saved` | array | Saved prompts, filled templates, composed prompts, custom prompts. Each saved item includes full content as an editable copy. Database-sourced items are marked with `source: 'database'` and can be edited without affecting the original prompt. |
 | `pl_sidebar_width` | number | User's preferred sidebar width in pixels (260–600). Persists across sessions. |
+| `api_settings` | object | API keys and model preferences for Playground and AI optimizer. Contains provider, keys for OpenAI/Anthropic/Google, and selected models. |
 
 ### Tab Structure
 
@@ -198,7 +256,9 @@ The `viewer.html` file is a self-contained single-page application:
 | **Compose** | Combine system prompt + framework + task template. |
 | **Create** | Build custom system prompts with field definitions. |
 | **Generate** | Choose a framework, answer questions, get a generated prompt. |
-| **My Library** | View saved prompts, compositions, and custom prompts. |
+| **Tools** | Prompt Linter (quality scoring), Prompt Optimizer (content-aware rewriting), Smart Recommender (personalized suggestions). |
+| **Playground** | Send prompts to AI models (OpenAI, Anthropic, Google). System prompts, token tracking, one-click copy. |
+| **My Library** | View saved prompts, compositions, and custom prompts. Edit, copy, delete, export/import. |
 
 ---
 
@@ -242,11 +302,17 @@ The `desktop/` directory contains build scripts for all platforms:
 | Script | Platform | Output |
 |--------|----------|--------|
 | `build-all.sh` | All | Builds macOS + Linux + Windows |
-| `build-macos.sh` | macOS | Native `.app` with WebKit (on Mac) or browser-wrapper `.app` (on Linux) |
-| `build-linux.sh` | Linux | Directory with `.desktop` file + installer |
-| `build-windows.bat` | Windows | Portable folder with `.vbs` / `.bat` launchers |
+| `build-macos.sh` | macOS | Native `.app` with Swift + WebKit (on Mac) or browser-wrapper `.app` (on Linux) |
+| `build-linux.sh` | Linux | Directory with `.desktop` file + GTK native app + GUI installer |
+| `build-windows.bat` | Windows | Portable folder with `.vbs` (Edge app mode) / `.bat` launchers + install/uninstall scripts |
 
-On macOS with Xcode Command Line Tools, `build-macos.sh` compiles a native Swift app (`desktop/macos-native/PromptWorkshop.swift`) that runs in its own window using WebKit — no browser needed. On Linux, it falls back to a browser-wrapper launcher.
+**macOS native build:** On macOS with Xcode Command Line Tools, `build-macos.sh` compiles a native Swift app (`desktop/macos-native/PromptWorkshop.swift`) that runs in its own window using WebKit — no browser needed. Requires macOS 11+. Produces both `.zip` and `.tar.gz`. On Linux, it falls back to a browser-wrapper launcher.
+
+**Linux native build:** `build-linux.sh` creates a package with a Python + GTK + WebKitGTK app (`desktop/linux-native/`) that runs in its own window. Falls back to Chrome/Edge app mode, then regular browser. Includes a GUI installer (`install.sh`) that works with zenity/kdialog.
+
+**Windows build:** Creates a portable package with a VBScript launcher that opens in Microsoft Edge app mode (own window, no browser chrome). Falls back to Chrome app mode, then default browser. Includes `Install.bat` (creates Desktop + Start Menu shortcuts) and `Uninstall.bat`.
+
+All desktop apps are built from source — there are no pre-built downloads. See [`desktop/README.md`](desktop/README.md) for detailed install guides.
 
 ---
 
@@ -257,12 +323,15 @@ node test/run.js
 ```
 
 Tests verify:
-- Prompt loading (52+ prompts from files + custom prompts)
+- Prompt loading (82+ prompts from files + custom prompts)
 - Required fields on each prompt (slug, title, category, tags, content)
 - Search scoring and ranking
 - Category count validation
 - Custom prompt creation and persistence
 - Generator framework validation
+- Linter scoring and rule evaluation
+- Optimizer transformations
+- Recommender scoring
 
 ---
 
@@ -285,6 +354,17 @@ Tests verify:
 
 - Node.js 18 or later
 - No npm install needed
+
+---
+
+## See also
+
+- **[README.md](README.md)** — overview, quick start, and CLI usage
+- **[GUIDE.md](GUIDE.md)** — step-by-step user guide
+- **[FUNCTIONS.md](FUNCTIONS.md)** — detailed reference for every tool
+- **[CHANGELOG.md](CHANGELOG.md)** — version history
+- **[desktop/README.md](desktop/README.md)** — desktop app build and install guides
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** — how to contribute
 
 ---
 
