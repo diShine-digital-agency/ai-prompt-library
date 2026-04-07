@@ -1,6 +1,6 @@
 # prompt-library Powerhouse
 
-**82+ expert-level prompt templates — with a CLI, a browser-based Prompt Workshop, and a desktop app — to search, browse, compose, create, lint, optimize, and test prompts with AI models.**
+**82+ expert-level prompt templates — with a CLI, a browser-based Prompt Workshop, and desktop apps — to search, browse, compose, create, lint, optimize, and test prompts with AI models.**
 
 If you work with LLMs regularly, you've probably got prompts scattered across Notion docs, Slack messages, and random text files. This library brings them together: organized, searchable, and ready to use.
 
@@ -8,9 +8,9 @@ If you work with LLMs regularly, you've probably got prompts scattered across No
 
 | Interface | How to open |
 |-----------|-------------|
-| **CLI** | `npm install -g @dishine/prompt-library` then `prompt-lib list` |
+| **CLI** | Clone the repo → `node bin/prompt-lib.js list` (or install globally with `npm install -g @dishine/prompt-library`) |
 | **Browser app** | Open `viewer.html` in any browser — no server, no internet required |
-| **Desktop app** | Build with `./desktop/build-all.sh` for macOS, Linux, or Windows |
+| **Desktop app** | Build from source with `./desktop/build-all.sh` — native window on macOS, Linux, and Windows |
 
 All three give you the same features: search and browse prompts, compose multi-layer prompts, create custom prompts with dynamic fields, generate prompts from frameworks, lint prompts for quality, optimize them automatically, and get smart recommendations. The browser and desktop app also include an **AI Playground** to send prompts directly to GPT, Claude, or Gemini.
 
@@ -32,7 +32,7 @@ The **Prompt Workshop** is a standalone HTML file — no server, no build step, 
 | **Compose** | Build layered prompts by combining a **system prompt** (persona) + **reasoning framework** (technique) + **task template** (the work). All three combine into one powerful prompt. |
 | **Create** | Build your own custom prompts with dynamic `{{field_name}}` placeholders. Define fields, write the body, and save to your personal library. |
 | **Generate** | Pick a proven framework, answer guided questions, and get a production-ready system prompt generated automatically — no prompt engineering experience needed. |
-| **Tools** | **Prompt Linter** (14-rule quality analysis with 0–100 scoring), **Prompt Optimizer** (content-aware rewriting that detects your domain, replaces vague language, strengthens weak verbs, adds domain-specific constraints + optional AI-powered rewriting), and **Smart Recommender** (describe your use case, get personalized prompt suggestions). |
+| **Tools** | **Prompt Linter** (14-rule quality analysis with 0–100 scoring), **Prompt Optimizer** (content-aware rewriting — detects your domain, replaces vague language, strengthens weak verbs, removes filler, adds domain-specific role/constraints/output format/quality checks + optional AI-powered rewriting), and **Smart Recommender** (describe your use case, get personalized prompt suggestions with a recommended system prompt + framework + template combo). See [FUNCTIONS.md](FUNCTIONS.md) for full details. |
 | **Playground** | Send prompts directly to AI models (OpenAI GPT, Anthropic Claude, Google Gemini). Add a system prompt, see responses, track token usage — iterate without leaving the tool. |
 | **My Library** | All your saved prompts, filled templates, and compositions. Stored in your browser's localStorage — persists across sessions. |
 
@@ -91,12 +91,17 @@ These aren't generic "write me a blog post" prompts. They're structured template
 ## Quick start
 
 ```bash
-# Clone and run directly
+# Clone and run directly — no npm install needed
+git clone https://github.com/diShine-digital-agency/ai-prompt-library.git
+cd ai-prompt-library
 node bin/prompt-lib.js list
 
 # Or install globally
 npm install -g @dishine/prompt-library
 prompt-lib list
+
+# Or just open the browser app — no Node.js required
+# Open viewer.html in any browser
 ```
 
 ---
@@ -262,14 +267,19 @@ ai-prompt-library/
     image-generation/      image & visual AI prompt templates
   desktop/
     build-all.sh           cross-platform build (macOS + Linux + Windows)
-    build-macos.sh         macOS native app build (or browser fallback on Linux)
-    build-linux.sh         Linux .desktop build script
-    build-windows.bat      Windows build script (for use on Windows)
+    build-macos.sh         macOS native app build (Swift on Mac, browser fallback on Linux)
+    build-linux.sh         Linux .desktop build script (GTK + WebKitGTK)
+    build-windows.bat      Windows build script (Edge app mode)
     macos-native/          Swift source for native macOS app
+    linux-native/          Python GTK source for native Linux app
+    icons/                 App icons for all platforms (.icns, .png, .ico)
     README.md              install guides, troubleshooting, platform notes
   viewer.html              interactive Prompt Workshop (standalone, works offline)
   test/run.js              test suite
   CHANGELOG.md             version history
+  CONTRIBUTING.md          how to contribute
+  FUNCTIONS.md             detailed tool and function reference
+  GUIDE.md                 user guide with examples
   TECHNICAL.md             architecture and technical documentation
 ```
 
@@ -277,21 +287,26 @@ ai-prompt-library/
 
 ## Desktop & Mobile Apps
 
-The Prompt Workshop runs as a **native application** on all desktop platforms — each with its own window, app icon, and one-click installer. No terminal needed.
+The Prompt Workshop runs as a **native application** on all desktop platforms — each with its own window, app icon, and one-click installer. No terminal needed after building.
+
+Desktop apps are built from source (no pre-built downloads). You need Node.js 18+ and Bash:
 
 ```bash
-# Build for all platforms at once (for developers)
+# Clone and build for all platforms
+git clone https://github.com/diShine-digital-agency/ai-prompt-library.git
+cd ai-prompt-library
 ./desktop/build-all.sh
 ```
 
-| Platform | How to install (no terminal needed) |
-|----------|-------------------------------------|
-| **macOS** | Download `.zip` → double-click to extract → drag `PromptWorkshop.app` to Applications |
-| **Linux** | Download `.tar.gz` → extract → double-click `install.sh` → find in app menu |
-| **Windows** | Download `.zip` → extract → double-click `Install.bat` → find on Desktop / Start Menu |
+| Platform | How to install |
+|----------|----------------|
+| **macOS** (built on Mac) | Build → move `dist/PromptWorkshop.app` to Applications. Native Swift app, runs in its own window. Requires Xcode Command Line Tools (`xcode-select --install`). |
+| **macOS** (built on Linux) | Build → move `dist/PromptWorkshop.app` to Applications. Opens in browser (no native window). |
+| **Linux** | Build → extract `dist/prompt-workshop-linux.tar.gz` → double-click `install.sh`. Native GTK window on most desktops (Ubuntu, Fedora, Mint), falls back to browser. |
+| **Windows** | Build → extract `dist/PromptWorkshop-win.zip` → double-click `Install.bat`. Opens in Edge app mode (own window), falls back to Chrome or browser. |
 | **Android / iOS** | Open `viewer.html` in browser → "Add to Home Screen" |
 
-All three desktop apps run in their **own window** (no browser chrome) with custom app icons, keyboard shortcuts, and persistent storage. See [`desktop/README.md`](desktop/README.md) for detailed step-by-step instructions with screenshots and troubleshooting.
+All three desktop apps run in their **own window** (no browser chrome) with custom app icons, keyboard shortcuts, and persistent storage. See [`desktop/README.md`](desktop/README.md) for detailed step-by-step instructions and troubleshooting.
 
 ---
 
@@ -306,8 +321,11 @@ All three desktop apps run in their **own window** (no browser chrome) with cust
 
 - **[README.md](README.md)** — this file, overview and quick start
 - **[GUIDE.md](GUIDE.md)** — detailed user guide with examples
+- **[FUNCTIONS.md](FUNCTIONS.md)** — detailed reference for every tool (linter, optimizer, recommender, generator, playground, etc.)
 - **[TECHNICAL.md](TECHNICAL.md)** — architecture, module reference, data formats, extension guide
 - **[CHANGELOG.md](CHANGELOG.md)** — version history and release notes
+- **[desktop/README.md](desktop/README.md)** — desktop app build and install guides
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** — how to contribute
 
 ---
 
