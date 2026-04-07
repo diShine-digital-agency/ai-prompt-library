@@ -277,26 +277,21 @@ ai-prompt-library/
 
 ## Desktop & Mobile Apps
 
-The Prompt Workshop runs as a **native macOS application** with its own window — no browser needed. On Linux and Windows it opens in your default browser as a lightweight self-contained package.
+The Prompt Workshop runs as a **native application** on all desktop platforms — each with its own window, app icon, and one-click installer. No terminal needed.
 
 ```bash
-# Build for all platforms at once
+# Build for all platforms at once (for developers)
 ./desktop/build-all.sh
-
-# Build just macOS native app (requires Mac + Xcode Command Line Tools)
-./desktop/build-macos.sh
 ```
 
-| Platform | Archive | Type | Install |
-|----------|---------|------|---------|
-| **macOS** | `PromptWorkshop.tar.gz` | Native app (own window) | Extract → drag to `/Applications/` |
-| **Linux** | `prompt-workshop-linux.tar.gz` | Browser wrapper | Extract → `./install.sh` → launch from app menu |
-| **Windows** | `PromptWorkshop-win.zip` | Browser wrapper | Extract → double-click `PromptWorkshop.vbs` |
-| **Android / iOS** | — | — | Open `viewer.html` in browser → "Add to Home Screen" |
+| Platform | How to install (no terminal needed) |
+|----------|-------------------------------------|
+| **macOS** | Download `.zip` → double-click to extract → drag `PromptWorkshop.app` to Applications |
+| **Linux** | Download `.tar.gz` → extract → double-click `install.sh` → find in app menu |
+| **Windows** | Download `.zip` → extract → double-click `Install.bat` → find on Desktop / Start Menu |
+| **Android / iOS** | Open `viewer.html` in browser → "Add to Home Screen" |
 
-The macOS native app features its own window, menu bar, Dock icon, Spotlight support, keyboard shortcuts (⌘C/V, ⌘+/-, ⌃⌘F full screen), and persistent storage independent of your browser.
-
-See [`desktop/README.md`](desktop/README.md) for detailed install instructions (including step-by-step for non-technical users), troubleshooting, and platform-specific notes.
+All three desktop apps run in their **own window** (no browser chrome) with custom app icons, keyboard shortcuts, and persistent storage. See [`desktop/README.md`](desktop/README.md) for detailed step-by-step instructions with screenshots and troubleshooting.
 
 ---
 

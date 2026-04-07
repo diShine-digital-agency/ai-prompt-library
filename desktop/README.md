@@ -18,12 +18,12 @@ All build scripts run on any system with Bash and Node.js. The macOS native app 
 
 Output goes to `dist/`:
 
-| Platform | Archive | Type | Install |
-|----------|---------|------|---------|
-| **macOS** (on Mac) | `PromptWorkshop.tar.gz` | Native app (own window) | Extract → drag to Applications |
+| Platform | Archive | Type | How to install |
+|----------|---------|------|----------------|
+| **macOS** (on Mac) | `PromptWorkshop-macOS.zip` | Native app (own window) | Double-click zip → drag to Applications |
 | **macOS** (on Linux) | `PromptWorkshop.tar.gz` | Browser wrapper | Extract → drag to Applications |
-| **Linux** | `prompt-workshop-linux.tar.gz` | Browser wrapper | Extract → `./install.sh` |
-| **Windows** | `PromptWorkshop-win.zip` | Browser wrapper | Extract → double-click `.vbs` |
+| **Linux** | `prompt-workshop-linux.tar.gz` | Native GTK app (own window) | Extract → double-click `install.sh` |
+| **Windows** | `PromptWorkshop-win.zip` | Native-style app (Edge app mode) | Extract → double-click `Install.bat` |
 
 ---
 
@@ -44,12 +44,12 @@ A **real macOS application** that runs in its own window — just like any other
 
 ### How to install (step by step)
 
-#### Option A: Download and install (easiest)
+#### Option A: Download and install (easiest — no terminal needed)
 
-1. **Download** `PromptWorkshop.tar.gz` from the [Releases page](https://github.com/diShine-digital-agency/ai-prompt-library/releases)
-2. **Double-click** the downloaded file to extract it — you'll see `PromptWorkshop.app`
+1. **Download** `PromptWorkshop-macOS.zip` from the [Releases page](https://github.com/diShine-digital-agency/ai-prompt-library/releases)
+2. **Double-click** the `.zip` file — macOS extracts it automatically
 3. **Drag** `PromptWorkshop.app` into your **Applications** folder
-4. **Double-click** `PromptWorkshop.app` in your Applications folder to launch
+4. **Double-click** `PromptWorkshop.app` to launch — that's it!
 
 > 💡 **First launch:** macOS may show a security warning. See [Troubleshooting](#macos-troubleshooting) below.
 
@@ -186,23 +186,36 @@ To use this version, simply run `./desktop/build-macos.sh` on Linux or on a Mac 
 
 ---
 
-## Linux
+## Linux — Native App
 
-### What you get
+### What is it?
 
-A self-contained directory with launcher script and `.desktop` file:
+A **native Linux application** that runs in its own window — just like any other app on your desktop. It does **not** open your browser. You get:
 
-```
-prompt-workshop/
-├── viewer.html               # The complete Prompt Workshop
-├── prompt-workshop            # Launcher script (opens browser)
-├── prompt-workshop.desktop    # Desktop entry file
-└── install.sh                 # Installer for ~/.local integration
-```
+- ✅ Its own window (no browser address bar, no tabs)
+- ✅ Application menu entry — search "Prompt Workshop" in Activities/app launcher
+- ✅ Keyboard shortcuts (Ctrl+C/V, Ctrl+±, F11 full screen)
+- ✅ Works completely offline
+- ✅ Your saved prompts persist between sessions
 
-### Install
+The native window uses GTK + WebKitGTK (pre-installed on most GNOME/Ubuntu/Fedora desktops). If those libraries aren't available, it falls back to Chrome/Edge app mode or your regular browser.
 
-#### Option 1: Install to user directory (recommended)
+### How to install (step by step — no terminal needed)
+
+#### Option A: Double-click install (easiest)
+
+1. **Download** `prompt-workshop-linux.tar.gz` from the [Releases page](https://github.com/diShine-digital-agency/ai-prompt-library/releases)
+2. **Right-click** the file → **Extract Here** (or double-click to open in Archive Manager)
+3. **Open** the `prompt-workshop` folder
+4. **Double-click** `install.sh`
+   - On GNOME: a dialog shows progress and a "✅ Installed!" message
+   - On KDE: a similar dialog appears
+   - On other desktops: a terminal window opens briefly with install status
+5. **Done!** Search "Prompt Workshop" in your application menu to launch
+
+> 💡 If `install.sh` opens as a text file instead of running, right-click it → **Properties** → **Permissions** → check **"Allow executing file as program"** → then double-click again.
+
+#### Option B: Install from terminal
 
 ```bash
 # 1. Extract
@@ -211,19 +224,12 @@ tar -xzf prompt-workshop-linux.tar.gz
 # 2. Run installer
 cd prompt-workshop
 ./install.sh
-```
 
-This installs to `~/.local/share/prompt-workshop/` and creates:
-- A symlink at `~/.local/bin/prompt-workshop`
-- A `.desktop` entry at `~/.local/share/applications/prompt-workshop.desktop`
-
-Launch from your application menu (search "Prompt Workshop") or terminal:
-
-```bash
+# 3. Launch
 prompt-workshop
 ```
 
-#### Option 2: Run directly (no install)
+#### Option C: Run directly (no install)
 
 ```bash
 tar -xzf prompt-workshop-linux.tar.gz
@@ -231,19 +237,30 @@ cd prompt-workshop
 ./prompt-workshop
 ```
 
-#### Option 3: System-wide install
+### What's inside the package
 
-```bash
-sudo cp viewer.html /opt/prompt-workshop/viewer.html
-sudo cp prompt-workshop /opt/prompt-workshop/prompt-workshop
-sudo ln -sf /opt/prompt-workshop/prompt-workshop /usr/local/bin/prompt-workshop
-sudo cp prompt-workshop.desktop /usr/share/applications/
-# Edit the .desktop file to update the Exec path
+```
+prompt-workshop/
+├── viewer.html               # The complete Prompt Workshop
+├── prompt-workshop            # Smart launcher (tries native → app-mode → browser)
+├── prompt-workshop-app.py     # Native GTK + WebKit application
+├── prompt-workshop.png        # App icon
+├── prompt-workshop.desktop    # Desktop entry file
+└── install.sh                 # GUI installer (double-click to install)
 ```
 
-### How it works
+### Native window requirements
 
-The launcher script detects your default browser using `xdg-open` (or falls back to `gnome-open`, `kde-open`, `firefox`, `google-chrome`, `chromium-browser`) and opens `viewer.html`. All saved data is in the browser's `localStorage`.
+For the best experience (own window, no browser), the app needs these libraries. They're **pre-installed on most desktop Linux distros** (Ubuntu, Fedora, Pop!_OS, Linux Mint, etc.):
+
+| Distro | Packages needed | Usually pre-installed? |
+|--------|----------------|----------------------|
+| Ubuntu/Debian | `python3-gi gir1.2-webkit2-4.0` | ✅ Yes (GNOME desktop) |
+| Fedora | `python3-gobject webkit2gtk3` | ✅ Yes |
+| Arch | `python-gobject webkit2gtk` | ⚠️ May need to install |
+| Linux Mint | `python3-gi gir1.2-webkit2-4.0` | ✅ Yes |
+
+If these are missing, the app automatically falls back to opening in Chrome/Edge app mode (own window) or your regular browser.
 
 ### Uninstall
 
@@ -255,115 +272,97 @@ rm -f ~/.local/share/applications/prompt-workshop.desktop
 
 ### Troubleshooting
 
-#### "Permission denied" when running the launcher
+#### "Permission denied" when running install.sh
 
+Right-click `install.sh` → **Properties** → **Permissions** → check **"Allow executing file as program"**. Then double-click again.
+
+Or from terminal:
 ```bash
-chmod +x prompt-workshop
-chmod +x install.sh
-```
-
-#### Browser doesn't open / "No browser found"
-
-The launcher tries these in order: `xdg-open`, `gnome-open`, `kde-open`, `firefox`, `google-chrome`, `chromium-browser`. If none are found:
-
-```bash
-# Install xdg-utils (most distros)
-sudo apt install xdg-utils        # Debian/Ubuntu
-sudo dnf install xdg-utils        # Fedora
-sudo pacman -S xdg-utils          # Arch
-
-# Or set a default browser
-xdg-settings set default-web-browser firefox.desktop
-
-# Or open manually
-firefox /path/to/prompt-workshop/viewer.html
-```
-
-#### File opens as text instead of in browser
-
-Make sure a browser is set as the handler for HTML files:
-
-```bash
-xdg-mime default firefox.desktop text/html
-# Or for Chrome:
-xdg-mime default google-chrome.desktop text/html
+chmod +x install.sh && ./install.sh
 ```
 
 #### App doesn't appear in application menu after install
 
 ```bash
-# Update the desktop database
 update-desktop-database ~/.local/share/applications/
-
-# On some systems you may need to log out and back in
 ```
+On some systems, log out and back in.
 
 #### `~/.local/bin` not in PATH
 
-If `prompt-workshop` command isn't found after install, add to your shell profile:
+If `prompt-workshop` command isn't found in terminal after install:
 
 ```bash
 # Add to ~/.bashrc or ~/.zshrc
 export PATH="$HOME/.local/bin:$PATH"
-
-# Then reload
 source ~/.bashrc
 ```
 
-#### Wayland: file:// URLs blocked
-
-Some Wayland compositors (GNOME 44+) may restrict `file://` URLs. Workaround:
-
-```bash
-# Use a simple local server instead
-cd ~/.local/share/prompt-workshop
-python3 -m http.server 8080 &
-xdg-open http://localhost:8080/viewer.html
-```
-
-#### Saved prompts missing after changing browsers
-
-Saved prompts are in the specific browser's `localStorage`. If you switch from Firefox to Chrome, your saved data won't transfer. Export your library as JSON first (My Library → Export all as JSON), then import in the new browser.
-
 ---
 
-## Windows
+## Windows — Native-Style App
 
-### What you get
+### What is it?
 
-A portable folder — no installation, no registry changes:
+A **native-style Windows application** that runs in its own window using Microsoft Edge (pre-installed on Windows 10/11). You get:
+
+- ✅ Its own window (no address bar, no tabs — looks like a native app)
+- ✅ Desktop shortcut with custom icon
+- ✅ Start Menu entry — search "Prompt Workshop"
+- ✅ Taskbar integration — pin it to your taskbar
+- ✅ Works completely offline
+- ✅ No admin rights needed
+- ✅ No registry changes
+
+### How to install (step by step — no terminal needed)
+
+1. **Download** `PromptWorkshop-win.zip` from the [Releases page](https://github.com/diShine-digital-agency/ai-prompt-library/releases)
+2. **Right-click** the `.zip` file → **Extract All…** → click **Extract**
+3. **Open** the `PromptWorkshop-win` folder
+4. **Double-click** `Install.bat`
+5. **Done!** You now have:
+   - A **Desktop shortcut** (Prompt Workshop icon on your desktop)
+   - A **Start Menu entry** (search "Prompt Workshop")
+
+> 💡 **First time only:** Windows SmartScreen may show "Windows protected your PC". Click **More info** → **Run anyway**. This is normal for unsigned scripts.
+
+### What's inside the package
 
 ```
-PromptWorkshop/
+PromptWorkshop-win/
 ├── viewer.html               # The complete Prompt Workshop
-├── PromptWorkshop.vbs        # Launcher (no console window)
-├── PromptWorkshop.bat        # Alternative launcher (shows console)
+├── PromptWorkshop.vbs        # Native-style launcher (Edge app mode)
+├── PromptWorkshop.bat        # Fallback launcher (default browser)
+├── PromptWorkshop.ico        # App icon
+├── Install.bat               # One-click installer (Desktop + Start Menu shortcuts)
+├── Uninstall.bat             # One-click uninstaller
 └── README.txt                # Quick start guide
 ```
 
-### Install
-
-1. Extract `PromptWorkshop-win.zip` to any folder (e.g., `C:\PromptWorkshop\` or your Desktop)
-2. Double-click `PromptWorkshop.vbs` to launch
-3. Optional: right-click `PromptWorkshop.vbs` → "Pin to Start" or create a desktop shortcut
-
-That's it — no installer, no admin rights needed.
-
 ### How it works
 
-- **`PromptWorkshop.vbs`** — A tiny VBScript that opens `viewer.html` in your default browser without showing a console window. This is the recommended launcher.
-- **`PromptWorkshop.bat`** — A batch file that does the same thing, but a console window briefly flashes. Use this if `.vbs` is blocked by your organization.
-- **`viewer.html`** — The complete Prompt Workshop. You can also just open this file directly in any browser.
+The app opens in **Microsoft Edge app mode** — this gives you a clean window without the browser's address bar, tabs, or menus. It looks and feels like a native desktop application.
+
+- **Edge is pre-installed** on Windows 10 and 11
+- If Edge isn't available, it tries **Google Chrome** app mode
+- If neither is available, it opens in your default browser
+
+### Portable use (no install)
+
+Don't want to install? Just double-click `PromptWorkshop.vbs` directly from any folder. No installation needed.
 
 ### Uninstall
 
-Delete the `PromptWorkshop` folder. Nothing is written to the registry or system directories.
+Double-click `Uninstall.bat` — removes the installed files and shortcuts. Or just delete:
+- `%LocalAppData%\PromptWorkshop\` folder
+- Desktop shortcut
+- Start Menu shortcut
 
 ### Troubleshooting
 
 #### Windows SmartScreen: "Windows protected your PC"
 
-When running the `.vbs` or `.bat` for the first time:
+When running `Install.bat` or `PromptWorkshop.vbs` for the first time:
 
 1. Click **"More info"**
 2. Click **"Run anyway"**
@@ -372,62 +371,21 @@ This only happens once. SmartScreen flags files downloaded from the internet tha
 
 #### Antivirus blocks `.vbs` file
 
-Some antivirus software blocks VBScript files. Solutions:
+Some antivirus software blocks VBScript files:
+- **Option 1:** Use `PromptWorkshop.bat` instead
+- **Option 2:** Open `viewer.html` directly in your browser
+- **Option 3:** Add an exception for the PromptWorkshop folder in your antivirus
 
-```
-Option 1: Use PromptWorkshop.bat instead
-Option 2: Open viewer.html directly in your browser
-Option 3: Add an exception for the PromptWorkshop folder in your antivirus
-```
+#### App opens in full browser instead of its own window
 
-#### Organization policy blocks scripts
-
-If your organization has Group Policy restricting `.vbs` and `.bat` files:
-
-```
-Just open viewer.html directly — drag it into your browser,
-or right-click → Open with → Chrome/Edge/Firefox
-```
-
-#### Browser opens but shows raw HTML code
-
-This means the file is opening in a text editor instead of a browser. Fix:
-
-```
-1. Right-click viewer.html
-2. Select "Open with"
-3. Choose your browser (Chrome, Edge, Firefox)
-4. Check "Always use this app to open .html files"
-```
-
-#### Edge shows "This page has been blocked"
-
-Microsoft Edge may block local `file://` pages with active content:
-
-```
-1. Click the shield icon in the address bar
-2. Click "Allow blocked content"
-
-Or use Chrome/Firefox instead — they handle local HTML files better.
-```
-
-#### Saved prompts not persisting
-
-LocalStorage for `file://` URLs behaves differently across browsers:
-- **Chrome**: localStorage works normally with `file://`
-- **Firefox**: localStorage works normally with `file://`
-- **Edge**: may restrict localStorage for local files. Use Chrome or Firefox instead.
-
-If data isn't persisting, check:
-1. You're not in private/incognito mode
-2. You haven't blocked cookies/site data for the file
-3. The file path hasn't changed (moving the folder resets localStorage for `file://`)
+This means Edge wasn't found in the standard location. Try:
+- Install Microsoft Edge from [microsoft.com/edge](https://www.microsoft.com/edge)
+- Or install Google Chrome — the launcher will use it in app mode
 
 #### Path with special characters
 
-Avoid putting the folder in paths with special characters (`#`, `%`, non-ASCII). These can break `file://` URLs. Use simple paths like:
-- ✅ `C:\PromptWorkshop\`
-- ✅ `C:\Users\YourName\Desktop\PromptWorkshop\`
+Avoid installing to paths with special characters (`#`, `%`, accented letters):
+- ✅ `C:\Users\YourName\AppData\Local\PromptWorkshop\`
 - ❌ `C:\Users\José\My #Tools\PromptWorkshop\`
 
 ---

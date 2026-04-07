@@ -87,16 +87,28 @@ fi
 # Copy the HTML
 cp "$REPO_DIR/viewer.html" "$OUTPUT_DIR/$APP_NAME.app/Contents/Resources/viewer.html"
 
-# Create distribution archive
+# Copy the app icon
+if [ -f "$SCRIPT_DIR/icons/AppIcon.icns" ]; then
+  cp "$SCRIPT_DIR/icons/AppIcon.icns" "$OUTPUT_DIR/$APP_NAME.app/Contents/Resources/AppIcon.icns"
+  echo "  → App icon included"
+fi
+
+# Create distribution archives (.zip for easy Finder install + .tar.gz)
 cd "$OUTPUT_DIR"
+if command -v zip &> /dev/null; then
+  zip -rq "$APP_NAME-macOS.zip" "$APP_NAME.app"
+fi
 tar -czf "$APP_NAME.tar.gz" "$APP_NAME.app"
 
 # Stats
 APP_SIZE=$(du -sh "$APP_NAME.app" | cut -f1)
-ARCHIVE_SIZE=$(du -sh "$APP_NAME.tar.gz" | cut -f1)
-
 echo ""
 echo "✓ Built $APP_NAME.app ($APP_SIZE)"
+if [ -f "$APP_NAME-macOS.zip" ]; then
+  ARCHIVE_SIZE=$(du -sh "$APP_NAME-macOS.zip" | cut -f1)
+  echo "✓ Created $APP_NAME-macOS.zip ($ARCHIVE_SIZE) — double-click to extract in Finder"
+fi
+ARCHIVE_SIZE=$(du -sh "$APP_NAME.tar.gz" | cut -f1)
 echo "✓ Created $APP_NAME.tar.gz ($ARCHIVE_SIZE)"
 
 if $NATIVE; then
