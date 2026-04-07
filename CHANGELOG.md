@@ -2,6 +2,68 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.3.0] — 2026-04-07
+
+### Added
+
+- **Dynamic Prompt Optimizer** — Completely rewritten optimizer that actually analyzes your prompt's content and applies intelligent, targeted improvements:
+  - **Domain detection** — Automatically detects 7 domains (coding, writing, marketing, data, business, education, image generation) and applies domain-specific optimizations
+  - **Smart role generation** — Instead of a generic "expert assistant", generates a relevant role like "senior software engineer" or "marketing strategist" based on what the prompt is about
+  - **Vague language replacement** — Detects words like "good", "nice", "stuff", "things" and replaces them with specific, actionable terms
+  - **Weak verb strengthening** — Removes hedging language ("can you", "I want you to", "try to", "maybe") and turns requests into direct instructions
+  - **Filler removal** — Strips redundant phrases ("basically", "honestly", "in my opinion") that waste tokens
+  - **Compound task decomposition** — Detects prompts with multiple tasks and breaks them into numbered steps
+  - **Audience detection** — Identifies target audiences (beginners, experts, executives, students) and adds appropriate tone guidance
+  - **Domain-specific constraints** — Adds quality rules relevant to the domain (e.g., "handle edge cases" for code, "cite data points" for analysis)
+  - **Domain-specific output format** — Suggests output formats matching the task (e.g., code blocks for coding, tables for data analysis)
+  - **Domain-specific example placeholders** — Adds relevant example templates the user can fill in
+  - **Domain-specific quality checks** — Adds verification steps tailored to the domain
+
+- **macOS Native App** — Native macOS application built with Swift and WebKit:
+  - Runs in its own window — no browser needed
+  - Full macOS menu bar with Edit (⌘C/V/Z), View (zoom, full screen), Window menus
+  - Dock icon — pin to Dock, find in Spotlight
+  - Custom app icon (`.icns`)
+  - Standard keyboard shortcuts (⌘Q quit, ⌘W close, ⌘+/- zoom, ⌃⌘F full screen)
+  - Persistent data storage independent of browser
+  - One-click install: double-click `.zip` → drag `.app` to Applications
+  - Requires macOS 11+ and Xcode Command Line Tools to build
+  - Falls back to browser-wrapper version when built on Linux
+
+- **Linux Native App** — Native Linux application built with Python3 + GTK + WebKitGTK:
+  - Runs in its own window — no browser needed (on most desktop Linux distros)
+  - Custom app icon in application menu
+  - GUI installer: double-click `install.sh` → shows progress dialog (zenity/kdialog)
+  - Falls back to Chrome/Edge app mode, then regular browser if GTK/WebKit unavailable
+  - Keyboard shortcuts (Ctrl+C/V, Ctrl+±, F11 full screen)
+  - Pre-installed dependencies on Ubuntu, Fedora, Linux Mint, Pop!_OS
+
+- **Windows Native-Style App** — Opens in Microsoft Edge app mode (own window, no browser chrome):
+  - Runs in its own window using Edge (pre-installed on Windows 10/11)
+  - Falls back to Chrome app mode, then default browser
+  - One-click installer: double-click `Install.bat` → creates Desktop + Start Menu shortcuts
+  - One-click uninstaller: `Uninstall.bat`
+  - Custom `.ico` app icon on shortcuts
+  - No admin rights needed, no registry changes
+
+- **App Icon** — Custom Prompt Workshop icon (prompt cursor + AI sparkle) in all platform formats:
+  - macOS: `.icns` bundle icon
+  - Linux: `.png` icon in application menu
+  - Windows: `.ico` for shortcuts and taskbar
+  - HTML: embedded favicon in `viewer.html`
+
+### Changed
+
+- **Optimizer output is now content-aware** — A coding prompt and a marketing prompt will receive completely different roles, constraints, output formats, and quality checks. The optimizer analyzes what your prompt is actually about instead of applying the same template every time.
+- Browser version of the optimizer in `viewer.html` updated to match the new dynamic engine
+- Desktop documentation (`desktop/README.md`) completely rewritten with step-by-step install instructions for non-technical users
+- All three platform installers work without terminal — just double-click
+- macOS `LSMinimumSystemVersion` updated from 10.13 to 11.0 for native WebKit support
+- macOS build now also produces `.zip` for easier Finder extraction (in addition to `.tar.gz`)
+- Windows launcher now uses Edge app mode instead of opening in default browser
+- Linux launcher tries native GTK → browser app mode → regular browser (in that order)
+- Version bumped to 2.3.0
+
 ## [2.2.1] — 2026-04-07
 
 ### Added

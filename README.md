@@ -32,7 +32,7 @@ The **Prompt Workshop** is a standalone HTML file — no server, no build step, 
 | **Compose** | Build layered prompts by combining a **system prompt** (persona) + **reasoning framework** (technique) + **task template** (the work). All three combine into one powerful prompt. |
 | **Create** | Build your own custom prompts with dynamic `{{field_name}}` placeholders. Define fields, write the body, and save to your personal library. |
 | **Generate** | Pick a proven framework, answer guided questions, and get a production-ready system prompt generated automatically — no prompt engineering experience needed. |
-| **Tools** | **Prompt Linter** (14-rule quality analysis with 0–100 scoring), **Prompt Optimizer** (instant rule-based + optional AI-powered rewriting), and **Smart Recommender** (describe your use case, get personalized prompt suggestions). |
+| **Tools** | **Prompt Linter** (14-rule quality analysis with 0–100 scoring), **Prompt Optimizer** (content-aware rewriting that detects your domain, replaces vague language, strengthens weak verbs, adds domain-specific constraints + optional AI-powered rewriting), and **Smart Recommender** (describe your use case, get personalized prompt suggestions). |
 | **Playground** | Send prompts directly to AI models (OpenAI GPT, Anthropic Claude, Google Gemini). Add a system prompt, see responses, track token usage — iterate without leaving the tool. |
 | **My Library** | All your saved prompts, filled templates, and compositions. Stored in your browser's localStorage — persists across sessions. |
 
@@ -248,6 +248,9 @@ ai-prompt-library/
     search.js              scored search (title/tag/category/content)
     formatter.js           ANSI terminal formatting
     generator.js           dynamic prompt generation from frameworks
+    linter.js              14-rule prompt quality scorer
+    optimizer.js           content-aware prompt optimizer (domain detection, vague language fix, etc.)
+    recommender.js         intent-based prompt matcher
   prompts/
     frameworks/            core prompting techniques
     model-specific/        model-optimized patterns
@@ -259,9 +262,10 @@ ai-prompt-library/
     image-generation/      image & visual AI prompt templates
   desktop/
     build-all.sh           cross-platform build (macOS + Linux + Windows)
-    build-macos.sh         macOS .app build script
+    build-macos.sh         macOS native app build (or browser fallback on Linux)
     build-linux.sh         Linux .desktop build script
     build-windows.bat      Windows build script (for use on Windows)
+    macos-native/          Swift source for native macOS app
     README.md              install guides, troubleshooting, platform notes
   viewer.html              interactive Prompt Workshop (standalone, works offline)
   test/run.js              test suite
@@ -273,21 +277,21 @@ ai-prompt-library/
 
 ## Desktop & Mobile Apps
 
-The Prompt Workshop runs as a native-feeling app on all platforms — no Electron, no heavy frameworks (~224KB per platform).
+The Prompt Workshop runs as a **native application** on all desktop platforms — each with its own window, app icon, and one-click installer. No terminal needed.
 
 ```bash
-# Build for all platforms at once
+# Build for all platforms at once (for developers)
 ./desktop/build-all.sh
 ```
 
-| Platform | Archive | Install |
-|----------|---------|---------|
-| **macOS** | `PromptWorkshop.tar.gz` | Extract → move `.app` to `/Applications/` |
-| **Linux** | `prompt-workshop-linux.tar.gz` | Extract → `./install.sh` → launch from app menu |
-| **Windows** | `PromptWorkshop-win.zip` | Extract → double-click `PromptWorkshop.vbs` |
-| **Android / iOS** | — | Open `viewer.html` in browser → "Add to Home Screen" |
+| Platform | How to install (no terminal needed) |
+|----------|-------------------------------------|
+| **macOS** | Download `.zip` → double-click to extract → drag `PromptWorkshop.app` to Applications |
+| **Linux** | Download `.tar.gz` → extract → double-click `install.sh` → find in app menu |
+| **Windows** | Download `.zip` → extract → double-click `Install.bat` → find on Desktop / Start Menu |
+| **Android / iOS** | Open `viewer.html` in browser → "Add to Home Screen" |
 
-See [`desktop/README.md`](desktop/README.md) for detailed install instructions, troubleshooting, and platform-specific notes.
+All three desktop apps run in their **own window** (no browser chrome) with custom app icons, keyboard shortcuts, and persistent storage. See [`desktop/README.md`](desktop/README.md) for detailed step-by-step instructions with screenshots and troubleshooting.
 
 ---
 

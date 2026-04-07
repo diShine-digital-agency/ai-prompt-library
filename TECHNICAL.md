@@ -242,11 +242,11 @@ The `desktop/` directory contains build scripts for all platforms:
 | Script | Platform | Output |
 |--------|----------|--------|
 | `build-all.sh` | All | Builds macOS + Linux + Windows |
-| `build-macos.sh` | macOS | `.app` bundle (~724KB) |
+| `build-macos.sh` | macOS | Native `.app` with WebKit (on Mac) or browser-wrapper `.app` (on Linux) |
 | `build-linux.sh` | Linux | Directory with `.desktop` file + installer |
 | `build-windows.bat` | Windows | Portable folder with `.vbs` / `.bat` launchers |
 
-All scripts can run on Linux (no cross-compilation needed). The app is a thin launcher that opens `viewer.html` in the system's default browser.
+On macOS with Xcode Command Line Tools, `build-macos.sh` compiles a native Swift app (`desktop/macos-native/PromptWorkshop.swift`) that runs in its own window using WebKit — no browser needed. On Linux, it falls back to a browser-wrapper launcher.
 
 ---
 

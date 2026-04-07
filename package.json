@@ -1,6 +1,6 @@
 {
   "name": "@dishine/prompt-library",
-  "version": "2.2.1",
+  "version": "2.3.0",
   "description": "82+ expert prompt engineering templates with CLI search, visual Prompt Workshop, Quick Fill & Compose, image generation prompts, system prompt creation, and dynamic prompt generation",
   "type": "module",
   "bin": { "prompt-lib": "bin/prompt-lib.js" },
