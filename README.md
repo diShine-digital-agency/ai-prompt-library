@@ -32,7 +32,7 @@ The **Prompt Workshop** is a standalone HTML file — no server, no build step, 
 | **Compose** | Build layered prompts by combining a **system prompt** (persona) + **reasoning framework** (technique) + **task template** (the work). All three combine into one powerful prompt. |
 | **Create** | Build your own custom prompts with dynamic `{{field_name}}` placeholders. Define fields, write the body, and save to your personal library. |
 | **Generate** | Pick a proven framework, answer guided questions, and get a production-ready system prompt generated automatically — no prompt engineering experience needed. |
-| **Tools** | **Prompt Linter** (14-rule quality analysis with 0–100 scoring), **Prompt Optimizer** (instant rule-based + optional AI-powered rewriting), and **Smart Recommender** (describe your use case, get personalized prompt suggestions). |
+| **Tools** | **Prompt Linter** (14-rule quality analysis with 0–100 scoring), **Prompt Optimizer** (content-aware rewriting that detects your domain, replaces vague language, strengthens weak verbs, adds domain-specific constraints + optional AI-powered rewriting), and **Smart Recommender** (describe your use case, get personalized prompt suggestions). |
 | **Playground** | Send prompts directly to AI models (OpenAI GPT, Anthropic Claude, Google Gemini). Add a system prompt, see responses, track token usage — iterate without leaving the tool. |
 | **My Library** | All your saved prompts, filled templates, and compositions. Stored in your browser's localStorage — persists across sessions. |
 
@@ -248,6 +248,9 @@ ai-prompt-library/
     search.js              scored search (title/tag/category/content)
     formatter.js           ANSI terminal formatting
     generator.js           dynamic prompt generation from frameworks
+    linter.js              14-rule prompt quality scorer
+    optimizer.js           content-aware prompt optimizer (domain detection, vague language fix, etc.)
+    recommender.js         intent-based prompt matcher
   prompts/
     frameworks/            core prompting techniques
     model-specific/        model-optimized patterns
@@ -259,9 +262,10 @@ ai-prompt-library/
     image-generation/      image & visual AI prompt templates
   desktop/
     build-all.sh           cross-platform build (macOS + Linux + Windows)
-    build-macos.sh         macOS .app build script
+    build-macos.sh         macOS native app build (or browser fallback on Linux)
     build-linux.sh         Linux .desktop build script
     build-windows.bat      Windows build script (for use on Windows)
+    macos-native/          Swift source for native macOS app
     README.md              install guides, troubleshooting, platform notes
   viewer.html              interactive Prompt Workshop (standalone, works offline)
   test/run.js              test suite
@@ -273,21 +277,26 @@ ai-prompt-library/
 
 ## Desktop & Mobile Apps
 
-The Prompt Workshop runs as a native-feeling app on all platforms — no Electron, no heavy frameworks (~224KB per platform).
+The Prompt Workshop runs as a **native macOS application** with its own window — no browser needed. On Linux and Windows it opens in your default browser as a lightweight self-contained package.
 
 ```bash
 # Build for all platforms at once
 ./desktop/build-all.sh
+
+# Build just macOS native app (requires Mac + Xcode Command Line Tools)
+./desktop/build-macos.sh
 ```
 
-| Platform | Archive | Install |
-|----------|---------|---------|
-| **macOS** | `PromptWorkshop.tar.gz` | Extract → move `.app` to `/Applications/` |
-| **Linux** | `prompt-workshop-linux.tar.gz` | Extract → `./install.sh` → launch from app menu |
-| **Windows** | `PromptWorkshop-win.zip` | Extract → double-click `PromptWorkshop.vbs` |
-| **Android / iOS** | — | Open `viewer.html` in browser → "Add to Home Screen" |
+| Platform | Archive | Type | Install |
+|----------|---------|------|---------|
+| **macOS** | `PromptWorkshop.tar.gz` | Native app (own window) | Extract → drag to `/Applications/` |
+| **Linux** | `prompt-workshop-linux.tar.gz` | Browser wrapper | Extract → `./install.sh` → launch from app menu |
+| **Windows** | `PromptWorkshop-win.zip` | Browser wrapper | Extract → double-click `PromptWorkshop.vbs` |
+| **Android / iOS** | — | — | Open `viewer.html` in browser → "Add to Home Screen" |
 
-See [`desktop/README.md`](desktop/README.md) for detailed install instructions, troubleshooting, and platform-specific notes.
+The macOS native app features its own window, menu bar, Dock icon, Spotlight support, keyboard shortcuts (⌘C/V, ⌘+/-, ⌃⌘F full screen), and persistent storage independent of your browser.
+
+See [`desktop/README.md`](desktop/README.md) for detailed install instructions (including step-by-step for non-technical users), troubleshooting, and platform-specific notes.
 
 ---
 

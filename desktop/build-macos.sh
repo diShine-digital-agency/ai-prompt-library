@@ -1,6 +1,7 @@
 #!/bin/bash
 # Build a macOS .app bundle for Prompt Workshop
-# Works on Linux or macOS — no Xcode needed
+# On macOS: builds a native app with its own window (no browser needed)
+# On Linux: builds a lightweight browser-wrapper .app as fallback
 # Usage: ./desktop/build-macos.sh
 
 set -e
@@ -18,6 +19,12 @@ echo "Building $APP_NAME.app v$VERSION..."
 rm -rf "$OUTPUT_DIR/$APP_NAME.app" "$OUTPUT_DIR/$APP_NAME.tar.gz"
 mkdir -p "$OUTPUT_DIR/$APP_NAME.app/Contents/MacOS"
 mkdir -p "$OUTPUT_DIR/$APP_NAME.app/Contents/Resources"
+
+# ── Detect if we can build native (macOS + swiftc) ──
+NATIVE=false
+if [[ "$(uname)" == "Darwin" ]] && command -v swiftc &> /dev/null; then
+  NATIVE=true
+fi
 
 # Info.plist
 cat > "$OUTPUT_DIR/$APP_NAME.app/Contents/Info.plist" << PLIST
@@ -42,7 +49,7 @@ cat > "$OUTPUT_DIR/$APP_NAME.app/Contents/Info.plist" << PLIST
   <key>CFBundleInfoDictionaryVersion</key>
   <string>6.0</string>
   <key>LSMinimumSystemVersion</key>
-  <string>10.13</string>
+  <string>11.0</string>
   <key>NSHighResolutionCapable</key>
   <true/>
   <key>CFBundleIconFile</key>
@@ -51,14 +58,31 @@ cat > "$OUTPUT_DIR/$APP_NAME.app/Contents/Info.plist" << PLIST
 </plist>
 PLIST
 
-# Launcher script
-cat > "$OUTPUT_DIR/$APP_NAME.app/Contents/MacOS/$APP_NAME" << 'LAUNCHER'
+if $NATIVE; then
+  # ── Native build: compile Swift app with WKWebView ──
+  echo "  → Compiling native app (Swift + WKWebView)..."
+  swiftc \
+    -O \
+    -whole-module-optimization \
+    -import-objc-header /dev/null \
+    -framework Cocoa \
+    -framework WebKit \
+    "$SCRIPT_DIR/macos-native/PromptWorkshop.swift" \
+    -o "$OUTPUT_DIR/$APP_NAME.app/Contents/MacOS/$APP_NAME"
+
+  echo "  → Native app compiled (runs in its own window, no browser needed)"
+else
+  # ── Fallback: browser-wrapper launcher ──
+  echo "  → Building browser-wrapper (not on macOS or swiftc unavailable)"
+  echo "  → For the native app, build on macOS with Xcode Command Line Tools"
+  cat > "$OUTPUT_DIR/$APP_NAME.app/Contents/MacOS/$APP_NAME" << 'LAUNCHER'
 #!/bin/bash
 # Prompt Workshop launcher — opens the embedded HTML in the default browser
 DIR="$(cd "$(dirname "$0")/../Resources" && pwd)"
 open "$DIR/viewer.html"
 LAUNCHER
-chmod +x "$OUTPUT_DIR/$APP_NAME.app/Contents/MacOS/$APP_NAME"
+  chmod +x "$OUTPUT_DIR/$APP_NAME.app/Contents/MacOS/$APP_NAME"
+fi
 
 # Copy the HTML
 cp "$REPO_DIR/viewer.html" "$OUTPUT_DIR/$APP_NAME.app/Contents/Resources/viewer.html"
@@ -74,6 +98,14 @@ ARCHIVE_SIZE=$(du -sh "$APP_NAME.tar.gz" | cut -f1)
 echo ""
 echo "✓ Built $APP_NAME.app ($APP_SIZE)"
 echo "✓ Created $APP_NAME.tar.gz ($ARCHIVE_SIZE)"
+
+if $NATIVE; then
+  echo ""
+  echo "  ★ Native build — runs in its own window (no browser needed)"
+  echo "  ★ Full macOS integration: menu bar, ⌘C/V, zoom, full screen"
+  echo "  ★ Your saved data persists in the app's own storage"
+fi
+
 echo ""
 echo "To install on macOS:"
 echo "  1. Download $APP_NAME.tar.gz"

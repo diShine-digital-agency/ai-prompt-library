@@ -1,112 +1,167 @@
 # Desktop & Mobile Apps
 
-The Prompt Workshop can run as a native-feeling application on **macOS**, **Linux**, and **Windows** — no Electron, no heavy frameworks, no compilation. Each platform package is ~224KB compressed and opens the full Prompt Workshop in your default browser.
+The Prompt Workshop can run as a **native macOS application** with its own window — no browser needed. On Linux and Windows, it opens in your browser as a lightweight, self-contained package.
 
-All build scripts run on any system with Bash and Node.js. You can build all three platforms from a single Linux machine.
+All build scripts run on any system with Bash and Node.js. The macOS native app requires building on a Mac.
 
----
-
-## Quick Start
+### Quick Start
 
 ```bash
 # Build for all platforms at once
 ./desktop/build-all.sh
 
 # Or build individually
-./desktop/build-macos.sh      # macOS .app bundle
+./desktop/build-macos.sh      # macOS native app (or browser fallback on Linux)
 ./desktop/build-linux.sh      # Linux with .desktop integration
 # Windows: use build-all.sh or build-windows.bat on Windows
 ```
 
 Output goes to `dist/`:
 
-| Platform | Archive | Size | Install method |
-|----------|---------|------|----------------|
-| macOS | `PromptWorkshop.tar.gz` | ~224KB | Extract → move `.app` to `/Applications/` |
-| Linux | `prompt-workshop-linux.tar.gz` | ~224KB | Extract → run `./install.sh` |
-| Windows | `PromptWorkshop-win.zip` | ~224KB | Extract → double-click `PromptWorkshop.vbs` |
+| Platform | Archive | Type | Install |
+|----------|---------|------|---------|
+| **macOS** (on Mac) | `PromptWorkshop.tar.gz` | Native app (own window) | Extract → drag to Applications |
+| **macOS** (on Linux) | `PromptWorkshop.tar.gz` | Browser wrapper | Extract → drag to Applications |
+| **Linux** | `prompt-workshop-linux.tar.gz` | Browser wrapper | Extract → `./install.sh` |
+| **Windows** | `PromptWorkshop-win.zip` | Browser wrapper | Extract → double-click `.vbs` |
 
 ---
 
-## macOS
+## macOS — Native App (recommended)
 
-### What you get
+### What is it?
 
-A standard macOS `.app` bundle:
+A **real macOS application** that runs in its own window — just like any other app on your Mac. It does **not** open your browser. You get:
+
+- ✅ Its own window with a native title bar
+- ✅ Full menu bar (File, Edit, View, Window)
+- ✅ Standard keyboard shortcuts (⌘C, ⌘V, ⌘Q, ⌘+/⌘- zoom, etc.)
+- ✅ Dock icon — pin it to your Dock like any other app
+- ✅ Spotlight search — find it by typing "Prompt Workshop"
+- ✅ Full screen support (⌃⌘F)
+- ✅ Your saved prompts persist between sessions
+- ✅ Works completely offline — no internet needed
+
+### How to install (step by step)
+
+#### Option A: Download and install (easiest)
+
+1. **Download** `PromptWorkshop.tar.gz` from the [Releases page](https://github.com/diShine-digital-agency/ai-prompt-library/releases)
+2. **Double-click** the downloaded file to extract it — you'll see `PromptWorkshop.app`
+3. **Drag** `PromptWorkshop.app` into your **Applications** folder
+4. **Double-click** `PromptWorkshop.app` in your Applications folder to launch
+
+> 💡 **First launch:** macOS may show a security warning. See [Troubleshooting](#macos-troubleshooting) below.
+
+#### Option B: Build from source
+
+If you want to build it yourself (requires a Mac with Xcode Command Line Tools):
+
+```bash
+# 1. Install Xcode Command Line Tools (if you don't have them)
+xcode-select --install
+
+# 2. Clone the repository
+git clone https://github.com/diShine-digital-agency/ai-prompt-library.git
+cd ai-prompt-library
+
+# 3. Build the app
+./desktop/build-macos.sh
+
+# 4. Install
+mv dist/PromptWorkshop.app /Applications/
+
+# 5. Launch
+open /Applications/PromptWorkshop.app
+```
+
+### What's inside the app
 
 ```
 PromptWorkshop.app/
 └── Contents/
     ├── Info.plist              # App metadata (bundle ID, version, icon)
     ├── MacOS/
-    │   └── PromptWorkshop      # Bash launcher script (opens browser)
+    │   └── PromptWorkshop      # Native macOS executable (Swift + WebKit)
     └── Resources/
         └── viewer.html         # The complete Prompt Workshop
 ```
 
-### Install
+The app is a native macOS application written in Swift. It uses Apple's built-in WebKit engine to display the Prompt Workshop in its own window — the same engine Safari uses, but without needing Safari or any other browser.
 
-```bash
-# 1. Extract the archive
-tar -xzf PromptWorkshop.tar.gz
+### How your data is stored
 
-# 2. Move to Applications
-mv PromptWorkshop.app /Applications/
+Your saved prompts, settings, and API keys are stored inside the app's own WebKit data store. This means:
 
-# 3. Launch
-open /Applications/PromptWorkshop.app
-```
+- ✅ Data persists across app restarts and updates
+- ✅ Data is separate from your browser — clearing Safari/Chrome data won't affect the app
+- ⚠️ If you delete the app, your data is lost — **export your library first** (My Library → Export all as JSON)
+- 💡 When updating, just replace the `.app` file — your data stays safe
 
-Or simply double-click `PromptWorkshop.app` in Finder after extracting.
+### Keyboard shortcuts
 
-### How it works
+| Shortcut | Action |
+|----------|--------|
+| ⌘Q | Quit |
+| ⌘W | Close window |
+| ⌘C / ⌘V | Copy / Paste |
+| ⌘Z / ⇧⌘Z | Undo / Redo |
+| ⌘+ / ⌘- | Zoom in / out |
+| ⌘0 | Reset zoom |
+| ⌃⌘F | Toggle full screen |
+| ⌘R | Reload |
+| ⌘M | Minimize |
+| ⌘H | Hide |
 
-The `.app` contains a small Bash script that runs `open viewer.html`, which opens the Prompt Workshop in your default browser (Safari, Chrome, Firefox, etc.). All your saved prompts are stored in the browser's `localStorage` — they persist across sessions and app restarts.
+Plus all the in-app shortcuts (1-7 for tabs, Ctrl+K for search, H for help, D for dark mode).
 
-### Troubleshooting
+### <a name="macos-troubleshooting"></a>Troubleshooting
 
 #### "PromptWorkshop.app is damaged and can't be opened"
 
-This is macOS Gatekeeper blocking unsigned apps. Fix:
+This is macOS Gatekeeper blocking unsigned apps. It's safe — the app is open source and you can inspect the code. Fix it with one of these methods:
+
+**Method 1 (easiest):** Right-click the app → click **Open** → click **Open** again in the dialog.
+
+**Method 2:** Open Terminal (search "Terminal" in Spotlight) and paste this:
 
 ```bash
-# Option 1: Right-click the app → Open (bypasses Gatekeeper once)
-
-# Option 2: Remove the quarantine flag
 xattr -cr /Applications/PromptWorkshop.app
-
-# Option 3: Allow in System Preferences
-# Go to System Preferences → Security & Privacy → General
-# Click "Open Anyway" next to the blocked app message
 ```
+
+Then double-click the app again.
+
+**Method 3:** Go to **System Settings → Privacy & Security** → scroll down → click **Open Anyway** next to the blocked app message.
 
 #### "PromptWorkshop.app can't be opened because Apple cannot check it for malicious software"
 
-Same Gatekeeper issue. Use one of the three options above.
-
-#### App opens but nothing happens
-
-The app opens `viewer.html` in your default browser. If no browser is set:
-
-```bash
-# Check your default browser
-defaults read com.apple.LaunchServices/com.apple.launchservices.secure LSHandlers | grep -A 2 "https"
-
-# Set Chrome as default (for example)
-# Open Chrome → Settings → Default browser → Make default
-```
-
-#### Saved prompts missing after update
-
-Your saved prompts are in the **browser's localStorage**, not inside the app. When you update the app (replace the `.app` bundle), your data is safe — it lives in the browser. However, if you switch browsers or clear browser data, saved prompts will be lost. Use the **Export JSON** button in My Library before clearing data.
+Same as above — use any of the three methods.
 
 #### App doesn't appear in Spotlight
 
-macOS indexes `/Applications/` periodically. To force reindex:
+macOS indexes `/Applications/` periodically. To force it:
 
 ```bash
 mdimport /Applications/PromptWorkshop.app
 ```
+
+Or wait a few minutes — it will appear automatically.
+
+#### Build error: "swiftc: command not found"
+
+You need Xcode Command Line Tools. Install them:
+
+```bash
+xcode-select --install
+```
+
+Follow the prompts. This is a one-time step — it takes about 5 minutes.
+
+#### I want to add it to my Dock
+
+1. Open `PromptWorkshop.app` from Applications
+2. Right-click its icon in the Dock
+3. Click **Options → Keep in Dock**
 
 #### Code signing (optional, for distribution)
 
@@ -120,6 +175,14 @@ codesign --deep --force --sign "Developer ID Application: Your Name (TEAMID)" Pr
 xcrun notarytool submit PromptWorkshop.zip --apple-id you@email.com --team-id TEAMID --wait
 xcrun stapler staple PromptWorkshop.app
 ```
+
+---
+
+## macOS — Browser version (fallback)
+
+If you build on Linux or don't have Xcode Command Line Tools, the build script creates a lighter version that opens in your default browser. It works identically but doesn't have its own window.
+
+To use this version, simply run `./desktop/build-macos.sh` on Linux or on a Mac without `swiftc`. The resulting `.app` will open `viewer.html` in Safari/Chrome when launched.
 
 ---
 
@@ -454,9 +517,10 @@ The Prompt Workshop is a standalone HTML file that works in any modern mobile br
 
 | Approach | Size | Deps | Offline | Native feel | Build on Linux |
 |----------|------|------|---------|-------------|----------------|
-| **This (shell/script wrapper)** | ~224KB | None | ✅ | Opens in browser | ✅ |
+| **This (macOS native)** | ~1MB | None (Swift built-in) | ✅ | ✅ Own window, menus, dock | ❌ (needs Mac) |
+| **This (browser wrapper)** | ~224KB | None | ✅ | Opens in browser | ✅ |
 | Electron / Nativefier | 200MB+ | Node.js | ✅ | Full native | ❌ |
 | Tauri | 50-80MB | Rust | ✅ | Full native | ❌ (cross-compile) |
 | PWA (hosted) | 0 | Web server | ✅ (after first load) | Partial | ✅ |
 
-The shell wrapper approach trades full native window chrome for a 1000x smaller package size and zero-complexity builds. Since the Prompt Workshop is a complete standalone web app, the browser provides a familiar, feature-rich environment (bookmarks, zoom, print, DevTools).
+The macOS native build gives you a real native app experience at a fraction of the size of Electron or Tauri. On Linux and Windows, the browser wrapper approach provides the same features with zero-complexity builds and tiny package sizes.
