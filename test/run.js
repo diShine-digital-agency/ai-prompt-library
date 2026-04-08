@@ -1,8 +1,11 @@
 import { loadPrompts, findPlaceholders, extractTemplate, saveCustomPrompt, loadCustomPrompts, USER_DATA_DIR } from '../src/index.js';
 import { searchPrompts } from '../src/search.js';
 import { getFrameworks, getFramework, generatePrompt } from '../src/generator.js';
-import { existsSync, mkdirSync, writeFileSync, unlinkSync, rmSync } from 'fs';
-import { join } from 'path';
+import { existsSync, mkdirSync, writeFileSync, unlinkSync, rmSync, readFileSync } from 'fs';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __test_dirname = dirname(fileURLToPath(import.meta.url));
 
 let passed = 0;
 let failed = 0;
@@ -149,13 +152,9 @@ const combo = buildRecommendation(prompts, 'I need to review code for security i
 assert(combo.topPrompts.length > 0, `Recommendation combo has ${combo.topPrompts.length} prompts`);
 
 // ── Cross-platform: clipboard command selection ──
-// These tests verify the platform-detection logic without actually calling clipboard tools.
-// We test by reading the source and confirming the correct commands are present.
-import { readFileSync as readFile } from 'fs';
-import { dirname as dirn } from 'path';
-import { fileURLToPath as toPath } from 'url';
-
-const cliSrc = readFile(join(dirn(toPath(import.meta.url)), '..', 'bin', 'prompt-lib.js'), 'utf-8');
+// These tests verify the platform-detection logic by checking the CLI source
+// contains the correct commands for each platform.
+const cliSrc = readFileSync(join(__test_dirname, '..', 'bin', 'prompt-lib.js'), 'utf-8');
 
 assert(cliSrc.includes("process.platform"), 'CLI uses process.platform for platform detection');
 assert(cliSrc.includes("'pbcopy'"), 'CLI uses pbcopy for macOS clipboard');
