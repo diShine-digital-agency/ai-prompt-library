@@ -60,4 +60,4 @@ Choose your language / Scegli la tua lingua / Choisissez votre langue:
 
 ---
 
-**Version:** 2.3.0 | **License:** MIT | **Built by:** [diShine Digital Agency](https://dishine.it)
+**Version:** 2.3.1 | **License:** MIT | **Built by:** [diShine Digital Agency](https://dishine.it)

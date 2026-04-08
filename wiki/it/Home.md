@@ -19,7 +19,7 @@ La AI Prompt Library è un toolkit completo e senza dipendenze per il prompt eng
 - **Generatore di prompt** — crea prompt dinamicamente usando 5 framework
 - **Compose & Create** — combina prompt di sistema + framework + template, oppure crea prompt personalizzati con campi dinamici
 
-**Versione:** 2.3.0 &nbsp;|&nbsp; **Licenza:** MIT &nbsp;|&nbsp; **Dipendenze:** Zero (solo moduli integrati di Node.js 18+)
+**Versione:** 2.3.1 &nbsp;|&nbsp; **Licenza:** MIT &nbsp;|&nbsp; **Dipendenze:** Zero (solo moduli integrati di Node.js 18+)
 
 ---
 
@@ -105,7 +105,7 @@ Applicazioni native per macOS (Swift + WebKit), Linux (Python + GTK + WebKitGTK)
 ---
 
 <p align="center">
-Realizzato con ❤️ da <a href="https://dishine.it">diShine Digital Agency</a> — v2.3.0
+Realizzato con ❤️ da <a href="https://dishine.it">diShine Digital Agency</a> — v2.3.1
 </p>
 
 ---

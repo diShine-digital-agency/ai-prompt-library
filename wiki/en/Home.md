@@ -19,7 +19,7 @@ The AI Prompt Library is a comprehensive, zero-dependency toolkit for prompt eng
 - **Prompt Generator** — dynamically create prompts using 5 frameworks
 - **Compose & Create** — layer system prompts + frameworks + templates, or build custom prompts with dynamic fields
 
-**Version:** 2.3.0 &nbsp;|&nbsp; **License:** MIT &nbsp;|&nbsp; **Dependencies:** Zero (only Node.js 18+ built-in modules)
+**Version:** 2.3.1 &nbsp;|&nbsp; **License:** MIT &nbsp;|&nbsp; **Dependencies:** Zero (only Node.js 18+ built-in modules)
 
 ---
 
@@ -105,7 +105,7 @@ Native applications for macOS (Swift + WebKit), Linux (Python + GTK + WebKitGTK)
 ---
 
 <p align="center">
-Built with ❤️ by <a href="https://dishine.it">diShine Digital Agency</a> — v2.3.0
+Built with ❤️ by <a href="https://dishine.it">diShine Digital Agency</a> — v2.3.1
 </p>
 
 ---
