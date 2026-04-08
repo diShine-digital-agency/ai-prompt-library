@@ -287,11 +287,6 @@ ai-prompt-library/
     linux-native/          Python GTK source for native Linux app
     icons/                 App icons for all platforms (.icns, .png, .ico)
     README.md              install guides, troubleshooting, platform notes
-  wiki/
-    README.md              trilingual wiki index
-    en/                    English wiki pages (11 pages)
-    it/                    Italian wiki pages (11 pages)
-    fr/                    French wiki pages (11 pages)
   viewer.html              interactive Prompt Workshop (standalone, works offline)
   test/run.js              test suite
   CHANGELOG.md             version history
@@ -370,7 +365,7 @@ See [GUIDE.md — Troubleshooting](GUIDE.md#troubleshooting) for more platform-s
 - **[TECHNICAL.md](TECHNICAL.md)** — architecture, module reference, data formats, extension guide
 - **[CHANGELOG.md](CHANGELOG.md)** — version history and release notes
 - **[desktop/README.md](desktop/README.md)** — desktop app build and install guides
-- **[Wiki](wiki/README.md)** — comprehensive trilingual wiki (English, Italian, French) with 33 pages covering every aspect of the tool
+- **[Wiki](https://github.com/diShine-digital-agency/ai-prompt-library/wiki)** — comprehensive trilingual wiki (English, Italian, French) with 33 pages covering every aspect of the tool
 - **[CONTRIBUTING.md](CONTRIBUTING.md)** — how to contribute
 
 ---

@@ -10,7 +10,7 @@ All notable changes to this project will be documented in this file.
   - **11 English pages** — Home, Getting Started, CLI Reference, Prompt Workshop, Prompting Techniques, AI Models Guide, Tools (Linter/Optimizer/Recommender), API & Playground, Architecture, Desktop Apps, Contributing
   - **11 Italian pages** — Full Italian translation of all wiki pages
   - **11 French pages** — Full French translation of all wiki pages
-  - **Wiki index** (`wiki/README.md`) — Trilingual navigation hub linking all 33 pages
+  - **Wiki** — Available at [GitHub Wiki](https://github.com/diShine-digital-agency/ai-prompt-library/wiki) with trilingual navigation sidebar and footer
   - Pages include: installation guides, complete CLI command reference, Prompt Workshop tab-by-tab documentation, 12 prompting frameworks with examples, AI model comparison with pricing and benchmarks, tool internals (linter rules, optimizer pipeline, recommender scoring), API integration, module architecture, desktop app build guides, and contributing guidelines
   - Code blocks and commands kept in English across all translations; standard technical terms preserved where conventional in IT/FR tech writing
 

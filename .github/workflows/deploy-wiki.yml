@@ -1,0 +1,78 @@
+name: Deploy Wiki
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '_wiki-pages/**'
+
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy-wiki:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check for wiki pages
+        run: |
+          if [ ! -d "_wiki-pages" ]; then
+            echo "::error::_wiki-pages directory not found"
+            exit 1
+          fi
+          FILE_COUNT=$(find _wiki-pages -name '*.md' | wc -l)
+          echo "Found $FILE_COUNT wiki pages to deploy"
+          echo "FILE_COUNT=$FILE_COUNT" >> "$GITHUB_ENV"
+
+      - name: Clone wiki repository
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          WIKI_URL="https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.wiki.git"
+          WIKI_DIR=$(mktemp -d)
+          echo "WIKI_DIR=$WIKI_DIR" >> "$GITHUB_ENV"
+
+          if git clone "$WIKI_URL" "$WIKI_DIR" 2>/dev/null; then
+            echo "Wiki repository cloned"
+          else
+            echo "Wiki repo not found — initializing"
+            cd "$WIKI_DIR"
+            git init
+            git remote add origin "$WIKI_URL"
+            cd -
+          fi
+
+      - name: Deploy wiki pages
+        run: |
+          # Clean existing markdown files (preserve .git)
+          find "$WIKI_DIR" -name '*.md' -not -path "$WIKI_DIR/.git/*" -delete 2>/dev/null || true
+
+          # Copy new wiki pages
+          cp _wiki-pages/*.md "$WIKI_DIR/"
+
+          cd "$WIKI_DIR"
+          git config user.name "diShine Digital Agency"
+          git config user.email "kevin@dishine.it"
+          git add -A
+
+          if git diff --staged --quiet 2>/dev/null; then
+            echo "No changes — wiki is already up to date"
+          else
+            git commit -m "Deploy wiki: $FILE_COUNT pages (EN/IT/FR)
+
+          Automated deployment by GitHub Actions
+          Triggered by: ${{ github.sha }}"
+
+            git push origin master 2>/dev/null || git push origin main 2>/dev/null || {
+              git push -u origin master 2>/dev/null || git push -u origin main
+            }
+            echo "Wiki deployed successfully"
+          fi
+
+      - name: Cleanup
+        if: always()
+        run: rm -rf "$WIKI_DIR"
