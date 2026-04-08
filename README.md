@@ -323,6 +323,33 @@ All three desktop apps run in their **own window** (no browser chrome) with cust
 
 ---
 
+## Platform Notes
+
+The CLI and browser app work on **macOS**, **Linux**, and **Windows**. Here are the platform-specific details:
+
+| Feature | macOS | Linux | Windows |
+|---------|-------|-------|---------|
+| CLI commands | ✅ Full support | ✅ Full support | ✅ Full support |
+| Clipboard (`copy`, `compose`) | ✅ Built-in (`pbcopy`) | ✅ Requires `xclip` or `xsel` | ✅ Built-in (`clip`) |
+| `viewer` command | ✅ `open` | ✅ `xdg-open` | ✅ `start` |
+| Browser app (`viewer.html`) | ✅ Any browser | ✅ Any browser | ✅ Any browser |
+| Desktop app build | ✅ Native Swift app | ✅ GTK + WebKitGTK | ✅ Edge app mode |
+| Build scripts (`.sh`) | ✅ Bash built-in | ✅ Bash built-in | ⚠️ Requires Git Bash or WSL |
+
+**Linux clipboard setup:** Install `xclip` (recommended) or `xsel` for clipboard commands to work. Without them, prompts are printed to the terminal for manual copying.
+
+```bash
+# Ubuntu / Debian
+sudo apt install xclip
+
+# Fedora
+sudo dnf install xclip
+```
+
+See [GUIDE.md — Troubleshooting](GUIDE.md#troubleshooting) for more platform-specific help.
+
+---
+
 ## Requirements
 
 - **Node.js** 18 or later

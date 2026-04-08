@@ -155,7 +155,7 @@ All notable changes to this project will be documented in this file.
   - Cinematic scene composition, art style transfer
   - All with `{{fieldname}}` placeholders for easy customization
 
-- **18 new curated prompt templates** (82 total), inspired by proven community prompts:
+- **22 new curated prompt templates** (82 total), inspired by proven community prompts:
   - `frameworks/mega-prompt` — Multi-section system prompt framework
   - `frameworks/prompt-evaluation` — Prompt quality evaluation and improvement
   - `frameworks/self-consistency` — Multi-path reasoning with voting

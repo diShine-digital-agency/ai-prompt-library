@@ -148,5 +148,28 @@ assert(recs[0].relevanceScore > 0, 'Top recommendation has positive score');
 const combo = buildRecommendation(prompts, 'I need to review code for security issues');
 assert(combo.topPrompts.length > 0, `Recommendation combo has ${combo.topPrompts.length} prompts`);
 
+// ── Cross-platform: clipboard command selection ──
+// These tests verify the platform-detection logic without actually calling clipboard tools.
+// We test by reading the source and confirming the correct commands are present.
+import { readFileSync as readFile } from 'fs';
+import { dirname as dirn } from 'path';
+import { fileURLToPath as toPath } from 'url';
+
+const cliSrc = readFile(join(dirn(toPath(import.meta.url)), '..', 'bin', 'prompt-lib.js'), 'utf-8');
+
+assert(cliSrc.includes("process.platform"), 'CLI uses process.platform for platform detection');
+assert(cliSrc.includes("'pbcopy'"), 'CLI uses pbcopy for macOS clipboard');
+assert(cliSrc.includes("'clip'"), 'CLI uses clip for Windows clipboard');
+assert(cliSrc.includes("'xclip -selection clipboard'"), 'CLI uses xclip for Linux clipboard');
+assert(cliSrc.includes("'xsel --clipboard --input'"), 'CLI uses xsel as Linux clipboard fallback');
+
+// ── Cross-platform: viewer open command selection ──
+assert(cliSrc.includes('`open "'), 'CLI uses open for macOS viewer');
+assert(cliSrc.includes('`start "" "'), 'CLI uses start for Windows viewer');
+assert(cliSrc.includes('`xdg-open "'), 'CLI uses xdg-open for Linux viewer');
+
+// ── Prompt count: verify all documented prompts exist ──
+assert(prompts.length >= 82, `Library has ${prompts.length} prompts (expected >= 82)`);
+
 console.log(`\nResults: ${passed} passed, ${failed} failed`);
 process.exit(failed > 0 ? 1 : 0);

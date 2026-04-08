@@ -622,6 +622,86 @@ node test/run.js
 
 ---
 
+## Troubleshooting
+
+Common issues and how to fix them.
+
+### `node: command not found`
+
+Node.js is not installed or not in your PATH. Install Node.js 18 or later from [nodejs.org](https://nodejs.org/) (grab the LTS version). After installation, restart your terminal.
+
+```bash
+node --version   # should print v18.x.x or later
+```
+
+### `SyntaxError: Cannot use import statement outside a module`
+
+Your Node.js version is too old. This project uses ES modules, which require Node.js 18+. Check your version with `node --version` and upgrade if needed.
+
+### `ERR_MODULE_NOT_FOUND` or `Cannot find module`
+
+You are likely running the command from the wrong directory. Make sure you are in the repository root:
+
+```bash
+cd ai-prompt-library
+node bin/prompt-lib.js list
+```
+
+If you installed globally with `npm install -g`, make sure the install completed without errors.
+
+### Clipboard not working (Linux)
+
+The CLI uses `xclip` or `xsel` for clipboard access on Linux. Install one of them:
+
+```bash
+# Ubuntu / Debian
+sudo apt install xclip
+
+# Fedora
+sudo dnf install xclip
+
+# Arch
+sudo pacman -S xclip
+```
+
+If neither is available, the CLI will print the prompt text so you can copy it manually.
+
+### `prompt-lib viewer` does not open the browser
+
+The `viewer` command uses your system's default file opener (`open` on macOS, `xdg-open` on Linux, `start` on Windows). If it fails:
+
+1. Check the terminal output for the file path (e.g., `/tmp/prompt-library-viewer.html`)
+2. Open that file manually in any browser
+
+On Linux, make sure `xdg-open` is installed (it comes with most desktop environments). On headless servers, there is no browser to open — download the file and open it on your local machine instead.
+
+### Permission denied on `npm link`
+
+On macOS and Linux, `npm link` may require elevated permissions:
+
+```bash
+sudo npm link
+```
+
+Or fix npm's default directory to avoid `sudo`:
+
+```bash
+mkdir -p ~/.npm-global
+npm config set prefix '~/.npm-global'
+# Add ~/.npm-global/bin to your PATH in .bashrc / .zshrc
+export PATH="$HOME/.npm-global/bin:$PATH"
+```
+
+### Windows-specific notes
+
+- **PowerShell** and **Command Prompt** both work for CLI commands.
+- **Git Bash** or **WSL** (Windows Subsystem for Linux) are needed to run the desktop build scripts (`.sh` files).
+- The `viewer` command opens the file in your default browser using `start`.
+- Clipboard uses the built-in `clip` command — no extra tools needed.
+- If you see path errors, make sure you are using forward slashes or the `path.join()` output provided by the tool.
+
+---
+
 ## FAQ
 
 **Q: Do I need an internet connection?**
