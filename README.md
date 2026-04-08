@@ -1,8 +1,21 @@
-# prompt-library Powerhouse
+# AI-Prompt Library: the prompt-engineering Powerhouse to search, compose, create, lint and optimize your prompt
+
+<p align="center">
+  <img src="desktop/images/prompt_workshop_02_compose_workflow2.webp" alt="PROMP WORKSHOP compose workflow" width="65%">
+</p>
 
 **82+ expert-level prompt templates — with a CLI, a browser-based Prompt Workshop, and desktop apps — to search, browse, compose, create, lint, optimize, and test prompts with AI models.**
 
+<p align="center">
+  <img src="desktop/images/prompt_workshop_03_create_custom_prompt2.webp" alt="PROMP WORKSHOP create custom prompt" width="49%">
+  <img src="desktop/images/prompt_workshop_05_tools_workspace2.webp" alt="PROMP WORKSHOP tools workspace" width="49%">
+</p>
+
 If you work with LLMs regularly, you've probably got prompts scattered across Notion docs, Slack messages, and random text files. This library brings them together: organized, searchable, and ready to use.
+
+<p align="center">
+  <img src="desktop/images/prompt_workshop_04_generate_framework2.webp" alt="PROMP WORKSHOP generate framework" width="60%">
+</p>
 
 **Three ways to use it:**
 
