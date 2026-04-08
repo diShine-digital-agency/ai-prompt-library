@@ -1,8 +1,11 @@
 import { loadPrompts, findPlaceholders, extractTemplate, saveCustomPrompt, loadCustomPrompts, USER_DATA_DIR } from '../src/index.js';
 import { searchPrompts } from '../src/search.js';
 import { getFrameworks, getFramework, generatePrompt } from '../src/generator.js';
-import { existsSync, mkdirSync, writeFileSync, unlinkSync, rmSync } from 'fs';
-import { join } from 'path';
+import { existsSync, mkdirSync, writeFileSync, unlinkSync, rmSync, readFileSync } from 'fs';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __test_dirname = dirname(fileURLToPath(import.meta.url));
 
 let passed = 0;
 let failed = 0;
@@ -147,6 +150,25 @@ assert(recs[0].relevanceScore > 0, 'Top recommendation has positive score');
 
 const combo = buildRecommendation(prompts, 'I need to review code for security issues');
 assert(combo.topPrompts.length > 0, `Recommendation combo has ${combo.topPrompts.length} prompts`);
+
+// ── Cross-platform: clipboard command selection ──
+// These tests verify the platform-detection logic by checking the CLI source
+// contains the correct commands for each platform.
+const cliSrc = readFileSync(join(__test_dirname, '..', 'bin', 'prompt-lib.js'), 'utf-8');
+
+assert(cliSrc.includes("process.platform"), 'CLI uses process.platform for platform detection');
+assert(cliSrc.includes("'pbcopy'"), 'CLI uses pbcopy for macOS clipboard');
+assert(cliSrc.includes("'clip'"), 'CLI uses clip for Windows clipboard');
+assert(cliSrc.includes("'xclip -selection clipboard'"), 'CLI uses xclip for Linux clipboard');
+assert(cliSrc.includes("'xsel --clipboard --input'"), 'CLI uses xsel as Linux clipboard fallback');
+
+// ── Cross-platform: viewer open command selection ──
+assert(cliSrc.includes('`open "'), 'CLI uses open for macOS viewer');
+assert(cliSrc.includes('`start "" "'), 'CLI uses start for Windows viewer');
+assert(cliSrc.includes('`xdg-open "'), 'CLI uses xdg-open for Linux viewer');
+
+// ── Prompt count: verify all documented prompts exist ──
+assert(prompts.length >= 82, `Library has ${prompts.length} prompts (expected >= 82)`);
 
 console.log(`\nResults: ${passed} passed, ${failed} failed`);
 process.exit(failed > 0 ? 1 : 0);

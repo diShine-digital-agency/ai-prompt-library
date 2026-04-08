@@ -57,7 +57,19 @@ const HELP = `
 
 function copyToClipboard(text) {
   try {
-    execSync('pbcopy', { input: text, stdio: ['pipe', 'pipe', 'pipe'] });
+    const platform = process.platform;
+    if (platform === 'darwin') {
+      execSync('pbcopy', { input: text, stdio: ['pipe', 'pipe', 'pipe'] });
+    } else if (platform === 'win32') {
+      execSync('clip', { input: text, stdio: ['pipe', 'pipe', 'pipe'] });
+    } else {
+      // Linux / FreeBSD — try xclip first, then xsel
+      try {
+        execSync('xclip -selection clipboard', { input: text, stdio: ['pipe', 'pipe', 'pipe'] });
+      } catch {
+        execSync('xsel --clipboard --input', { input: text, stdio: ['pipe', 'pipe', 'pipe'] });
+      }
+    }
     console.log('\n  Copied to clipboard.');
   } catch {
     console.log('\n  (clipboard not available — copy manually from above)');
@@ -604,7 +616,14 @@ function viewerCommand(prompts) {
   console.log(`  Viewer opened with ${prompts.length} prompts`);
 
   try {
-    execSync(`open "${outPath}"`, { stdio: 'ignore' });
+    const platform = process.platform;
+    if (platform === 'darwin') {
+      execSync(`open "${outPath}"`, { stdio: 'ignore' });
+    } else if (platform === 'win32') {
+      execSync(`start "" "${outPath}"`, { stdio: 'ignore', shell: true });
+    } else {
+      execSync(`xdg-open "${outPath}"`, { stdio: 'ignore' });
+    }
   } catch {
     console.log(`  Could not open automatically. Open this file in your browser:\n  ${outPath}`);
   }
