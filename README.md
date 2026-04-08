@@ -1,4 +1,4 @@
-# AI-Prompt Library: the prompt-engineering Powerhouse to search, compose, create, lint and optimize your prompt
+# AI-Prompt Library: the prompt-engineering powerhouse to search, compose, create, lint and optimize your prompt
 
 <p align="center">
   <img src="desktop/images/prompt_workshop_02_compose_workflow2.webp" alt="PROMP WORKSHOP compose workflow" width="65%">
