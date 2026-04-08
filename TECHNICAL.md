@@ -1,6 +1,6 @@
 # Technical Documentation
 
-Architecture, data flow, and extension guide for the diShine Prompt Library v2.3.
+Architecture, data flow, and extension guide for the diShine Prompt Library v2.3.1.
 
 > **Looking for how to use the tools?** See [FUNCTIONS.md](FUNCTIONS.md) for detailed usage docs on each function.
 
