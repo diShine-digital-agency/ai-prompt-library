@@ -3045,6 +3045,14 @@ function getApiSettings() {
 }
 function saveApiSettings(s) { storage.set('api_settings', s); }
 function hasApiKey() { var s = getApiSettings(); return !!(s.openai_key || s.anthropic_key || s.google_key); }
+function getConfiguredProviders() {
+  var s = getApiSettings();
+  var providers = [];
+  if (s.openai_key) providers.push({ provider: 'openai', key: s.openai_key, model: s.openai_model || 'gpt-4o-mini', label: 'OpenAI' });
+  if (s.anthropic_key) providers.push({ provider: 'anthropic', key: s.anthropic_key, model: s.anthropic_model || 'claude-sonnet-4-20250514', label: 'Anthropic' });
+  if (s.google_key) providers.push({ provider: 'google', key: s.google_key, model: s.google_model || 'gemini-2.0-flash', label: 'Google' });
+  return providers;
+}
 function getActiveProvider() {
   var s = getApiSettings();
   if (s.provider === 'openai' && s.openai_key) return { provider: 'openai', key: s.openai_key, model: s.openai_model };
@@ -4020,7 +4028,7 @@ function showPlayground() {
 
   var desc = document.createElement('p');
   desc.style.cssText = 'color:var(--text-secondary);margin-bottom:16px;font-size:14px;';
-  desc.textContent = 'Send prompts to AI models, see responses, iterate. Configure API keys via the \u2699 button.';
+  desc.textContent = 'Send prompts to AI models, compare responses across providers, and iterate. Configure API keys via the \u2699 button.';
   main.appendChild(desc);
 
   if (showHelpBanners) {
@@ -4032,8 +4040,9 @@ function showPlayground() {
       '<li><strong>System prompt</strong> (optional) — sets the AI\'s persona and rules (like the "You are a…" part)</li>' +
       '<li><strong>User prompt</strong> — what you actually want the AI to do</li>' +
       '<li><strong>Model</strong> — which AI to use (set in \u2699 API Settings)</li>' +
+      '<li><strong>\u2696 Compare Models</strong> — send the same prompt to all your configured AI providers at once and see results side-by-side. Great for picking the best model for your use case. Requires 2+ API keys configured.</li>' +
       '</ul>' +
-      '<div class="tip">\uD83D\uDC49 Quick workflow: Browse \u2192 Quick Fill a template \u2192 Copy \u2192 Paste here \u2192 Send to AI</div>';
+      '<div class="tip">\uD83D\uDC49 Quick workflow: Browse \u2192 Quick Fill a template \u2192 Copy \u2192 Paste here \u2192 Send to AI (or Compare across models)</div>';
     main.appendChild(help);
   }
 
@@ -4147,7 +4156,118 @@ function showPlayground() {
   };
   actions.appendChild(lintBtn);
 
+  // Multi-Model Compare
+  var configured = getConfiguredProviders();
+  if (configured.length >= 2) {
+    var compareBtn = document.createElement('button');
+    compareBtn.className = 'btn';
+    compareBtn.id = 'pgCompareBtn';
+    compareBtn.textContent = '\u2696 Compare (' + configured.length + ' models)';
+    compareBtn.title = 'Send the same prompt to all configured providers simultaneously and compare responses side-by-side';
+    compareBtn.style.cssText = 'padding:10px 16px;font-size:14px;';
+    compareBtn.onclick = async function() {
+      var userPrompt = document.getElementById('pgUserPrompt').value.trim();
+      if (!userPrompt) { showToast('Enter a prompt first'); return; }
+      var sysPrompt = document.getElementById('pgSystemPrompt').value.trim();
+      compareBtn.disabled = true;
+      sendBtn.disabled = true;
+      compareBtn.textContent = '\u23F3 Comparing...';
+      var respArea = document.getElementById('pgResponseArea');
+      respArea.textContent = '';
+
+      // Create grid for side-by-side results
+      var grid = document.createElement('div');
+      grid.style.cssText = 'display:grid;grid-template-columns:repeat(' + Math.min(configured.length, 3) + ',1fr);gap:12px;';
+      respArea.appendChild(grid);
+
+      // Create cards
+      var cards = [];
+      configured.forEach(function(prov) {
+        var card = document.createElement('div');
+        card.style.cssText = 'border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;';
+        var header = document.createElement('div');
+        header.style.cssText = 'padding:10px 12px;background:var(--code-bg);font-weight:600;font-size:13px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;';
+        var provLabel = document.createElement('span');
+        provLabel.textContent = prov.label;
+        header.appendChild(provLabel);
+        var modelBadge = document.createElement('span');
+        modelBadge.style.cssText = 'font-size:11px;font-weight:400;color:var(--text-dim);';
+        modelBadge.textContent = prov.model;
+        header.appendChild(modelBadge);
+        card.appendChild(header);
+        var body = document.createElement('div');
+        body.style.cssText = 'padding:12px;font-size:13px;line-height:1.6;min-height:100px;';
+        body.innerHTML = '<div class="pg-loading"><div class="spinner"></div>Waiting...</div>';
+        body.id = 'compare-body-' + prov.provider;
+        card.appendChild(body);
+        grid.appendChild(card);
+        cards.push({ prov: prov, body: body, card: card });
+      });
+
+      // Send to all in parallel
+      var startTime = Date.now();
+      var promises = cards.map(function(c) {
+        var t0 = Date.now();
+        return sendToAI(userPrompt, sysPrompt, c.prov.provider, c.prov.key, c.prov.model)
+          .then(function(result) {
+            var elapsed = ((Date.now() - t0) / 1000).toFixed(1);
+            c.body.textContent = '';
+            var pre = document.createElement('div');
+            pre.style.cssText = 'white-space:pre-wrap;word-wrap:break-word;';
+            pre.textContent = result.text;
+            c.body.appendChild(pre);
+            var meta = document.createElement('div');
+            meta.style.cssText = 'margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:11px;color:var(--text-dim);';
+            var metaParts = [elapsed + 's'];
+            if (result.usage) {
+              var tokIn = result.usage.prompt_tokens || result.usage.input_tokens || '?';
+              var tokOut = result.usage.completion_tokens || result.usage.output_tokens || '?';
+              metaParts.push(tokIn + '→' + tokOut + ' tok');
+            }
+            meta.textContent = metaParts.join(' · ');
+            c.body.appendChild(meta);
+            // Copy button
+            var cpBtn = document.createElement('button');
+            cpBtn.className = 'btn';
+            cpBtn.textContent = '\uD83D\uDCCB Copy';
+            cpBtn.style.cssText = 'margin-top:6px;font-size:11px;padding:4px 8px;';
+            cpBtn.onclick = function() { navigator.clipboard.writeText(result.text).then(function(){ showToast('Copied!'); }); };
+            c.body.appendChild(cpBtn);
+          })
+          .catch(function(err) {
+            c.body.innerHTML = '<div style="color:var(--danger);font-size:12px;">\u274C ' + escapeHtml(err.message) + '</div>';
+          });
+      });
+      await Promise.allSettled(promises);
+      var totalTime = ((Date.now() - startTime) / 1000).toFixed(1);
+
+      // Summary bar
+      var summary = document.createElement('div');
+      summary.style.cssText = 'margin-top:12px;padding:10px;background:var(--code-bg);border-radius:var(--radius);font-size:12px;color:var(--text-secondary);text-align:center;';
+      summary.textContent = '\u2696 Compared ' + configured.length + ' models in ' + totalTime + 's';
+      respArea.appendChild(summary);
+
+      compareBtn.disabled = false;
+      sendBtn.disabled = false;
+      compareBtn.textContent = '\u2696 Compare (' + configured.length + ' models)';
+    };
+    actions.appendChild(compareBtn);
+  } else if (configured.length === 1) {
+    var compareHint = document.createElement('span');
+    compareHint.style.cssText = 'font-size:11px;color:var(--text-dim);align-self:center;';
+    compareHint.textContent = 'Add 2+ API keys via \u2699 to compare models';
+    actions.appendChild(compareHint);
+  }
+
   main.appendChild(actions);
+
+  // Multi-model hint (always visible)
+  if (configured.length >= 2) {
+    var compareHintLine = document.createElement('div');
+    compareHintLine.style.cssText = 'font-size:12px;color:var(--text-dim);margin-top:8px;padding:6px 10px;background:var(--code-bg);border-radius:var(--radius);';
+    compareHintLine.innerHTML = '\u2696 <strong>Multi-Model Compare:</strong> You have ' + configured.length + ' providers configured (' + configured.map(function(p){ return p.label; }).join(', ') + '). Click "Compare" to send your prompt to all models at once and see responses side-by-side — great for finding the best model for your task.';
+    main.appendChild(compareHintLine);
+  }
 
   // Response area
   var respArea = document.createElement('div');
