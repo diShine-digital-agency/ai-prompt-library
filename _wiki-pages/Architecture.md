@@ -341,6 +341,16 @@ These keys are used by the Prompt Workshop (`viewer.html`):
 | `pl_saved` | `JSON array` | All saved prompts, filled templates, composed prompts, custom prompts. Items from the database are marked with `source: 'database'` |
 | `pl_sidebar_width` | `number` | Sidebar width in pixels (260–600). Persists across sessions |
 | `api_settings` | `JSON object` | API keys and model preferences for Playground and AI Optimizer. Contains provider, keys for OpenAI/Anthropic/Google, and selected models |
+| `pg_prefill` | `string` | Temporary playground prefill data. Cleared after use |
+
+### v2.4.0 Architecture Updates
+
+- **Linter** now includes prompt-type detection (image/code/system/general) with adjusted rule weights — see [INFRASTRUCTURE.md](https://github.com/diShine-digital-agency/ai-prompt-library/blob/main/INFRASTRUCTURE.md)
+- **Optimizer** adds a diff view engine for color-coded before/after comparison
+- **Playground** includes multi-model compare via `Promise.allSettled()` with 30s `AbortController` timeouts
+- **Create tab** includes 6 starter templates pre-filling title, tags, body, and dynamic fields
+- **My Library** has search, type filter, and sort controls
+- **Accessibility**: ARIA landmarks, `role="tablist"`, skip-to-content link, `focus-visible`, arrow-key tab navigation
 
 ---
 

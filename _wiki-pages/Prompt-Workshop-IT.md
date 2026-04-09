@@ -86,6 +86,7 @@ Il prompt composto segue questa struttura:
 Crea prompt di sistema personalizzati con campi dinamici partendo da zero.
 
 **Funzionalità:**
+- **Template Iniziali (v2.4.0)** — 6 scheletri predefiniti (Assistente Esperto, Content Writer, Generatore di Codice, Analista Dati, Strategist Marketing, Prompt Immagine) — clicca per pre-compilare, poi personalizza
 - **Costruttore di campi** — definisci campi dinamici che diventano segnaposto `{{nome_campo}}`
 - **Metadati dei campi** — ogni campo ha un nome e una descrizione
 - **Editor del prompt** — scrivi il corpo del prompt usando i campi definiti
@@ -145,6 +146,8 @@ Analizza il tuo prompt rispetto a 14 regole di qualità. Produce un punteggio (0
 - I risultati mostrano le regole ✅ superate e i suggerimenti 💡 di miglioramento
 - Le regole sono ordinate per impatto (i fallimenti con peso maggiore per primi)
 
+**Rilevamento Tipo di Prompt (v2.4.0):** Il linter rileva automaticamente il tipo di prompt (🎨 Immagine, 💻 Codice, 🤖 Sistema, 📝 Generale) e adegua i pesi delle regole. I prompt per immagini saltano regole irrilevanti come pubblico/tono; i prompt per codice pesano di più i vincoli.
+
 Consulta [Strumenti: Linter, Optimizer, Recommender](Strumenti-Linter-Optimizer-Recommender) per l'elenco completo delle regole.
 
 #### Optimizer
@@ -157,6 +160,8 @@ Riscrive il tuo prompt usando l'ottimizzazione consapevole del contenuto. Due mo
 | **Basata su IA** | Invia il prompt a GPT/Claude/Gemini per una riscrittura professionale. | Chiave API (impostata in ⚙ Impostazioni) |
 
 Mostra i punteggi prima/dopo, tutte le modifiche apportate e il dominio rilevato.
+
+**Vista Differenze (v2.4.0):** Alterna tra "Ottimizzato" (risultato pulito) e "Vista Diff" (confronto colorato prima/dopo: verde = aggiunto, rosso barrato = rimosso).
 
 #### Recommender
 
@@ -188,6 +193,7 @@ Invia prompt direttamente ai modelli AI e ottieni risposte — tutto all'interno
 - **Pulsante Invia** — invia il prompt e visualizza la risposta
 - **Tracciamento token** — mostra l'utilizzo dei token input/output per ogni richiesta
 - **Copia con un clic** — copia la risposta dell'IA
+- **⚖ Confronto Multi-Modello (v2.4.0)** — configura 2+ chiavi API, clicca "Confronta" per inviare lo stesso prompt a tutti i provider simultaneamente. I risultati appaiono affiancati con tempi, token e pulsanti di copia.
 - **Visualizzazione risposta** — risposta dell'IA formattata con rendering markdown
 
 Le chiavi API sono memorizzate nel `localStorage` — non lasciano mai il tuo browser.
@@ -199,6 +205,7 @@ Le chiavi API sono memorizzate nel `localStorage` — non lasciano mai il tuo br
 Gestisci tutti i prompt salvati, le composizioni e i prompt personalizzati.
 
 **Funzionalità:**
+- **Cerca, Filtra e Ordina (v2.4.0)** — cerca per titolo/contenuto, filtra per tipo (Preferiti/Compilati/Composti/Personalizzati), ordina (Più recenti/Più vecchi/A→Z/Z→A)
 - **Visualizza elementi salvati** — vedi tutti i prompt salvati con titoli, date e tipi
 - **Modifica** — modifica il contenuto dei prompt salvati inline
 - **Copia** — copia qualsiasi prompt salvato negli appunti

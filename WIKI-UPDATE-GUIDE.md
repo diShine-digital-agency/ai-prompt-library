@@ -340,21 +340,21 @@ No changes needed.
 
 Use this checklist to track your progress:
 
-- [ ] `Home.md` — version 2.3.1 → 2.4.0, add new features
-- [ ] `Home-IT.md` — same in Italian
-- [ ] `Accueil.md` — same in French
-- [ ] `Prompt-Workshop.md` — update Tools, Create, Playground, My Library sections
-- [ ] `Prompt-Workshop-IT.md` — same in Italian
-- [ ] `Prompt-Workshop-FR.md` — same in French
-- [ ] `Tools-Linter-Optimizer-Recommender.md` — add type awareness, diff view
-- [ ] `Strumenti-Linter-Optimizer-Recommender.md` — same in Italian
-- [ ] `Outils-Linter-Optimizer-Recommender.md` — same in French
-- [ ] `API-and-Playground.md` — add multi-model compare, security notes
-- [ ] `API-e-Playground.md` — same in Italian
-- [ ] `API-et-Playground.md` — same in French
-- [ ] `Architecture.md` — update tab table, add localStorage key
-- [ ] `Architettura.md` — same in Italian
-- [ ] `Architecture-FR.md` — same in French
+- [x] `Home.md` — version 2.3.1 → 2.4.0, add new features
+- [x] `Home-IT.md` — same in Italian
+- [x] `Accueil.md` — same in French
+- [x] `Prompt-Workshop.md` — update Tools, Create, Playground, My Library sections
+- [x] `Prompt-Workshop-IT.md` — same in Italian
+- [x] `Prompt-Workshop-FR.md` — same in French
+- [x] `Tools-Linter-Optimizer-Recommender.md` — add type awareness, diff view
+- [x] `Strumenti-Linter-Optimizer-Recommender.md` — same in Italian
+- [x] `Outils-Linter-Optimizer-Recommender.md` — same in French
+- [x] `API-and-Playground.md` — add multi-model compare, security notes
+- [x] `API-e-Playground.md` — same in Italian
+- [x] `API-et-Playground.md` — same in French
+- [x] `Architecture.md` — update tab table, add localStorage key
+- [x] `Architettura.md` — same in Italian
+- [x] `Architecture-FR.md` — same in French
 
 **Pages that need NO changes:** Getting-Started (3 langs), Contributing (3 langs), Desktop-Apps (3 langs), AI-Models-Guide (3 langs), Prompting-Techniques (3 langs), _Sidebar.md, _Footer.md
 
