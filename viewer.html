@@ -1811,7 +1811,7 @@ function showSaved() {
   main.appendChild(h2);
 
   var desc = document.createElement('p');
-  desc.style.cssText = 'color:var(--text-secondary);margin-bottom:20px;font-size:14px;';
+  desc.style.cssText = 'color:var(--text-secondary);margin-bottom:16px;font-size:14px;';
   desc.textContent = 'Your saved prompts, filled templates, and composed prompts. Stored in your browser.';
   main.appendChild(desc);
 
@@ -1826,6 +1826,39 @@ function showSaved() {
     container.innerHTML = '<div class="empty-state"><div class="icon">&#128218;</div><h3>Empty</h3><p>Save prompts to see them here.</p></div>';
     return;
   }
+
+  // ── Filter & Sort bar ──
+  var filterBar = document.createElement('div');
+  filterBar.style.cssText = 'display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center;';
+
+  // Search within library
+  var searchInput = document.createElement('input');
+  searchInput.type = 'text';
+  searchInput.placeholder = '🔍 Search saved prompts...';
+  searchInput.id = 'libSearchInput';
+  searchInput.style.cssText = 'flex:1;min-width:160px;padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-input);color:var(--text);font-size:13px;';
+  filterBar.appendChild(searchInput);
+
+  // Type filter
+  var typeSelect = document.createElement('select');
+  typeSelect.id = 'libTypeFilter';
+  typeSelect.style.cssText = 'padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-input);color:var(--text);font-size:13px;';
+  typeSelect.innerHTML = '<option value="all">All types</option><option value="favorite">⭐ Favorites</option><option value="filled">📝 Filled</option><option value="composed">🔗 Composed</option><option value="custom">✨ Custom</option>';
+  filterBar.appendChild(typeSelect);
+
+  // Sort
+  var sortSelect = document.createElement('select');
+  sortSelect.id = 'libSortOrder';
+  sortSelect.style.cssText = 'padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-input);color:var(--text);font-size:13px;';
+  sortSelect.innerHTML = '<option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="alpha">A → Z</option><option value="alpha-desc">Z → A</option>';
+  filterBar.appendChild(sortSelect);
+
+  main.appendChild(filterBar);
+
+  // Library content container
+  var libContent = document.createElement('div');
+  libContent.id = 'libContent';
+  main.appendChild(libContent);
 
   // actions bar
   var actionsBar = document.createElement('div');
@@ -1878,24 +1911,63 @@ function showSaved() {
   actionsBar.appendChild(clearBtn);
   main.appendChild(actionsBar);
 
-  // group by type
-  var favorites = saved.filter(function(s){return s.type==='favorite';});
-  var filled = saved.filter(function(s){return s.type==='filled';});
-  var composed = saved.filter(function(s){return s.type==='composed';});
-  var custom = saved.filter(function(s){return s.type==='custom';});
+  function renderLibrary() {
+    var filterType = document.getElementById('libTypeFilter').value;
+    var sortOrder = document.getElementById('libSortOrder').value;
+    var searchTerm = document.getElementById('libSearchInput').value.toLowerCase().trim();
+    var libEl = document.getElementById('libContent');
+    libEl.textContent = '';
 
-  if (favorites.length > 0) {
-    main.appendChild(savedSection('Favorites', favorites, 'favorite'));
+    var filtered = saved;
+    if (filterType !== 'all') filtered = filtered.filter(function(s) { return s.type === filterType; });
+    if (searchTerm) filtered = filtered.filter(function(s) { return (s.title || '').toLowerCase().includes(searchTerm) || (s.result || '').toLowerCase().includes(searchTerm); });
+
+    // Sort
+    filtered = filtered.slice();
+    if (sortOrder === 'newest') filtered.sort(function(a,b) { return (b.id || 0) - (a.id || 0); });
+    else if (sortOrder === 'oldest') filtered.sort(function(a,b) { return (a.id || 0) - (b.id || 0); });
+    else if (sortOrder === 'alpha') filtered.sort(function(a,b) { return (a.title || '').localeCompare(b.title || ''); });
+    else if (sortOrder === 'alpha-desc') filtered.sort(function(a,b) { return (b.title || '').localeCompare(a.title || ''); });
+
+    if (filtered.length === 0) {
+      libEl.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text-dim);">No matching prompts found.</div>';
+      return;
+    }
+
+    // Count by type
+    var counts = {};
+    filtered.forEach(function(s) { counts[s.type] = (counts[s.type] || 0) + 1; });
+    var countBar = document.createElement('div');
+    countBar.style.cssText = 'font-size:12px;color:var(--text-dim);margin-bottom:12px;';
+    var countParts = [];
+    if (counts.favorite) countParts.push('⭐ ' + counts.favorite + ' favorites');
+    if (counts.filled) countParts.push('📝 ' + counts.filled + ' filled');
+    if (counts.composed) countParts.push('🔗 ' + counts.composed + ' composed');
+    if (counts.custom) countParts.push('✨ ' + counts.custom + ' custom');
+    countBar.textContent = filtered.length + ' items · ' + countParts.join(' · ');
+    libEl.appendChild(countBar);
+
+    // Group by type if showing all
+    if (filterType === 'all') {
+      var types = ['favorite', 'filled', 'composed', 'custom'];
+      var labels = { favorite: 'Favorites', filled: 'Filled prompts', composed: 'Composed prompts', custom: 'Custom prompts' };
+      types.forEach(function(t) {
+        var items = filtered.filter(function(s) { return s.type === t; });
+        if (items.length > 0) libEl.appendChild(savedSection(labels[t], items, t));
+      });
+    } else {
+      var labels2 = { favorite: 'Favorites', filled: 'Filled prompts', composed: 'Composed prompts', custom: 'Custom prompts' };
+      libEl.appendChild(savedSection(labels2[filterType] || filterType, filtered, filterType));
+    }
   }
-  if (filled.length > 0) {
-    main.appendChild(savedSection('Filled prompts', filled, 'filled'));
-  }
-  if (composed.length > 0) {
-    main.appendChild(savedSection('Composed prompts', composed, 'composed'));
-  }
-  if (custom.length > 0) {
-    main.appendChild(savedSection('Custom prompts', custom, 'custom'));
-  }
+
+  // Event listeners for filter/sort/search
+  searchInput.oninput = renderLibrary;
+  typeSelect.onchange = renderLibrary;
+  sortSelect.onchange = renderLibrary;
+
+  // Initial render
+  renderLibrary();
 
   // sidebar list for saved tab
   saved.slice().reverse().forEach(function(s) {
@@ -1926,7 +1998,7 @@ function savedSection(title, items, type) {
   h3.style.cssText = 'font-size:16px;margin-bottom:12px;';
   section.appendChild(h3);
 
-  items.slice().reverse().forEach(function(s) {
+  items.forEach(function(s) {
     var item = document.createElement('div');
     item.className = 'saved-item';
 
