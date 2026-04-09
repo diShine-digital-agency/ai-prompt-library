@@ -2084,9 +2084,49 @@ function showCreate() {
   h2.style.cssText = 'margin-bottom:8px;font-size:24px;';
   main.appendChild(h2);
   var desc = document.createElement('p');
-  desc.style.cssText = 'color:var(--text-secondary);margin-bottom:24px;font-size:14px;';
+  desc.style.cssText = 'color:var(--text-secondary);margin-bottom:16px;font-size:14px;';
   desc.textContent = 'Define dynamic fields, write your prompt, and save it to your library. It will appear in Browse and Compose.';
   main.appendChild(desc);
+
+  // ── Starter Templates ──
+  var starters = [
+    { name: '🤖 Expert Assistant', title: 'Expert {{domain}} Assistant', tags: 'expert, assistant', body: 'You are a senior {{domain}} expert with {{years}} years of experience.\n\nYour task: {{task}}\n\nContext: {{context}}\n\nRules:\n- Always provide specific, actionable advice\n- Cite sources when making claims\n- Ask clarifying questions if the request is ambiguous\n\nOutput format: Respond in structured markdown with clear headings.\n\nBefore responding, verify your answer is accurate and complete.', fields: [{name:'domain',desc:'Area of expertise'},{name:'years',desc:'Years of experience'},{name:'task',desc:'What the AI should do'},{name:'context',desc:'Background information'}] },
+    { name: '📝 Content Writer', title: 'Content Writer — {{content_type}}', tags: 'writing, content', body: 'You are an experienced content strategist specializing in {{content_type}}.\n\nAudience: {{audience}}\nTone: {{tone}}\n\nYour task: Write compelling {{content_type}} that engages the target audience.\n\nRules:\n- Use clear, concise language\n- Include a strong opening hook\n- Break content into scannable sections\n- End with a clear call-to-action\n\nOutput format: Respond in markdown with headings, bullet points, and emphasis where appropriate.', fields: [{name:'content_type',desc:'Blog post, email, social media, etc.'},{name:'audience',desc:'Target reader'},{name:'tone',desc:'Professional, casual, persuasive, etc.'}] },
+    { name: '💻 Code Generator', title: '{{language}} Code Generator', tags: 'development, code', body: 'You are a senior software engineer expert in {{language}}.\n\nYour task: {{task}}\n\nContext: {{context}}\n\nRules:\n- Write clean, well-documented code\n- Follow {{language}} best practices and conventions\n- Include error handling and edge cases\n- Add inline comments for complex logic\n- Suggest relevant design patterns when applicable\n\nOutput format: Respond with well-commented code blocks using markdown fences. Explain key decisions briefly above each block.\n\nBefore responding, verify the code handles edge cases and follows best practices.', fields: [{name:'language',desc:'Programming language'},{name:'task',desc:'What to build'},{name:'context',desc:'Project context or constraints'}] },
+    { name: '📊 Data Analyst', title: 'Data Analysis — {{dataset}}', tags: 'data, analysis', body: 'You are a senior data analyst with expertise in statistical analysis and data visualization.\n\nDataset: {{dataset}}\nObjective: {{objective}}\n\nYour task: Analyze the provided data and deliver actionable insights.\n\nRules:\n- Cite specific data points and metrics\n- Distinguish correlation from causation\n- Acknowledge data limitations\n- Present findings with appropriate precision\n\nOutput format: Structured analysis with:\n1. Summary of findings\n2. Methodology\n3. Key insights (with supporting data)\n4. Recommended actions\n\nUse tables for comparative data.', fields: [{name:'dataset',desc:'Description of the data'},{name:'objective',desc:'What you want to learn'}] },
+    { name: '📣 Marketing Strategist', title: 'Marketing — {{campaign_type}}', tags: 'marketing, strategy', body: 'You are a senior marketing strategist with expertise in digital marketing and conversion optimization.\n\nCampaign type: {{campaign_type}}\nProduct/Service: {{product}}\nTarget audience: {{audience}}\n\nYour task: Create a comprehensive marketing strategy.\n\nRules:\n- Ground recommendations in measurable outcomes\n- Consider audience demographics and psychographics\n- Include specific, actionable next steps\n- Define KPIs for each recommendation\n\nOutput format: Strategy document with sections for goals, tactics, timeline, budget considerations, and success metrics.', fields: [{name:'campaign_type',desc:'Email, social media, SEO, etc.'},{name:'product',desc:'What you are marketing'},{name:'audience',desc:'Target audience'}] },
+    { name: '🎨 Image Prompt', title: 'Image — {{subject}}', tags: 'image-generation, visual', body: '{{subject}}, {{style}}, {{lighting}}, {{composition}}, highly detailed, professional quality, {{additional_details}}', fields: [{name:'subject',desc:'Main subject of the image'},{name:'style',desc:'Art style (e.g., photorealistic, watercolor, anime)'},{name:'lighting',desc:'Lighting type (e.g., golden hour, studio, dramatic)'},{name:'composition',desc:'Camera angle or framing'},{name:'additional_details',desc:'Extra details or modifiers'}] },
+  ];
+
+  var starterSection = document.createElement('div');
+  starterSection.style.cssText = 'margin-bottom:24px;padding:16px;border:1px solid var(--border);border-radius:var(--radius);background:var(--code-bg);';
+  var starterH = document.createElement('div');
+  starterH.style.cssText = 'font-weight:600;margin-bottom:10px;font-size:14px;';
+  starterH.textContent = '⚡ Quick start — choose a template:';
+  starterSection.appendChild(starterH);
+  var starterGrid = document.createElement('div');
+  starterGrid.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;';
+  starters.forEach(function(s) {
+    var btn = document.createElement('button');
+    btn.className = 'btn';
+    btn.textContent = s.name;
+    btn.style.cssText = 'font-size:13px;padding:8px 14px;';
+    btn.onclick = function() {
+      document.getElementById('createTitle').value = s.title;
+      document.getElementById('createCategory').value = (s.tags.split(',')[0] || 'custom').trim();
+      document.getElementById('createTags').value = s.tags;
+      document.getElementById('createBody').value = s.body;
+      // Clear existing fields and add template fields
+      var fieldsList = document.getElementById('createFieldsList');
+      fieldsList.textContent = '';
+      s.fields.forEach(function(f) { addCreateField(fieldsList, f.name, f.desc); });
+      updateCreatePreview();
+      showToast('Template loaded — customize and save!');
+    };
+    starterGrid.appendChild(btn);
+  });
+  starterSection.appendChild(starterGrid);
+  main.appendChild(starterSection);
 
   var form = document.createElement('div');
 
@@ -2215,7 +2255,7 @@ function makeSelect(label, id, options, selected) {
 }
 
 var createFieldCount = 0;
-function addCreateField(container) {
+function addCreateField(container, prefillName, prefillDesc) {
   createFieldCount++;
   var row = document.createElement('div');
   row.style.cssText = 'display:flex;gap:8px;margin-bottom:8px;align-items:center;';
@@ -2226,12 +2266,14 @@ function addCreateField(container) {
   nameInput.className = 'create-field-name';
   nameInput.style.cssText = 'flex:1;padding:8px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-input);color:var(--text);font-size:13px;font-family:monospace;';
   nameInput.oninput = function() { updateCreateFieldsHint(); updateCreatePreview(); };
+  if (prefillName) nameInput.value = prefillName;
   row.appendChild(nameInput);
   var descInput = document.createElement('input');
   descInput.type = 'text';
   descInput.placeholder = 'Description';
   descInput.className = 'create-field-desc';
   descInput.style.cssText = 'flex:2;padding:8px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-input);color:var(--text);font-size:13px;';
+  if (prefillDesc) descInput.value = prefillDesc;
   row.appendChild(descInput);
   var removeBtn = document.createElement('button');
   removeBtn.textContent = '\u2715';
