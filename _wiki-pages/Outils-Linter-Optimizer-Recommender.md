@@ -100,6 +100,19 @@ Rules: 2/14 passed | 23 words
 - Incluez des exemples (7 points)
 - Utilisez des en-têtes de section (7 points)
 
+### Détection du Type de Prompt (v2.4.0)
+
+Le linter détecte automatiquement le type de prompt et ajuste les poids des règles :
+
+| Type | Détection | Changements de poids |
+|------|-----------|---------------------|
+| 🎨 Image | Mots-clés : image, photo, visual, dall-e, midjourney... | Ignore audience, tone, quality-check. Augmente vague-language (×1.5) |
+| 💻 Code | Mots-clés : code, function, class, api, debug... | Augmente task, context, output-format, constraints (×1.2) |
+| 🤖 Système | Mots-clés : you are, act as, persona... + longueur < 800 | Augmente role (×1.5), constraints (×1.5). Relâche length (×0.5) |
+| 📝 Général | Par défaut | Tous les poids à ×1.0 |
+
+> Pour le tableau complet des multiplicateurs, voir [INFRASTRUCTURE.md](https://github.com/diShine-digital-agency/ai-prompt-library/blob/main/INFRASTRUCTURE.md#3-prompt-type-detection).
+
 ---
 
 ## Prompt Optimizer
@@ -249,6 +262,12 @@ logically structured, and engaging for the target audience.
 - Ajout d'un format de sortie spécifique à la rédaction
 - Ajout de contraintes qualité spécifiques à la rédaction
 - Ajout d'une étape de vérification qualité
+
+### Vue Différences (v2.4.0)
+
+Après optimisation, basculez entre :
+- **Optimisé** — prompt optimisé propre
+- **Vue Diff** — comparaison colorée ligne par ligne (🟢 ajouté, 🔴 supprimé, sans marqueur = inchangé)
 
 ---
 

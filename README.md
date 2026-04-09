@@ -43,11 +43,11 @@ The **Prompt Workshop** is a standalone HTML file — no server, no build step, 
 |-----|-------------|
 | **Browse** | Search and filter all 82+ prompts by category, difficulty, model, or keyword. Click any prompt to read the full content, copy it, or build it interactively. |
 | **Compose** | Build layered prompts by combining a **system prompt** (persona) + **reasoning framework** (technique) + **task template** (the work). All three combine into one powerful prompt. |
-| **Create** | Build your own custom prompts with dynamic `{{field_name}}` placeholders. Define fields, write the body, and save to your personal library. |
+| **Create** | Build your own custom prompts with dynamic `{{field_name}}` placeholders. Choose from 6 starter templates (Expert Assistant, Content Writer, Code Generator, Data Analyst, Marketing Strategist, Image Prompt) or start from scratch. Define fields, write the body, and save to your personal library. |
 | **Generate** | Pick a proven framework, answer guided questions, and get a production-ready system prompt generated automatically — no prompt engineering experience needed. |
-| **Tools** | **Prompt Linter** (14-rule quality analysis with 0–100 scoring), **Prompt Optimizer** (content-aware rewriting — detects your domain, replaces vague language, strengthens weak verbs, removes filler, adds domain-specific role/constraints/output format/quality checks + optional AI-powered rewriting), and **Smart Recommender** (describe your use case, get personalized prompt suggestions with a recommended system prompt + framework + template combo). See [FUNCTIONS.md](FUNCTIONS.md) for full details. |
-| **Playground** | Send prompts directly to AI models (OpenAI GPT, Anthropic Claude, Google Gemini). Add a system prompt, see responses, track token usage — iterate without leaving the tool. |
-| **My Library** | All your saved prompts, filled templates, and compositions. Stored in your browser's localStorage — persists across sessions. |
+| **Tools** | **Prompt Linter** (14-rule quality analysis with 0–100 scoring, auto-detects prompt type — image/code/system/general — and adjusts rule weights), **Prompt Optimizer** (content-aware rewriting with diff view — detects your domain, replaces vague language, strengthens weak verbs, removes filler, adds domain-specific role/constraints/output format/quality checks + optional AI-powered rewriting), and **Smart Recommender** (describe your use case, get personalized prompt suggestions with a recommended system prompt + framework + template combo). See [FUNCTIONS.md](FUNCTIONS.md) for full details. |
+| **Playground** | Send prompts directly to AI models (OpenAI GPT, Anthropic Claude, Google Gemini). Add a system prompt, see responses, track token usage — iterate without leaving the tool. **Multi-Model Compare**: configure 2+ API keys, then click "⚖ Compare" to send the same prompt to all providers at once and see responses side-by-side with timing and token stats. |
+| **My Library** | All your saved prompts, filled templates, and compositions with search, type filter, and sort controls. Stored in your browser's localStorage — persists across sessions. |
 
 ### Quick Fill & Compose
 
@@ -362,6 +362,7 @@ See [GUIDE.md — Troubleshooting](GUIDE.md#troubleshooting) for more platform-s
 - **[README.md](README.md)** — this file, overview and quick start
 - **[GUIDE.md](GUIDE.md)** — detailed user guide with examples
 - **[FUNCTIONS.md](FUNCTIONS.md)** — detailed reference for every tool (linter, optimizer, recommender, generator, playground, etc.)
+- **[INFRASTRUCTURE.md](INFRASTRUCTURE.md)** — algorithms, scoring math, and engine internals (technical & non-technical)
 - **[TECHNICAL.md](TECHNICAL.md)** — architecture, module reference, data formats, extension guide
 - **[CHANGELOG.md](CHANGELOG.md)** — version history and release notes
 - **[desktop/README.md](desktop/README.md)** — desktop app build and install guides

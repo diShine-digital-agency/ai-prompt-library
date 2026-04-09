@@ -9,6 +9,18 @@
 
 import { lintPrompt } from './linter.js';
 
+/** Create a fetch wrapper with a 30-second timeout */
+function fetchWithTimeout(url, options, timeoutMs = 30000) {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeoutMs);
+  return fetch(url, { ...options, signal: controller.signal })
+    .catch(err => {
+      if (err.name === 'AbortError') throw new Error('Request timed out after 30 seconds. Please try again.');
+      throw err;
+    })
+    .finally(() => clearTimeout(id));
+}
+
 /* ── Domain detection ── */
 
 const DOMAIN_SIGNALS = {
@@ -509,7 +521,7 @@ Return ONLY the optimized prompt, nothing else. No explanations, no commentary.`
   const userMessage = `Optimize this prompt:\n\n${text}`;
 
   if (provider === 'openai') {
-    const resp = await fetch('https://api.openai.com/v1/chat/completions', {
+    const resp = await fetchWithTimeout('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
       body: JSON.stringify({
@@ -528,7 +540,7 @@ Return ONLY the optimized prompt, nothing else. No explanations, no commentary.`
   }
 
   if (provider === 'anthropic') {
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    const resp = await fetchWithTimeout('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -549,7 +561,7 @@ Return ONLY the optimized prompt, nothing else. No explanations, no commentary.`
   }
 
   if (provider === 'google') {
-    const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model || 'gemini-2.0-flash'}:generateContent?key=${apiKey}`, {
+    const resp = await fetchWithTimeout(`https://generativelanguage.googleapis.com/v1beta/models/${model || 'gemini-2.0-flash'}:generateContent?key=${apiKey}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -574,7 +586,7 @@ export async function sendToAI(prompt, systemPrompt, provider, apiKey, model) {
     if (systemPrompt) messages.push({ role: 'system', content: systemPrompt });
     messages.push({ role: 'user', content: prompt });
 
-    const resp = await fetch('https://api.openai.com/v1/chat/completions', {
+    const resp = await fetchWithTimeout('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
       body: JSON.stringify({ model: model || 'gpt-4o-mini', messages, temperature: 0.7, max_tokens: 4000 }),
@@ -592,7 +604,7 @@ export async function sendToAI(prompt, systemPrompt, provider, apiKey, model) {
   }
 
   if (provider === 'anthropic') {
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    const resp = await fetchWithTimeout('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -621,7 +633,7 @@ export async function sendToAI(prompt, systemPrompt, provider, apiKey, model) {
 
   if (provider === 'google') {
     const fullPrompt = systemPrompt ? `${systemPrompt}\n\n${prompt}` : prompt;
-    const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model || 'gemini-2.0-flash'}:generateContent?key=${apiKey}`, {
+    const resp = await fetchWithTimeout(`https://generativelanguage.googleapis.com/v1beta/models/${model || 'gemini-2.0-flash'}:generateContent?key=${apiKey}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

@@ -164,6 +164,29 @@ Il conteggio dei token viene visualizzato dopo ogni risposta, aiutandoti a monit
 
 ---
 
+## ⚖ Confronto Multi-Modello (v2.4.0)
+
+Invia lo stesso prompt a tutti i provider configurati simultaneamente e confronta le risposte affiancate.
+
+**Come usarlo:**
+1. Configura 2+ chiavi API tramite ⚙ Impostazioni
+2. Scrivi il prompt nel Playground
+3. Clicca **"⚖ Confronta (N modelli)"**
+4. I risultati appaiono in una griglia: testo della risposta, tempi, utilizzo token, pulsante copia
+
+**Dettagli tecnici:**
+- Usa `Promise.allSettled()` — il fallimento di un provider non blocca gli altri
+- Ogni richiesta ha un timeout di 30 secondi tramite AbortController
+- Il pulsante Invia è disabilitato durante il confronto
+
+## Sicurezza (v2.4.0)
+
+- Tutte le chiamate API impongono un **timeout di 30 secondi** tramite AbortController
+- Il modale Impostazioni API mostra un **avviso di sicurezza** sulla memorizzazione in chiaro nel localStorage
+- Le chiavi API non vengono mai inviate altrove se non all'endpoint del provider selezionato
+
+---
+
 ## Utilizzo Programmatico (JavaScript)
 
 La Prompt Library può essere importata e usata in modo programmatico nei tuoi progetti JavaScript/Node.js.

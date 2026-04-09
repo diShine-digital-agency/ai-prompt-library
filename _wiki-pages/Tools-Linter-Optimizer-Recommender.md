@@ -100,6 +100,19 @@ Rules: 2/14 passed | 23 words
 - Include examples (7 points)
 - Use section headers (7 points)
 
+### Prompt-Type Awareness (v2.4.0)
+
+The linter auto-detects prompt types and adjusts rule weights:
+
+| Type | Detection | Key weight changes |
+|------|-----------|-------------------|
+| 🎨 Image | Keywords: image, photo, visual, dall-e, midjourney... | Skips audience, tone, quality-check. Boosts vague-language (×1.5) |
+| 💻 Code | Keywords: code, function, class, api, debug... | Boosts task, context, output-format, constraints (×1.2) |
+| 🤖 System | Keywords: you are, act as, persona... + length < 800 | Boosts role (×1.5), constraints (×1.5). Relaxes length (×0.5) |
+| 📝 General | Fallback | All weights at ×1.0 |
+
+> For the complete weight multiplier table, see [INFRASTRUCTURE.md](https://github.com/diShine-digital-agency/ai-prompt-library/blob/main/INFRASTRUCTURE.md#3-prompt-type-detection).
+
 ---
 
 ## Prompt Optimizer
@@ -249,6 +262,12 @@ logically structured, and engaging for the target audience.
 - Added writing-specific output format
 - Added writing-specific quality constraints
 - Added quality verification step
+
+### Diff View (v2.4.0)
+
+After optimization, toggle between:
+- **Optimized** — clean optimized prompt
+- **Diff view** — line-by-line color-coded comparison (🟢 added, 🔴 removed, unmarked = unchanged)
 
 ---
 

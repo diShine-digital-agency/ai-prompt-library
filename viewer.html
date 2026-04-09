@@ -16,7 +16,7 @@
     --bg-input: #ffffff;
     --text: #1e293b;
     --text-secondary: #64748b;
-    --text-dim: #94a3b8;
+    --text-dim: #6b7280;
     --border: #e2e8f0;
     --code-bg: #f1f5f9;
     --success: #22c55e;
@@ -32,13 +32,15 @@
     --bg-input: #0f172a;
     --text: #f1f5f9;
     --text-secondary: #94a3b8;
-    --text-dim: #64748b;
+    --text-dim: #8b95a5;
     --border: #334155;
     --code-bg: #0f172a;
     --accent-dim: rgba(37,99,235,0.2);
     --shadow: 0 1px 3px rgba(0,0,0,0.3);
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
+  .skip-link:focus { position:fixed!important; left:8px!important; top:8px!important; width:auto!important; height:auto!important; overflow:visible!important; background:var(--accent); color:#fff; padding:8px 16px; border-radius:var(--radius); z-index:10000; font-size:14px; font-weight:600; text-decoration:none; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     background: var(--bg);
@@ -678,20 +680,21 @@
 </style>
 </head>
 <body>
-<div class="sidebar" id="sidebar">
+<a href="#mainPanel" class="skip-link" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;z-index:9999;">Skip to main content</a>
+<div class="sidebar" id="sidebar" role="navigation" aria-label="Prompt navigation">
   <div class="sidebar-resize-handle" id="sidebarResizeHandle"></div>
   <div class="sidebar-header">
     <h1>Prompt Workshop <span class="count" id="countBadge"></span></h1>
     <input type="text" class="search-box" id="searchInput" placeholder="Search prompts, tags, models...">
   </div>
-  <div class="nav-tabs">
-    <div class="nav-tab active" data-tab="browse" onclick="switchTab('browse')">Browse</div>
-    <div class="nav-tab" data-tab="compose" onclick="switchTab('compose')">Compose</div>
-    <div class="nav-tab" data-tab="create" onclick="switchTab('create')">Create</div>
-    <div class="nav-tab" data-tab="generate" onclick="switchTab('generate')">Generate</div>
-    <div class="nav-tab" data-tab="tools" onclick="switchTab('tools')">Tools</div>
-    <div class="nav-tab" data-tab="playground" onclick="switchTab('playground')">Playground</div>
-    <div class="nav-tab" data-tab="saved" onclick="switchTab('saved')">My Library</div>
+  <div class="nav-tabs" role="tablist" aria-label="Workshop tabs">
+    <div class="nav-tab active" data-tab="browse" onclick="switchTab('browse')" role="tab" aria-selected="true" tabindex="0">Browse</div>
+    <div class="nav-tab" data-tab="compose" onclick="switchTab('compose')" role="tab" aria-selected="false" tabindex="-1">Compose</div>
+    <div class="nav-tab" data-tab="create" onclick="switchTab('create')" role="tab" aria-selected="false" tabindex="-1">Create</div>
+    <div class="nav-tab" data-tab="generate" onclick="switchTab('generate')" role="tab" aria-selected="false" tabindex="-1">Generate</div>
+    <div class="nav-tab" data-tab="tools" onclick="switchTab('tools')" role="tab" aria-selected="false" tabindex="-1">Tools</div>
+    <div class="nav-tab" data-tab="playground" onclick="switchTab('playground')" role="tab" aria-selected="false" tabindex="-1">Playground</div>
+    <div class="nav-tab" data-tab="saved" onclick="switchTab('saved')" role="tab" aria-selected="false" tabindex="-1">My Library</div>
   </div>
   <div id="filterBar" class="filter-bar">
     <div>
@@ -711,14 +714,14 @@
   <div class="footer">Built by <a href="https://dishine.it" target="_blank">diShine</a></div>
 </div>
 
-<div class="main welcome" id="mainPanel">
+<div class="main welcome" id="mainPanel" role="main" aria-label="Main content">
   <h2>Prompt Workshop</h2>
   <p>Browse expert prompts, fill in placeholders interactively, compose multi-layer prompts, and build your own library.</p>
   <div class="welcome-stats" id="welcomeStats"></div>
   <p style="font-size:13px; margin-top:12px;">Pick a prompt from the sidebar to get started, or try <strong>Compose</strong> to build a layered prompt.</p>
 </div>
 
-<div class="toolbar">
+<div class="toolbar" role="toolbar" aria-label="Settings">
   <button onclick="toggleHelp()" title="Toggle beginner tips (H)" id="helpBtn">?</button>
   <button onclick="showApiSettings()" title="API Settings" id="settingsBtn">&#9881;</button>
   <button onclick="toggleDark()" title="Toggle dark mode" id="darkBtn">&#9789;</button>
@@ -1216,7 +1219,10 @@ function renderWelcome() {
 function switchTab(tab) {
   activeTab = tab;
   document.querySelectorAll('.nav-tab').forEach(function(t) {
-    t.classList.toggle('active', t.getAttribute('data-tab') === tab);
+    var isActive = t.getAttribute('data-tab') === tab;
+    t.classList.toggle('active', isActive);
+    t.setAttribute('aria-selected', isActive ? 'true' : 'false');
+    t.setAttribute('tabindex', isActive ? '0' : '-1');
   });
   var filterBar = document.getElementById('filterBar');
   var sidebarList = document.getElementById('promptList');
@@ -1811,7 +1817,7 @@ function showSaved() {
   main.appendChild(h2);
 
   var desc = document.createElement('p');
-  desc.style.cssText = 'color:var(--text-secondary);margin-bottom:20px;font-size:14px;';
+  desc.style.cssText = 'color:var(--text-secondary);margin-bottom:16px;font-size:14px;';
   desc.textContent = 'Your saved prompts, filled templates, and composed prompts. Stored in your browser.';
   main.appendChild(desc);
 
@@ -1826,6 +1832,39 @@ function showSaved() {
     container.innerHTML = '<div class="empty-state"><div class="icon">&#128218;</div><h3>Empty</h3><p>Save prompts to see them here.</p></div>';
     return;
   }
+
+  // ── Filter & Sort bar ──
+  var filterBar = document.createElement('div');
+  filterBar.style.cssText = 'display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center;';
+
+  // Search within library
+  var searchInput = document.createElement('input');
+  searchInput.type = 'text';
+  searchInput.placeholder = '🔍 Search saved prompts...';
+  searchInput.id = 'libSearchInput';
+  searchInput.style.cssText = 'flex:1;min-width:160px;padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-input);color:var(--text);font-size:13px;';
+  filterBar.appendChild(searchInput);
+
+  // Type filter
+  var typeSelect = document.createElement('select');
+  typeSelect.id = 'libTypeFilter';
+  typeSelect.style.cssText = 'padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-input);color:var(--text);font-size:13px;';
+  typeSelect.innerHTML = '<option value="all">All types</option><option value="favorite">⭐ Favorites</option><option value="filled">📝 Filled</option><option value="composed">🔗 Composed</option><option value="custom">✨ Custom</option>';
+  filterBar.appendChild(typeSelect);
+
+  // Sort
+  var sortSelect = document.createElement('select');
+  sortSelect.id = 'libSortOrder';
+  sortSelect.style.cssText = 'padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-input);color:var(--text);font-size:13px;';
+  sortSelect.innerHTML = '<option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="alpha">A → Z</option><option value="alpha-desc">Z → A</option>';
+  filterBar.appendChild(sortSelect);
+
+  main.appendChild(filterBar);
+
+  // Library content container
+  var libContent = document.createElement('div');
+  libContent.id = 'libContent';
+  main.appendChild(libContent);
 
   // actions bar
   var actionsBar = document.createElement('div');
@@ -1878,24 +1917,63 @@ function showSaved() {
   actionsBar.appendChild(clearBtn);
   main.appendChild(actionsBar);
 
-  // group by type
-  var favorites = saved.filter(function(s){return s.type==='favorite';});
-  var filled = saved.filter(function(s){return s.type==='filled';});
-  var composed = saved.filter(function(s){return s.type==='composed';});
-  var custom = saved.filter(function(s){return s.type==='custom';});
+  function renderLibrary() {
+    var filterType = document.getElementById('libTypeFilter').value;
+    var sortOrder = document.getElementById('libSortOrder').value;
+    var searchTerm = document.getElementById('libSearchInput').value.toLowerCase().trim();
+    var libEl = document.getElementById('libContent');
+    libEl.textContent = '';
 
-  if (favorites.length > 0) {
-    main.appendChild(savedSection('Favorites', favorites, 'favorite'));
+    var filtered = saved;
+    if (filterType !== 'all') filtered = filtered.filter(function(s) { return s.type === filterType; });
+    if (searchTerm) filtered = filtered.filter(function(s) { return (s.title || '').toLowerCase().includes(searchTerm) || (s.result || '').toLowerCase().includes(searchTerm); });
+
+    // Sort
+    filtered = filtered.slice();
+    if (sortOrder === 'newest') filtered.sort(function(a,b) { return (b.id || 0) - (a.id || 0); });
+    else if (sortOrder === 'oldest') filtered.sort(function(a,b) { return (a.id || 0) - (b.id || 0); });
+    else if (sortOrder === 'alpha') filtered.sort(function(a,b) { return (a.title || '').localeCompare(b.title || ''); });
+    else if (sortOrder === 'alpha-desc') filtered.sort(function(a,b) { return (b.title || '').localeCompare(a.title || ''); });
+
+    if (filtered.length === 0) {
+      libEl.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text-dim);">No matching prompts found.</div>';
+      return;
+    }
+
+    // Count by type
+    var counts = {};
+    filtered.forEach(function(s) { counts[s.type] = (counts[s.type] || 0) + 1; });
+    var countBar = document.createElement('div');
+    countBar.style.cssText = 'font-size:12px;color:var(--text-dim);margin-bottom:12px;';
+    var countParts = [];
+    if (counts.favorite) countParts.push('⭐ ' + counts.favorite + ' favorites');
+    if (counts.filled) countParts.push('📝 ' + counts.filled + ' filled');
+    if (counts.composed) countParts.push('🔗 ' + counts.composed + ' composed');
+    if (counts.custom) countParts.push('✨ ' + counts.custom + ' custom');
+    countBar.textContent = filtered.length + ' items · ' + countParts.join(' · ');
+    libEl.appendChild(countBar);
+
+    // Group by type if showing all
+    if (filterType === 'all') {
+      var types = ['favorite', 'filled', 'composed', 'custom'];
+      var labels = { favorite: 'Favorites', filled: 'Filled prompts', composed: 'Composed prompts', custom: 'Custom prompts' };
+      types.forEach(function(t) {
+        var items = filtered.filter(function(s) { return s.type === t; });
+        if (items.length > 0) libEl.appendChild(savedSection(labels[t], items, t));
+      });
+    } else {
+      var labels2 = { favorite: 'Favorites', filled: 'Filled prompts', composed: 'Composed prompts', custom: 'Custom prompts' };
+      libEl.appendChild(savedSection(labels2[filterType] || filterType, filtered, filterType));
+    }
   }
-  if (filled.length > 0) {
-    main.appendChild(savedSection('Filled prompts', filled, 'filled'));
-  }
-  if (composed.length > 0) {
-    main.appendChild(savedSection('Composed prompts', composed, 'composed'));
-  }
-  if (custom.length > 0) {
-    main.appendChild(savedSection('Custom prompts', custom, 'custom'));
-  }
+
+  // Event listeners for filter/sort/search
+  searchInput.oninput = renderLibrary;
+  typeSelect.onchange = renderLibrary;
+  sortSelect.onchange = renderLibrary;
+
+  // Initial render
+  renderLibrary();
 
   // sidebar list for saved tab
   saved.slice().reverse().forEach(function(s) {
@@ -1926,7 +2004,7 @@ function savedSection(title, items, type) {
   h3.style.cssText = 'font-size:16px;margin-bottom:12px;';
   section.appendChild(h3);
 
-  items.slice().reverse().forEach(function(s) {
+  items.forEach(function(s) {
     var item = document.createElement('div');
     item.className = 'saved-item';
 
@@ -2084,9 +2162,49 @@ function showCreate() {
   h2.style.cssText = 'margin-bottom:8px;font-size:24px;';
   main.appendChild(h2);
   var desc = document.createElement('p');
-  desc.style.cssText = 'color:var(--text-secondary);margin-bottom:24px;font-size:14px;';
+  desc.style.cssText = 'color:var(--text-secondary);margin-bottom:16px;font-size:14px;';
   desc.textContent = 'Define dynamic fields, write your prompt, and save it to your library. It will appear in Browse and Compose.';
   main.appendChild(desc);
+
+  // ── Starter Templates ──
+  var starters = [
+    { name: '🤖 Expert Assistant', title: 'Expert {{domain}} Assistant', tags: 'expert, assistant', body: 'You are a senior {{domain}} expert with {{years}} years of experience.\n\nYour task: {{task}}\n\nContext: {{context}}\n\nRules:\n- Always provide specific, actionable advice\n- Cite sources when making claims\n- Ask clarifying questions if the request is ambiguous\n\nOutput format: Respond in structured markdown with clear headings.\n\nBefore responding, verify your answer is accurate and complete.', fields: [{name:'domain',desc:'Area of expertise'},{name:'years',desc:'Years of experience'},{name:'task',desc:'What the AI should do'},{name:'context',desc:'Background information'}] },
+    { name: '📝 Content Writer', title: 'Content Writer — {{content_type}}', tags: 'writing, content', body: 'You are an experienced content strategist specializing in {{content_type}}.\n\nAudience: {{audience}}\nTone: {{tone}}\n\nYour task: Write compelling {{content_type}} that engages the target audience.\n\nRules:\n- Use clear, concise language\n- Include a strong opening hook\n- Break content into scannable sections\n- End with a clear call-to-action\n\nOutput format: Respond in markdown with headings, bullet points, and emphasis where appropriate.', fields: [{name:'content_type',desc:'Blog post, email, social media, etc.'},{name:'audience',desc:'Target reader'},{name:'tone',desc:'Professional, casual, persuasive, etc.'}] },
+    { name: '💻 Code Generator', title: '{{language}} Code Generator', tags: 'development, code', body: 'You are a senior software engineer expert in {{language}}.\n\nYour task: {{task}}\n\nContext: {{context}}\n\nRules:\n- Write clean, well-documented code\n- Follow {{language}} best practices and conventions\n- Include error handling and edge cases\n- Add inline comments for complex logic\n- Suggest relevant design patterns when applicable\n\nOutput format: Respond with well-commented code blocks using markdown fences. Explain key decisions briefly above each block.\n\nBefore responding, verify the code handles edge cases and follows best practices.', fields: [{name:'language',desc:'Programming language'},{name:'task',desc:'What to build'},{name:'context',desc:'Project context or constraints'}] },
+    { name: '📊 Data Analyst', title: 'Data Analysis — {{dataset}}', tags: 'data, analysis', body: 'You are a senior data analyst with expertise in statistical analysis and data visualization.\n\nDataset: {{dataset}}\nObjective: {{objective}}\n\nYour task: Analyze the provided data and deliver actionable insights.\n\nRules:\n- Cite specific data points and metrics\n- Distinguish correlation from causation\n- Acknowledge data limitations\n- Present findings with appropriate precision\n\nOutput format: Structured analysis with:\n1. Summary of findings\n2. Methodology\n3. Key insights (with supporting data)\n4. Recommended actions\n\nUse tables for comparative data.', fields: [{name:'dataset',desc:'Description of the data'},{name:'objective',desc:'What you want to learn'}] },
+    { name: '📣 Marketing Strategist', title: 'Marketing — {{campaign_type}}', tags: 'marketing, strategy', body: 'You are a senior marketing strategist with expertise in digital marketing and conversion optimization.\n\nCampaign type: {{campaign_type}}\nProduct/Service: {{product}}\nTarget audience: {{audience}}\n\nYour task: Create a comprehensive marketing strategy.\n\nRules:\n- Ground recommendations in measurable outcomes\n- Consider audience demographics and psychographics\n- Include specific, actionable next steps\n- Define KPIs for each recommendation\n\nOutput format: Strategy document with sections for goals, tactics, timeline, budget considerations, and success metrics.', fields: [{name:'campaign_type',desc:'Email, social media, SEO, etc.'},{name:'product',desc:'What you are marketing'},{name:'audience',desc:'Target audience'}] },
+    { name: '🎨 Image Prompt', title: 'Image — {{subject}}', tags: 'image-generation, visual', body: '{{subject}}, {{style}}, {{lighting}}, {{composition}}, highly detailed, professional quality, {{additional_details}}', fields: [{name:'subject',desc:'Main subject of the image'},{name:'style',desc:'Art style (e.g., photorealistic, watercolor, anime)'},{name:'lighting',desc:'Lighting type (e.g., golden hour, studio, dramatic)'},{name:'composition',desc:'Camera angle or framing'},{name:'additional_details',desc:'Extra details or modifiers'}] },
+  ];
+
+  var starterSection = document.createElement('div');
+  starterSection.style.cssText = 'margin-bottom:24px;padding:16px;border:1px solid var(--border);border-radius:var(--radius);background:var(--code-bg);';
+  var starterH = document.createElement('div');
+  starterH.style.cssText = 'font-weight:600;margin-bottom:10px;font-size:14px;';
+  starterH.textContent = '⚡ Quick start — choose a template:';
+  starterSection.appendChild(starterH);
+  var starterGrid = document.createElement('div');
+  starterGrid.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;';
+  starters.forEach(function(s) {
+    var btn = document.createElement('button');
+    btn.className = 'btn';
+    btn.textContent = s.name;
+    btn.style.cssText = 'font-size:13px;padding:8px 14px;';
+    btn.onclick = function() {
+      document.getElementById('createTitle').value = s.title;
+      document.getElementById('createCategory').value = (s.tags.split(',')[0] || 'custom').trim();
+      document.getElementById('createTags').value = s.tags;
+      document.getElementById('createBody').value = s.body;
+      // Clear existing fields and add template fields
+      var fieldsList = document.getElementById('createFieldsList');
+      fieldsList.textContent = '';
+      s.fields.forEach(function(f) { addCreateField(fieldsList, f.name, f.desc); });
+      updateCreatePreview();
+      showToast('Template loaded — customize and save!');
+    };
+    starterGrid.appendChild(btn);
+  });
+  starterSection.appendChild(starterGrid);
+  main.appendChild(starterSection);
 
   var form = document.createElement('div');
 
@@ -2215,7 +2333,7 @@ function makeSelect(label, id, options, selected) {
 }
 
 var createFieldCount = 0;
-function addCreateField(container) {
+function addCreateField(container, prefillName, prefillDesc) {
   createFieldCount++;
   var row = document.createElement('div');
   row.style.cssText = 'display:flex;gap:8px;margin-bottom:8px;align-items:center;';
@@ -2226,12 +2344,14 @@ function addCreateField(container) {
   nameInput.className = 'create-field-name';
   nameInput.style.cssText = 'flex:1;padding:8px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-input);color:var(--text);font-size:13px;font-family:monospace;';
   nameInput.oninput = function() { updateCreateFieldsHint(); updateCreatePreview(); };
+  if (prefillName) nameInput.value = prefillName;
   row.appendChild(nameInput);
   var descInput = document.createElement('input');
   descInput.type = 'text';
   descInput.placeholder = 'Description';
   descInput.className = 'create-field-desc';
   descInput.style.cssText = 'flex:2;padding:8px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-input);color:var(--text);font-size:13px;';
+  if (prefillDesc) descInput.value = prefillDesc;
   row.appendChild(descInput);
   var removeBtn = document.createElement('button');
   removeBtn.textContent = '\u2715';
@@ -2925,6 +3045,14 @@ function getApiSettings() {
 }
 function saveApiSettings(s) { storage.set('api_settings', s); }
 function hasApiKey() { var s = getApiSettings(); return !!(s.openai_key || s.anthropic_key || s.google_key); }
+function getConfiguredProviders() {
+  var s = getApiSettings();
+  var providers = [];
+  if (s.openai_key) providers.push({ provider: 'openai', key: s.openai_key, model: s.openai_model || 'gpt-4o-mini', label: 'OpenAI' });
+  if (s.anthropic_key) providers.push({ provider: 'anthropic', key: s.anthropic_key, model: s.anthropic_model || 'claude-sonnet-4-20250514', label: 'Anthropic' });
+  if (s.google_key) providers.push({ provider: 'google', key: s.google_key, model: s.google_model || 'gemini-2.0-flash', label: 'Google' });
+  return providers;
+}
 function getActiveProvider() {
   var s = getApiSettings();
   if (s.provider === 'openai' && s.openai_key) return { provider: 'openai', key: s.openai_key, model: s.openai_model };
@@ -2947,6 +3075,7 @@ function showApiSettings() {
   modal.className = 'modal';
   modal.innerHTML = '<h3>&#9881; API Settings</h3>' +
     '<p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;">Configure API keys to use the AI Playground, AI-powered prompt optimization, and smart recommendations. Keys are stored locally in your browser — never sent anywhere except the API provider.</p>' +
+    '<p style="font-size:12px;color:var(--warning);margin-bottom:16px;">&#128274; Security: API keys are stored in your browser\'s localStorage (plaintext). This tool runs locally — keys are only sent to the API providers you select. Do not use this on shared or public computers.</p>' +
     '<div class="field-group"><label>Active Provider</label>' +
     '<select id="apiProvider">' +
     '<option value="openai"' + (s.provider==='openai'?' selected':'') + '>OpenAI (GPT)</option>' +
@@ -2996,30 +3125,50 @@ var LINT_RULES = [
   { id:'has-role', name:'Role definition', weight:10, test:function(t){return /you are|act as|role:|persona:|as a/i.test(t);}, suggestion:'Add a role: "You are a senior [role] expert…"' },
   { id:'has-task', name:'Clear task', weight:12, test:function(t){return /task:|your (job|goal|task)|objective:|you (will|should|must)|please (help|create|write|generate|analyze)/i.test(t);}, suggestion:'State the task: "Your task is to…"' },
   { id:'has-context', name:'Context provided', weight:8, test:function(t){return /context:|background:|situation:|given (that|the)|here is|the following/i.test(t);}, suggestion:'Add context: "Context: …"' },
-  { id:'has-output-format', name:'Output format', weight:10, test:function(t){return /output( format)?:|format:|respond (in|with|using)|use (markdown|json|bullet|table|list)/i.test(t);}, suggestion:'Specify format: "Respond in [format]"' },
+  { id:'has-output-format', name:'Output format', weight:10, test:function(t){return /output( format)?:|format:|respond (in|with|using)|use (markdown|json|bullet|table|list)|structured as/i.test(t);}, suggestion:'Specify format: "Respond in [format]"' },
   { id:'has-constraints', name:'Constraints', weight:8, test:function(t){return /rule|constraint|never|always|do not|must not|important:|don't|avoid|ensure/i.test(t);}, suggestion:'Add rules: "Never do X" / "Always do Y"' },
   { id:'sufficient-length', name:'Sufficient detail', weight:8, test:function(t){return t.split(/\s+/).length>=50;}, suggestion:'Add more detail (aim for 50+ words).' },
   { id:'not-too-long', name:'Not too long', weight:5, test:function(t){return t.split(/\s+/).length<=2000;}, suggestion:'Consider simplifying (under 2000 words).' },
-  { id:'has-examples', name:'Examples', weight:7, test:function(t){return /example:|for example|e\.g\.|such as|sample:/i.test(t);}, suggestion:'Add examples of expected output.' },
+  { id:'has-examples', name:'Examples', weight:7, test:function(t){return /example:|for example|e\.g\.|such as|here is an example|sample:/i.test(t);}, suggestion:'Add examples of expected output.' },
   { id:'has-sections', name:'Structured', weight:7, test:function(t){var h=t.match(/^(#{1,3} |[A-Z][A-Z ]+:)/gm);return h&&h.length>=2;}, suggestion:'Add clear section headers.' },
   { id:'no-vague', name:'Specific language', weight:7, test:function(t){var v=t.match(/\b(good|nice|proper|appropriate|best|great|interesting|relevant)\b/gi);return !v||v.length<=3;}, suggestion:'Replace vague words with specific criteria.' },
-  { id:'has-audience', name:'Target audience', weight:5, test:function(t){return /audience:|target:|for (a |an )?(beginner|expert|developer|manager|executive|student)/i.test(t);}, suggestion:'Specify audience: "This is for [audience]…"' },
-  { id:'has-tone', name:'Tone specified', weight:5, test:function(t){return /tone:|style:|voice:|be (professional|casual|formal|friendly|technical|concise)/i.test(t);}, suggestion:'Define tone: "Use a [tone] tone."' },
+  { id:'has-audience', name:'Target audience', weight:5, test:function(t){return /audience:|target:|for (a |an )?(beginner|expert|developer|manager|executive|student|client|user|reader)/i.test(t);}, suggestion:'Specify audience: "This is for [audience]…"' },
+  { id:'has-tone', name:'Tone specified', weight:5, test:function(t){return /tone:|style:|voice:|be (professional|casual|formal|friendly|technical|concise|detailed)/i.test(t);}, suggestion:'Define tone: "Use a [tone] tone."' },
   { id:'no-please-overuse', name:'Not overly polite', weight:3, test:function(t){return (t.match(/\bplease\b/gi)||[]).length<=2;}, suggestion:'Reduce "please" — direct instructions work better.' },
   { id:'has-quality-check', name:'Quality step', weight:5, test:function(t){return /verif|check your|review your|double.check|ensure (accuracy|quality)|before (responding|answering)/i.test(t);}, suggestion:'Add: "Before responding, verify that…"' },
 ];
 
-function browserLintPrompt(text) {
-  if (!text) return { score:0, grade:'F', passed:[], failed:LINT_RULES, suggestions:['Provide a prompt.'] };
+function detectPromptType(text) {
+  var lower = text.toLowerCase();
+  if (/\b(image|photo|visual|illustration|portrait|logo|scene|art style|dall-e|midjourney|stable diffusion|generate.*image)\b/i.test(lower)) return 'image';
+  if (/\b(code|function|class|module|api|debug|refactor|programming|javascript|python|typescript|repository|commit|pull request)\b/i.test(lower)) return 'code';
+  if (/\b(you are|act as|your role|system prompt|persona|assistant|agent)\b/i.test(lower) && lower.length < 800) return 'system';
+  return 'general';
+}
+
+var TYPE_WEIGHTS = {
+  image:   { 'has-role':0.5,'has-task':1,'has-context':1,'has-output-format':0.3,'has-constraints':0.5,'sufficient-length':0.5,'not-too-long':1,'has-examples':1.2,'has-sections':0.3,'no-vague':1.5,'has-audience':0,'has-tone':0,'no-please-overuse':1,'has-quality-check':0 },
+  code:    { 'has-role':0.8,'has-task':1.2,'has-context':1.2,'has-output-format':1.2,'has-constraints':1.2,'sufficient-length':0.8,'not-too-long':1,'has-examples':1,'has-sections':1,'no-vague':1.2,'has-audience':0.5,'has-tone':0.3,'no-please-overuse':1,'has-quality-check':1.2 },
+  system:  { 'has-role':1.5,'has-task':1.2,'has-context':0.8,'has-output-format':0.8,'has-constraints':1.5,'sufficient-length':0.5,'not-too-long':1,'has-examples':0.5,'has-sections':0.8,'no-vague':1,'has-audience':0.5,'has-tone':1.2,'no-please-overuse':1,'has-quality-check':0.8 },
+  general: {}
+};
+
+function browserLintPrompt(text, promptType) {
+  if (!text) return { score:0, grade:'F', promptType:'general', passed:[], failed:LINT_RULES, suggestions:['Provide a prompt.'] };
+  var type = promptType || detectPromptType(text);
+  var tw = TYPE_WEIGHTS[type] || {};
   var earned=0, total=0, passed=[], failed=[];
   LINT_RULES.forEach(function(r) {
-    total += r.weight;
-    if (r.test(text)) { earned += r.weight; passed.push(r); }
-    else { failed.push(r); }
+    var m = tw[r.id] !== undefined ? tw[r.id] : 1;
+    if (m === 0) return;
+    var aw = Math.round(r.weight * m);
+    total += aw;
+    if (r.test(text)) { earned += aw; passed.push({id:r.id,name:r.name,weight:aw,suggestion:r.suggestion,passed:true}); }
+    else { failed.push({id:r.id,name:r.name,weight:aw,suggestion:r.suggestion,passed:false}); }
   });
-  var score = Math.round((earned/total)*100);
+  var score = total > 0 ? Math.round((earned/total)*100) : 0;
   var grade = score>=90?'A':score>=75?'B':score>=60?'C':score>=40?'D':'F';
-  return { score:score, grade:grade, passed:passed, failed:failed, suggestions:failed.sort(function(a,b){return b.weight-a.weight;}).map(function(r){return r.suggestion;}), wordCount:text.split(/\s+/).length };
+  return { score:score, grade:grade, promptType:type, passed:passed, failed:failed, suggestions:failed.sort(function(a,b){return b.weight-a.weight;}).map(function(r){return r.suggestion;}), wordCount:text.split(/\s+/).length };
 }
 
 // ── PROMPT OPTIMIZER (browser version — dynamic, content-aware) ──
@@ -3379,6 +3528,9 @@ function browserRecommend(description) {
 
 // ── SEND TO AI (Playground) ──
 async function sendToAI(prompt, systemPrompt, provider, apiKey, model) {
+  var controller = new AbortController();
+  var timeoutId = setTimeout(function() { controller.abort(); }, 30000);
+  try {
   if (provider === 'openai') {
     var messages = [];
     if (systemPrompt) messages.push({ role: 'system', content: systemPrompt });
@@ -3387,6 +3539,7 @@ async function sendToAI(prompt, systemPrompt, provider, apiKey, model) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
       body: JSON.stringify({ model: model || 'gpt-4o-mini', messages: messages, temperature: 0.7, max_tokens: 4000 }),
+      signal: controller.signal,
     });
     if (!resp.ok) { var err = await resp.json().catch(function(){return {};}); throw new Error('OpenAI: ' + (err.error ? err.error.message : resp.statusText)); }
     var data = await resp.json();
@@ -3397,6 +3550,7 @@ async function sendToAI(prompt, systemPrompt, provider, apiKey, model) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
       body: JSON.stringify({ model: model || 'claude-sonnet-4-20250514', max_tokens: 4000, system: systemPrompt || undefined, messages: [{ role: 'user', content: prompt }] }),
+      signal: controller.signal,
     });
     if (!resp2.ok) { var err2 = await resp2.json().catch(function(){return {};}); throw new Error('Anthropic: ' + (err2.error ? err2.error.message : resp2.statusText)); }
     var data2 = await resp2.json();
@@ -3408,12 +3562,19 @@ async function sendToAI(prompt, systemPrompt, provider, apiKey, model) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ contents: [{ parts: [{ text: fullPrompt }] }], generationConfig: { temperature: 0.7, maxOutputTokens: 4000 } }),
+      signal: controller.signal,
     });
     if (!resp3.ok) { var err3 = await resp3.json().catch(function(){return {};}); throw new Error('Google: ' + (err3.error ? err3.error.message : resp3.statusText)); }
     var data3 = await resp3.json();
     return { text: data3.candidates[0].content.parts[0].text, model: model || 'gemini-2.0-flash', usage: null };
   }
   throw new Error('Unsupported provider: ' + provider);
+  } catch(e) {
+    if (e.name === 'AbortError') throw new Error('Request timed out after 30 seconds. Please try again.');
+    throw e;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 }
 
 // ── AI Optimize ──
@@ -3527,9 +3688,11 @@ function renderLintResults(result) {
   scoreCircle.textContent = result.score;
   scoreRow.appendChild(scoreCircle);
 
+  var typeLabels = { image: '🎨 Image prompt', code: '💻 Code prompt', system: '🤖 System prompt', general: '📝 General prompt' };
   var scoreInfo = document.createElement('div');
   scoreInfo.innerHTML = '<div style="font-size:18px;font-weight:700;">Grade: ' + result.grade + '</div>' +
-    '<div style="font-size:13px;color:var(--text-secondary);">' + result.passed.length + '/' + (result.passed.length+result.failed.length) + ' rules passed · ' + result.wordCount + ' words</div>';
+    '<div style="font-size:13px;color:var(--text-secondary);">' + result.passed.length + '/' + (result.passed.length+result.failed.length) + ' rules passed · ' + result.wordCount + ' words</div>' +
+    '<div style="font-size:12px;color:var(--accent);margin-top:4px;">' + (typeLabels[result.promptType] || typeLabels.general) + ' — rules adjusted for this type</div>';
   scoreRow.appendChild(scoreInfo);
   el.appendChild(scoreRow);
 
@@ -3631,10 +3794,11 @@ function renderOptimizeResults(result, isAI) {
   // Score comparison
   var scoreRow = document.createElement('div');
   scoreRow.style.cssText = 'display:flex;align-items:center;gap:12px;margin-bottom:16px;font-size:15px;';
+  var impSign = result.scoreAfter > result.scoreBefore ? '+' : (result.scoreAfter === result.scoreBefore ? '±' : '');
   scoreRow.innerHTML = '<span style="color:var(--danger);font-weight:700;">' + result.scoreBefore + '</span>' +
     ' <span style="color:var(--text-dim);">\u2192</span> ' +
     '<span style="color:var(--success);font-weight:700;">' + result.scoreAfter + '</span>' +
-    ' <span style="color:var(--success);">(+' + (result.scoreAfter - result.scoreBefore) + ' improvement)</span>' +
+    ' <span style="color:var(--success);">(' + impSign + (result.scoreAfter - result.scoreBefore) + ' improvement)</span>' +
     (isAI ? ' <span class="tag" style="background:var(--accent-dim);color:var(--accent);">AI-Enhanced</span>' : '');
   el.appendChild(scoreRow);
 
@@ -3652,11 +3816,72 @@ function renderOptimizeResults(result, isAI) {
     });
   }
 
-  // Optimized prompt
-  var pre = document.createElement('pre');
-  pre.style.cssText = 'background:var(--code-bg);padding:16px;border-radius:var(--radius);font-size:13px;line-height:1.6;white-space:pre-wrap;word-wrap:break-word;border:1px solid var(--border);margin-top:16px;max-height:500px;overflow-y:auto;';
-  pre.textContent = result.optimized;
-  el.appendChild(pre);
+  // View toggle: Optimized | Diff
+  var viewToggle = document.createElement('div');
+  viewToggle.style.cssText = 'display:flex;gap:4px;margin-top:16px;margin-bottom:8px;';
+  var viewOptBtn = document.createElement('button');
+  viewOptBtn.className = 'btn primary';
+  viewOptBtn.textContent = 'Optimized';
+  viewOptBtn.style.cssText = 'font-size:12px;padding:6px 12px;';
+  var viewDiffBtn = document.createElement('button');
+  viewDiffBtn.className = 'btn';
+  viewDiffBtn.textContent = 'Diff view';
+  viewDiffBtn.style.cssText = 'font-size:12px;padding:6px 12px;';
+  viewToggle.appendChild(viewOptBtn);
+  viewToggle.appendChild(viewDiffBtn);
+  el.appendChild(viewToggle);
+
+  var preContainer = document.createElement('div');
+  preContainer.id = 'optPreContainer';
+  el.appendChild(preContainer);
+
+  function showOptimized() {
+    preContainer.textContent = '';
+    viewOptBtn.className = 'btn primary';
+    viewDiffBtn.className = 'btn';
+    var pre = document.createElement('pre');
+    pre.style.cssText = 'background:var(--code-bg);padding:16px;border-radius:var(--radius);font-size:13px;line-height:1.6;white-space:pre-wrap;word-wrap:break-word;border:1px solid var(--border);max-height:500px;overflow-y:auto;';
+    pre.textContent = result.optimized;
+    preContainer.appendChild(pre);
+  }
+
+  function showDiff() {
+    preContainer.textContent = '';
+    viewOptBtn.className = 'btn';
+    viewDiffBtn.className = 'btn primary';
+    var diffEl = document.createElement('div');
+    diffEl.style.cssText = 'background:var(--code-bg);padding:16px;border-radius:var(--radius);font-size:13px;line-height:1.8;white-space:pre-wrap;word-wrap:break-word;border:1px solid var(--border);max-height:500px;overflow-y:auto;';
+    // Simple line-level diff
+    var origLines = (result.original || '').split('\n');
+    var optLines = (result.optimized || '').split('\n');
+    var maxLen = Math.max(origLines.length, optLines.length);
+    var html = '';
+    for (var i = 0; i < maxLen; i++) {
+      var oLine = origLines[i] !== undefined ? origLines[i] : '';
+      var nLine = optLines[i] !== undefined ? optLines[i] : '';
+      if (i >= origLines.length) {
+        html += '<div style="background:rgba(34,197,94,0.15);padding:1px 4px;border-left:3px solid var(--success);">+ ' + escapeHtml(nLine) + '</div>';
+      } else if (i >= optLines.length) {
+        html += '<div style="background:rgba(239,68,68,0.15);padding:1px 4px;border-left:3px solid var(--danger);text-decoration:line-through;opacity:0.7;">- ' + escapeHtml(oLine) + '</div>';
+      } else if (oLine !== nLine) {
+        html += '<div style="background:rgba(239,68,68,0.15);padding:1px 4px;border-left:3px solid var(--danger);text-decoration:line-through;opacity:0.7;">- ' + escapeHtml(oLine) + '</div>';
+        html += '<div style="background:rgba(34,197,94,0.15);padding:1px 4px;border-left:3px solid var(--success);">+ ' + escapeHtml(nLine) + '</div>';
+      } else {
+        html += '<div style="padding:1px 4px;">  ' + escapeHtml(nLine) + '</div>';
+      }
+    }
+    diffEl.innerHTML = html;
+    preContainer.appendChild(diffEl);
+    // Legend
+    var legend = document.createElement('div');
+    legend.style.cssText = 'font-size:11px;color:var(--text-dim);margin-top:6px;';
+    legend.innerHTML = '<span style="color:var(--danger);">\u2501</span> Removed &nbsp; <span style="color:var(--success);">\u2501</span> Added &nbsp; No marker = unchanged';
+    preContainer.appendChild(legend);
+  }
+
+  viewOptBtn.onclick = showOptimized;
+  viewDiffBtn.onclick = showDiff;
+  showOptimized(); // default view
 
   // Actions
   var actions = document.createElement('div');
@@ -3803,7 +4028,7 @@ function showPlayground() {
 
   var desc = document.createElement('p');
   desc.style.cssText = 'color:var(--text-secondary);margin-bottom:16px;font-size:14px;';
-  desc.textContent = 'Send prompts to AI models, see responses, iterate. Configure API keys via the \u2699 button.';
+  desc.textContent = 'Send prompts to AI models, compare responses across providers, and iterate. Configure API keys via the \u2699 button.';
   main.appendChild(desc);
 
   if (showHelpBanners) {
@@ -3815,8 +4040,9 @@ function showPlayground() {
       '<li><strong>System prompt</strong> (optional) — sets the AI\'s persona and rules (like the "You are a…" part)</li>' +
       '<li><strong>User prompt</strong> — what you actually want the AI to do</li>' +
       '<li><strong>Model</strong> — which AI to use (set in \u2699 API Settings)</li>' +
+      '<li><strong>\u2696 Compare Models</strong> — send the same prompt to all your configured AI providers at once and see results side-by-side. Great for picking the best model for your use case. Requires 2+ API keys configured.</li>' +
       '</ul>' +
-      '<div class="tip">\uD83D\uDC49 Quick workflow: Browse \u2192 Quick Fill a template \u2192 Copy \u2192 Paste here \u2192 Send to AI</div>';
+      '<div class="tip">\uD83D\uDC49 Quick workflow: Browse \u2192 Quick Fill a template \u2192 Copy \u2192 Paste here \u2192 Send to AI (or Compare across models)</div>';
     main.appendChild(help);
   }
 
@@ -3930,7 +4156,118 @@ function showPlayground() {
   };
   actions.appendChild(lintBtn);
 
+  // Multi-Model Compare
+  var configured = getConfiguredProviders();
+  if (configured.length >= 2) {
+    var compareBtn = document.createElement('button');
+    compareBtn.className = 'btn';
+    compareBtn.id = 'pgCompareBtn';
+    compareBtn.textContent = '\u2696 Compare (' + configured.length + ' models)';
+    compareBtn.title = 'Send the same prompt to all configured providers simultaneously and compare responses side-by-side';
+    compareBtn.style.cssText = 'padding:10px 16px;font-size:14px;';
+    compareBtn.onclick = async function() {
+      var userPrompt = document.getElementById('pgUserPrompt').value.trim();
+      if (!userPrompt) { showToast('Enter a prompt first'); return; }
+      var sysPrompt = document.getElementById('pgSystemPrompt').value.trim();
+      compareBtn.disabled = true;
+      sendBtn.disabled = true;
+      compareBtn.textContent = '\u23F3 Comparing...';
+      var respArea = document.getElementById('pgResponseArea');
+      respArea.textContent = '';
+
+      // Create grid for side-by-side results
+      var grid = document.createElement('div');
+      grid.style.cssText = 'display:grid;grid-template-columns:repeat(' + Math.min(configured.length, 3) + ',1fr);gap:12px;';
+      respArea.appendChild(grid);
+
+      // Create cards
+      var cards = [];
+      configured.forEach(function(prov) {
+        var card = document.createElement('div');
+        card.style.cssText = 'border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;';
+        var header = document.createElement('div');
+        header.style.cssText = 'padding:10px 12px;background:var(--code-bg);font-weight:600;font-size:13px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;';
+        var provLabel = document.createElement('span');
+        provLabel.textContent = prov.label;
+        header.appendChild(provLabel);
+        var modelBadge = document.createElement('span');
+        modelBadge.style.cssText = 'font-size:11px;font-weight:400;color:var(--text-dim);';
+        modelBadge.textContent = prov.model;
+        header.appendChild(modelBadge);
+        card.appendChild(header);
+        var body = document.createElement('div');
+        body.style.cssText = 'padding:12px;font-size:13px;line-height:1.6;min-height:100px;';
+        body.innerHTML = '<div class="pg-loading"><div class="spinner"></div>Waiting...</div>';
+        body.id = 'compare-body-' + prov.provider;
+        card.appendChild(body);
+        grid.appendChild(card);
+        cards.push({ prov: prov, body: body, card: card });
+      });
+
+      // Send to all in parallel
+      var startTime = Date.now();
+      var promises = cards.map(function(c) {
+        var t0 = Date.now();
+        return sendToAI(userPrompt, sysPrompt, c.prov.provider, c.prov.key, c.prov.model)
+          .then(function(result) {
+            var elapsed = ((Date.now() - t0) / 1000).toFixed(1);
+            c.body.textContent = '';
+            var pre = document.createElement('div');
+            pre.style.cssText = 'white-space:pre-wrap;word-wrap:break-word;';
+            pre.textContent = result.text;
+            c.body.appendChild(pre);
+            var meta = document.createElement('div');
+            meta.style.cssText = 'margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:11px;color:var(--text-dim);';
+            var metaParts = [elapsed + 's'];
+            if (result.usage) {
+              var tokIn = result.usage.prompt_tokens || result.usage.input_tokens || '?';
+              var tokOut = result.usage.completion_tokens || result.usage.output_tokens || '?';
+              metaParts.push(tokIn + '→' + tokOut + ' tok');
+            }
+            meta.textContent = metaParts.join(' · ');
+            c.body.appendChild(meta);
+            // Copy button
+            var cpBtn = document.createElement('button');
+            cpBtn.className = 'btn';
+            cpBtn.textContent = '\uD83D\uDCCB Copy';
+            cpBtn.style.cssText = 'margin-top:6px;font-size:11px;padding:4px 8px;';
+            cpBtn.onclick = function() { navigator.clipboard.writeText(result.text).then(function(){ showToast('Copied!'); }); };
+            c.body.appendChild(cpBtn);
+          })
+          .catch(function(err) {
+            c.body.innerHTML = '<div style="color:var(--danger);font-size:12px;">\u274C ' + escapeHtml(err.message) + '</div>';
+          });
+      });
+      await Promise.allSettled(promises);
+      var totalTime = ((Date.now() - startTime) / 1000).toFixed(1);
+
+      // Summary bar
+      var summary = document.createElement('div');
+      summary.style.cssText = 'margin-top:12px;padding:10px;background:var(--code-bg);border-radius:var(--radius);font-size:12px;color:var(--text-secondary);text-align:center;';
+      summary.textContent = '\u2696 Compared ' + configured.length + ' models in ' + totalTime + 's';
+      respArea.appendChild(summary);
+
+      compareBtn.disabled = false;
+      sendBtn.disabled = false;
+      compareBtn.textContent = '\u2696 Compare (' + configured.length + ' models)';
+    };
+    actions.appendChild(compareBtn);
+  } else if (configured.length === 1) {
+    var compareHint = document.createElement('span');
+    compareHint.style.cssText = 'font-size:11px;color:var(--text-dim);align-self:center;';
+    compareHint.textContent = 'Add 2+ API keys via \u2699 to compare models';
+    actions.appendChild(compareHint);
+  }
+
   main.appendChild(actions);
+
+  // Multi-model hint (always visible)
+  if (configured.length >= 2) {
+    var compareHintLine = document.createElement('div');
+    compareHintLine.style.cssText = 'font-size:12px;color:var(--text-dim);margin-top:8px;padding:6px 10px;background:var(--code-bg);border-radius:var(--radius);';
+    compareHintLine.innerHTML = '\u2696 <strong>Multi-Model Compare:</strong> You have ' + configured.length + ' providers configured (' + configured.map(function(p){ return p.label; }).join(', ') + '). Click "Compare" to send your prompt to all models at once and see responses side-by-side — great for finding the best model for your task.';
+    main.appendChild(compareHintLine);
+  }
 
   // Response area
   var respArea = document.createElement('div');
@@ -3972,8 +4309,21 @@ document.addEventListener('keydown', function(e) {
 // Add keyboard shortcut hints to nav tabs
 (function addKbdHints() {
   var tabs = document.querySelectorAll('.nav-tab');
+  var tabNames = [];
   tabs.forEach(function(tab, i) {
     tab.title = 'Press ' + (i+1) + ' to switch';
+    tabNames.push(tab.getAttribute('data-tab'));
+  });
+  // Arrow key navigation for tabs
+  document.querySelector('.nav-tabs').addEventListener('keydown', function(e) {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+      e.preventDefault();
+      var current = tabNames.indexOf(activeTab);
+      if (e.key === 'ArrowRight') current = (current + 1) % tabNames.length;
+      else current = (current - 1 + tabNames.length) % tabNames.length;
+      switchTab(tabNames[current]);
+      tabs[current].focus();
+    }
   });
 })();
 </script>

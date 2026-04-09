@@ -143,6 +143,7 @@ export function findPlaceholders(text) {
 }
 
 export function extractTemplate(content) {
+  if (!content || typeof content !== 'string') return null;
   const templateMatch = content.match(/## Template[ \t]*\n(?:[ \t]*\n)*```[^\n]*\n([\s\S]*?)```/);
   return templateMatch ? templateMatch[1] : null;
 }

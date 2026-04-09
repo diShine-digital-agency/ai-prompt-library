@@ -100,6 +100,19 @@ Rules: 2/14 passed | 23 words
 - Includi esempi (7 punti)
 - Usa intestazioni di sezione (7 punti)
 
+### Rilevamento Tipo di Prompt (v2.4.0)
+
+Il linter rileva automaticamente il tipo di prompt e adegua i pesi delle regole:
+
+| Tipo | Rilevamento | Modifiche ai pesi |
+|------|-------------|-------------------|
+| 🎨 Immagine | Parole chiave: image, photo, visual, dall-e, midjourney... | Salta audience, tone, quality-check. Aumenta vague-language (×1.5) |
+| 💻 Codice | Parole chiave: code, function, class, api, debug... | Aumenta task, context, output-format, constraints (×1.2) |
+| 🤖 Sistema | Parole chiave: you are, act as, persona... + lunghezza < 800 | Aumenta role (×1.5), constraints (×1.5). Rilassa length (×0.5) |
+| 📝 Generale | Predefinito | Tutti i pesi a ×1.0 |
+
+> Per la tabella completa dei moltiplicatori, vedi [INFRASTRUCTURE.md](https://github.com/diShine-digital-agency/ai-prompt-library/blob/main/INFRASTRUCTURE.md#3-prompt-type-detection).
+
 ---
 
 ## Prompt Optimizer
@@ -249,6 +262,12 @@ logically structured, and engaging for the target audience.
 - Aggiunto il formato di output specifico per la scrittura
 - Aggiunti vincoli di qualità specifici per la scrittura
 - Aggiunto il passaggio di verifica della qualità
+
+### Vista Differenze (v2.4.0)
+
+Dopo l'ottimizzazione, alterna tra:
+- **Ottimizzato** — prompt ottimizzato pulito
+- **Vista Diff** — confronto colorato riga per riga (🟢 aggiunto, 🔴 rimosso, senza marcatore = invariato)
 
 ---
 

@@ -341,6 +341,16 @@ Queste chiavi sono usate dal Prompt Workshop (`viewer.html`):
 | `pl_saved` | `JSON array` | Tutti i prompt salvati, template compilati, prompt composti, prompt personalizzati. Gli elementi dal database sono contrassegnati con `source: 'database'` |
 | `pl_sidebar_width` | `number` | Larghezza barra laterale in pixel (260–600). Persiste tra le sessioni |
 | `api_settings` | `JSON object` | Chiavi API e preferenze modello per Playground e AI Optimizer. Contiene provider, chiavi per OpenAI/Anthropic/Google e modelli selezionati |
+| `pg_prefill` | `string` | Dati temporanei di pre-compilazione del playground. Cancellati dopo l'uso |
+
+### Aggiornamenti Architettura v2.4.0
+
+- **Linter** — rilevamento del tipo di prompt (immagine/codice/sistema/generale) con pesi delle regole adeguati — vedi [INFRASTRUCTURE.md](https://github.com/diShine-digital-agency/ai-prompt-library/blob/main/INFRASTRUCTURE.md)
+- **Optimizer** — motore diff per confronto colorato prima/dopo
+- **Playground** — confronto multi-modello tramite `Promise.allSettled()` con timeout 30s `AbortController`
+- **Create** — 6 template iniziali che pre-compilano titolo, tag, corpo e campi dinamici
+- **La Mia Libreria** — ricerca, filtro per tipo, ordinamento
+- **Accessibilità** — ARIA landmarks, `role="tablist"`, link salta al contenuto, `focus-visible`, navigazione tra schede con frecce
 
 ---
 

@@ -13,7 +13,7 @@
 export function recommendPrompts(prompts, description) {
   if (!description || typeof description !== 'string') return [];
 
-  const terms = description.toLowerCase().split(/\s+/).filter(t => t.length > 2);
+  const terms = description.toLowerCase().split(/\s+/).filter(t => t.length > 1);
   const descLower = description.toLowerCase();
 
   // Detect intent categories from the description

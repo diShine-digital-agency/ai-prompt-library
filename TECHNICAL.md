@@ -1,6 +1,6 @@
 # Technical Documentation
 
-Architecture, data flow, and extension guide for the diShine Prompt Library v2.3.1.
+Architecture, data flow, and extension guide for the diShine Prompt Library v2.4.0.
 
 > **Looking for how to use the tools?** See [FUNCTIONS.md](FUNCTIONS.md) for detailed usage docs on each function.
 
@@ -254,11 +254,11 @@ The `viewer.html` file is a self-contained single-page application:
 |-----|-------------|
 | **Browse** | Search, filter, and read prompts. Build prompts interactively. |
 | **Compose** | Combine system prompt + framework + task template. |
-| **Create** | Build custom system prompts with field definitions. |
+| **Create** | Build custom system prompts with field definitions. 6 starter templates available. |
 | **Generate** | Choose a framework, answer questions, get a generated prompt. |
-| **Tools** | Prompt Linter (quality scoring), Prompt Optimizer (content-aware rewriting), Smart Recommender (personalized suggestions). |
-| **Playground** | Send prompts to AI models (OpenAI, Anthropic, Google). System prompts, token tracking, one-click copy. |
-| **My Library** | View saved prompts, compositions, and custom prompts. Edit, copy, delete, export/import. |
+| **Tools** | Prompt Linter (type-aware quality scoring), Prompt Optimizer (content-aware rewriting with diff view), Smart Recommender (personalized suggestions). |
+| **Playground** | Send prompts to AI models (OpenAI, Anthropic, Google). System prompts, token tracking, one-click copy. Multi-model comparison (⚖ Compare). |
+| **My Library** | View saved prompts with search, type filter, and sort controls. Edit, copy, delete, export/import. |
 
 ---
 
@@ -362,6 +362,7 @@ Tests verify:
 - **[README.md](README.md)** — overview, quick start, and CLI usage
 - **[GUIDE.md](GUIDE.md)** — step-by-step user guide
 - **[FUNCTIONS.md](FUNCTIONS.md)** — detailed reference for every tool
+- **[INFRASTRUCTURE.md](INFRASTRUCTURE.md)** — algorithms, scoring math, and engine internals (technical & non-technical)
 - **[CHANGELOG.md](CHANGELOG.md)** — version history
 - **[desktop/README.md](desktop/README.md)** — desktop app build and install guides
 - **[CONTRIBUTING.md](CONTRIBUTING.md)** — how to contribute

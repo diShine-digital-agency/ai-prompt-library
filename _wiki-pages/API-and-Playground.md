@@ -164,6 +164,29 @@ Token counts are displayed after each response, helping you monitor costs and op
 
 ---
 
+## ⚖ Multi-Model Compare (v2.4.0)
+
+Send the same prompt to all configured providers simultaneously and compare responses side-by-side.
+
+**How to use:**
+1. Configure 2+ API keys via ⚙ Settings
+2. Write your prompt in the Playground
+3. Click **"⚖ Compare (N models)"**
+4. Results appear in a grid: response text, timing, token usage, copy button
+
+**Technical details:**
+- Uses `Promise.allSettled()` — one provider failing doesn't block others
+- Each request has a 30-second timeout via AbortController
+- Send button is disabled during comparison
+
+## Security (v2.4.0)
+
+- All API calls enforce a **30-second timeout** via AbortController
+- API Settings modal shows a **security warning** about plaintext localStorage storage
+- API keys are never sent anywhere except the selected provider's endpoint
+
+---
+
 ## Programmatic Usage (JavaScript)
 
 The Prompt Library can be imported and used programmatically in your own JavaScript/Node.js projects.
