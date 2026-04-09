@@ -1,6 +1,6 @@
 # Prompt Library — User Guide
 
-A practical, non-technical guide to getting started with the diShine Prompt Library v2.3.
+A practical, non-technical guide to getting started with the diShine Prompt Library v2.3.1.
 
 ---
 
