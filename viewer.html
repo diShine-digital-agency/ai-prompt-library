@@ -3666,10 +3666,11 @@ function renderOptimizeResults(result, isAI) {
   // Score comparison
   var scoreRow = document.createElement('div');
   scoreRow.style.cssText = 'display:flex;align-items:center;gap:12px;margin-bottom:16px;font-size:15px;';
+  var impSign = result.scoreAfter >= result.scoreBefore ? '+' : '';
   scoreRow.innerHTML = '<span style="color:var(--danger);font-weight:700;">' + result.scoreBefore + '</span>' +
     ' <span style="color:var(--text-dim);">\u2192</span> ' +
     '<span style="color:var(--success);font-weight:700;">' + result.scoreAfter + '</span>' +
-    ' <span style="color:var(--success);">(+' + (result.scoreAfter - result.scoreBefore) + ' improvement)</span>' +
+    ' <span style="color:var(--success);">(' + impSign + (result.scoreAfter - result.scoreBefore) + ' improvement)</span>' +
     (isAI ? ' <span class="tag" style="background:var(--accent-dim);color:var(--accent);">AI-Enhanced</span>' : '');
   el.appendChild(scoreRow);
 
@@ -3687,11 +3688,72 @@ function renderOptimizeResults(result, isAI) {
     });
   }
 
-  // Optimized prompt
-  var pre = document.createElement('pre');
-  pre.style.cssText = 'background:var(--code-bg);padding:16px;border-radius:var(--radius);font-size:13px;line-height:1.6;white-space:pre-wrap;word-wrap:break-word;border:1px solid var(--border);margin-top:16px;max-height:500px;overflow-y:auto;';
-  pre.textContent = result.optimized;
-  el.appendChild(pre);
+  // View toggle: Optimized | Diff
+  var viewToggle = document.createElement('div');
+  viewToggle.style.cssText = 'display:flex;gap:4px;margin-top:16px;margin-bottom:8px;';
+  var viewOptBtn = document.createElement('button');
+  viewOptBtn.className = 'btn primary';
+  viewOptBtn.textContent = 'Optimized';
+  viewOptBtn.style.cssText = 'font-size:12px;padding:6px 12px;';
+  var viewDiffBtn = document.createElement('button');
+  viewDiffBtn.className = 'btn';
+  viewDiffBtn.textContent = 'Diff view';
+  viewDiffBtn.style.cssText = 'font-size:12px;padding:6px 12px;';
+  viewToggle.appendChild(viewOptBtn);
+  viewToggle.appendChild(viewDiffBtn);
+  el.appendChild(viewToggle);
+
+  var preContainer = document.createElement('div');
+  preContainer.id = 'optPreContainer';
+  el.appendChild(preContainer);
+
+  function showOptimized() {
+    preContainer.textContent = '';
+    viewOptBtn.className = 'btn primary';
+    viewDiffBtn.className = 'btn';
+    var pre = document.createElement('pre');
+    pre.style.cssText = 'background:var(--code-bg);padding:16px;border-radius:var(--radius);font-size:13px;line-height:1.6;white-space:pre-wrap;word-wrap:break-word;border:1px solid var(--border);max-height:500px;overflow-y:auto;';
+    pre.textContent = result.optimized;
+    preContainer.appendChild(pre);
+  }
+
+  function showDiff() {
+    preContainer.textContent = '';
+    viewOptBtn.className = 'btn';
+    viewDiffBtn.className = 'btn primary';
+    var diffEl = document.createElement('div');
+    diffEl.style.cssText = 'background:var(--code-bg);padding:16px;border-radius:var(--radius);font-size:13px;line-height:1.8;white-space:pre-wrap;word-wrap:break-word;border:1px solid var(--border);max-height:500px;overflow-y:auto;';
+    // Simple line-level diff
+    var origLines = (result.original || '').split('\n');
+    var optLines = (result.optimized || '').split('\n');
+    var maxLen = Math.max(origLines.length, optLines.length);
+    var html = '';
+    for (var i = 0; i < maxLen; i++) {
+      var oLine = origLines[i] !== undefined ? origLines[i] : '';
+      var nLine = optLines[i] !== undefined ? optLines[i] : '';
+      if (i >= origLines.length) {
+        html += '<div style="background:rgba(34,197,94,0.15);padding:1px 4px;border-left:3px solid var(--success);">+ ' + escapeHtml(nLine) + '</div>';
+      } else if (i >= optLines.length) {
+        html += '<div style="background:rgba(239,68,68,0.15);padding:1px 4px;border-left:3px solid var(--danger);text-decoration:line-through;opacity:0.7;">- ' + escapeHtml(oLine) + '</div>';
+      } else if (oLine !== nLine) {
+        if (oLine.trim()) html += '<div style="background:rgba(239,68,68,0.15);padding:1px 4px;border-left:3px solid var(--danger);text-decoration:line-through;opacity:0.7;">- ' + escapeHtml(oLine) + '</div>';
+        if (nLine.trim()) html += '<div style="background:rgba(34,197,94,0.15);padding:1px 4px;border-left:3px solid var(--success);">+ ' + escapeHtml(nLine) + '</div>';
+      } else {
+        html += '<div style="padding:1px 4px;">  ' + escapeHtml(nLine) + '</div>';
+      }
+    }
+    diffEl.innerHTML = html;
+    preContainer.appendChild(diffEl);
+    // Legend
+    var legend = document.createElement('div');
+    legend.style.cssText = 'font-size:11px;color:var(--text-dim);margin-top:6px;';
+    legend.innerHTML = '<span style="color:var(--danger);">\u2501</span> Removed &nbsp; <span style="color:var(--success);">\u2501</span> Added &nbsp; No marker = unchanged';
+    preContainer.appendChild(legend);
+  }
+
+  viewOptBtn.onclick = showOptimized;
+  viewDiffBtn.onclick = showDiff;
+  showOptimized(); // default view
 
   // Actions
   var actions = document.createElement('div');
