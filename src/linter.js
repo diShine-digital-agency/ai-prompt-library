@@ -129,10 +129,36 @@ const RULES = [
   },
 ];
 
-export function lintPrompt(text) {
+/**
+ * Detect the prompt type from content to adjust linting weights.
+ * Returns: 'image', 'code', 'system', or 'general'
+ */
+function detectPromptType(text) {
+  const lower = text.toLowerCase();
+  if (/\b(image|photo|visual|illustration|portrait|logo|scene|art style|dall-e|midjourney|stable diffusion|generate.*image)\b/i.test(lower)) return 'image';
+  if (/\b(code|function|class|module|api|debug|refactor|programming|javascript|python|typescript|repository|commit|pull request)\b/i.test(lower)) return 'code';
+  if (/\b(you are|act as|your role|system prompt|persona|assistant|agent)\b/i.test(lower) && lower.length < 800) return 'system';
+  return 'general';
+}
+
+/**
+ * Weight adjustments per prompt type.
+ * 1.0 = normal, 0 = skip rule, 0.5 = half weight, 1.5 = extra important
+ */
+const TYPE_WEIGHTS = {
+  image:   { 'has-role': 0.5, 'has-task': 1.0, 'has-context': 1.0, 'has-output-format': 0.3, 'has-constraints': 0.5, 'sufficient-length': 0.5, 'not-too-long': 1.0, 'has-examples': 1.2, 'has-sections': 0.3, 'no-vague-language': 1.5, 'has-audience': 0, 'has-tone': 0, 'no-please-overuse': 1.0, 'has-quality-check': 0 },
+  code:    { 'has-role': 0.8, 'has-task': 1.2, 'has-context': 1.2, 'has-output-format': 1.2, 'has-constraints': 1.2, 'sufficient-length': 0.8, 'not-too-long': 1.0, 'has-examples': 1.0, 'has-sections': 1.0, 'no-vague-language': 1.2, 'has-audience': 0.5, 'has-tone': 0.3, 'no-please-overuse': 1.0, 'has-quality-check': 1.2 },
+  system:  { 'has-role': 1.5, 'has-task': 1.2, 'has-context': 0.8, 'has-output-format': 0.8, 'has-constraints': 1.5, 'sufficient-length': 0.5, 'not-too-long': 1.0, 'has-examples': 0.5, 'has-sections': 0.8, 'no-vague-language': 1.0, 'has-audience': 0.5, 'has-tone': 1.2, 'no-please-overuse': 1.0, 'has-quality-check': 0.8 },
+  general: {},
+};
+
+export function lintPrompt(text, options) {
   if (!text || typeof text !== 'string') {
-    return { score: 0, grade: 'F', passed: [], failed: RULES.map(r => ({ ...r, passed: false })), suggestions: ['Provide a prompt to analyze.'] };
+    return { score: 0, grade: 'F', promptType: 'general', passed: [], failed: RULES.map(r => ({ ...r, passed: false })), suggestions: ['Provide a prompt to analyze.'] };
   }
+
+  const promptType = (options && options.promptType) || detectPromptType(text);
+  const typeWeights = TYPE_WEIGHTS[promptType] || {};
 
   const passed = [];
   const failed = [];
@@ -140,17 +166,20 @@ export function lintPrompt(text) {
   let totalWeight = 0;
 
   for (const rule of RULES) {
-    totalWeight += rule.weight;
+    const multiplier = typeWeights[rule.id] !== undefined ? typeWeights[rule.id] : 1.0;
+    if (multiplier === 0) continue; // skip rule for this type
+    const adjustedWeight = Math.round(rule.weight * multiplier);
+    totalWeight += adjustedWeight;
     const result = rule.test(text);
     if (result) {
-      earnedWeight += rule.weight;
-      passed.push({ ...rule, passed: true });
+      earnedWeight += adjustedWeight;
+      passed.push({ ...rule, weight: adjustedWeight, passed: true });
     } else {
-      failed.push({ ...rule, passed: false });
+      failed.push({ ...rule, weight: adjustedWeight, passed: false });
     }
   }
 
-  const score = Math.round((earnedWeight / totalWeight) * 100);
+  const score = totalWeight > 0 ? Math.round((earnedWeight / totalWeight) * 100) : 0;
   const grade = score >= 90 ? 'A' : score >= 75 ? 'B' : score >= 60 ? 'C' : score >= 40 ? 'D' : 'F';
 
   const suggestions = failed
@@ -160,7 +189,8 @@ export function lintPrompt(text) {
   return {
     score,
     grade,
-    totalRules: RULES.length,
+    promptType,
+    totalRules: passed.length + failed.length,
     passedCount: passed.length,
     failedCount: failed.length,
     passed,

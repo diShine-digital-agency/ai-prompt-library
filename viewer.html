@@ -3010,17 +3010,37 @@ var LINT_RULES = [
   { id:'has-quality-check', name:'Quality step', weight:5, test:function(t){return /verif|check your|review your|double.check|ensure (accuracy|quality)|before (responding|answering)/i.test(t);}, suggestion:'Add: "Before responding, verify that…"' },
 ];
 
-function browserLintPrompt(text) {
-  if (!text) return { score:0, grade:'F', passed:[], failed:LINT_RULES, suggestions:['Provide a prompt.'] };
+function detectPromptType(text) {
+  var lower = text.toLowerCase();
+  if (/\b(image|photo|visual|illustration|portrait|logo|scene|art style|dall-e|midjourney|stable diffusion|generate.*image)\b/i.test(lower)) return 'image';
+  if (/\b(code|function|class|module|api|debug|refactor|programming|javascript|python|typescript|repository|commit|pull request)\b/i.test(lower)) return 'code';
+  if (/\b(you are|act as|your role|system prompt|persona|assistant|agent)\b/i.test(lower) && lower.length < 800) return 'system';
+  return 'general';
+}
+
+var TYPE_WEIGHTS = {
+  image:   { 'has-role':0.5,'has-task':1,'has-context':1,'has-output-format':0.3,'has-constraints':0.5,'sufficient-length':0.5,'not-too-long':1,'has-examples':1.2,'has-sections':0.3,'no-vague':1.5,'has-audience':0,'has-tone':0,'no-please-overuse':1,'has-quality-check':0 },
+  code:    { 'has-role':0.8,'has-task':1.2,'has-context':1.2,'has-output-format':1.2,'has-constraints':1.2,'sufficient-length':0.8,'not-too-long':1,'has-examples':1,'has-sections':1,'no-vague':1.2,'has-audience':0.5,'has-tone':0.3,'no-please-overuse':1,'has-quality-check':1.2 },
+  system:  { 'has-role':1.5,'has-task':1.2,'has-context':0.8,'has-output-format':0.8,'has-constraints':1.5,'sufficient-length':0.5,'not-too-long':1,'has-examples':0.5,'has-sections':0.8,'no-vague':1,'has-audience':0.5,'has-tone':1.2,'no-please-overuse':1,'has-quality-check':0.8 },
+  general: {}
+};
+
+function browserLintPrompt(text, promptType) {
+  if (!text) return { score:0, grade:'F', promptType:'general', passed:[], failed:LINT_RULES, suggestions:['Provide a prompt.'] };
+  var type = promptType || detectPromptType(text);
+  var tw = TYPE_WEIGHTS[type] || {};
   var earned=0, total=0, passed=[], failed=[];
   LINT_RULES.forEach(function(r) {
-    total += r.weight;
-    if (r.test(text)) { earned += r.weight; passed.push(r); }
-    else { failed.push(r); }
+    var m = tw[r.id] !== undefined ? tw[r.id] : 1;
+    if (m === 0) return;
+    var aw = Math.round(r.weight * m);
+    total += aw;
+    if (r.test(text)) { earned += aw; passed.push({id:r.id,name:r.name,weight:aw,suggestion:r.suggestion,passed:true}); }
+    else { failed.push({id:r.id,name:r.name,weight:aw,suggestion:r.suggestion,passed:false}); }
   });
-  var score = Math.round((earned/total)*100);
+  var score = total > 0 ? Math.round((earned/total)*100) : 0;
   var grade = score>=90?'A':score>=75?'B':score>=60?'C':score>=40?'D':'F';
-  return { score:score, grade:grade, passed:passed, failed:failed, suggestions:failed.sort(function(a,b){return b.weight-a.weight;}).map(function(r){return r.suggestion;}), wordCount:text.split(/\s+/).length };
+  return { score:score, grade:grade, promptType:type, passed:passed, failed:failed, suggestions:failed.sort(function(a,b){return b.weight-a.weight;}).map(function(r){return r.suggestion;}), wordCount:text.split(/\s+/).length };
 }
 
 // ── PROMPT OPTIMIZER (browser version — dynamic, content-aware) ──
@@ -3540,9 +3560,11 @@ function renderLintResults(result) {
   scoreCircle.textContent = result.score;
   scoreRow.appendChild(scoreCircle);
 
+  var typeLabels = { image: '🎨 Image prompt', code: '💻 Code prompt', system: '🤖 System prompt', general: '📝 General prompt' };
   var scoreInfo = document.createElement('div');
   scoreInfo.innerHTML = '<div style="font-size:18px;font-weight:700;">Grade: ' + result.grade + '</div>' +
-    '<div style="font-size:13px;color:var(--text-secondary);">' + result.passed.length + '/' + (result.passed.length+result.failed.length) + ' rules passed · ' + result.wordCount + ' words</div>';
+    '<div style="font-size:13px;color:var(--text-secondary);">' + result.passed.length + '/' + (result.passed.length+result.failed.length) + ' rules passed · ' + result.wordCount + ' words</div>' +
+    '<div style="font-size:12px;color:var(--accent);margin-top:4px;">' + (typeLabels[result.promptType] || typeLabels.general) + ' — rules adjusted for this type</div>';
   scoreRow.appendChild(scoreInfo);
   el.appendChild(scoreRow);
 
