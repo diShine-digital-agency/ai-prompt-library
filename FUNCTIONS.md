@@ -70,7 +70,7 @@ Multi-word queries score each word independently. A prompt matching both "code" 
 
 ### What it does
 
-Analyzes any prompt against 14 quality rules and gives you a score from 0 to 100, a letter grade (A–F), and prioritized suggestions for improvement.
+Analyzes any prompt against 14 quality rules and gives you a score from 0 to 100, a letter grade (A–F), and prioritized suggestions for improvement. **Auto-detects prompt type** (🎨 Image, 💻 Code, 🤖 System, 📝 General) and adjusts rule weights accordingly — image prompts skip irrelevant rules like "tone" and "audience", code prompts weight "constraints" and "output format" more heavily.
 
 ### Why it's useful
 
@@ -430,6 +430,7 @@ Instead of switching between the library and ChatGPT/Claude/Gemini, you can test
 - Track token usage (input/output tokens, where supported)
 - Copy the response with one click
 - Switch between providers without losing your prompt
+- **⚖ Multi-Model Compare** — configure 2+ API keys, then click "Compare" to send the same prompt to all providers simultaneously. Results appear side-by-side in a grid with per-model response time, token usage, and copy buttons. Great for finding which model handles your use case best.
 
 ### How it works
 

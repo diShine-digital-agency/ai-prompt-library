@@ -2,6 +2,42 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.4.0] — 2026-04-09
+
+### Added
+
+- **Multi-Model Testing** — New "⚖ Compare" button in the AI Playground sends the same prompt to all configured providers (OpenAI, Anthropic, Google) simultaneously and displays responses side-by-side in a grid. Shows response time, token usage, and per-response copy buttons. Includes clear inline instructions explaining the feature. Requires 2+ API keys configured.
+
+- **Prompt-Type Aware Linter** — The linter now auto-detects prompt types (🎨 Image, 💻 Code, 🤖 System, 📝 General) and adjusts rule weights accordingly. Image prompts skip irrelevant rules like "tone" and "audience"; code prompts weight "constraints" and "output format" more heavily; system prompts prioritize "role definition" and "constraints". Detected type is displayed in lint results.
+
+- **Optimizer Diff View** — The optimizer results now include a toggle between "Optimized" and "Diff view" modes. The diff view shows a color-coded line-by-line comparison: green for added lines, red (strikethrough) for removed lines, and unmarked for unchanged lines. Includes a legend.
+
+- **Create Tab Starter Templates** — 6 pre-built prompt skeletons in the Create tab: Expert Assistant, Content Writer, Code Generator, Data Analyst, Marketing Strategist, and Image Prompt. One click pre-fills the title, tags, body, and dynamic fields — just customize and save.
+
+- **My Library Search, Filter & Sort** — My Library now has a search bar, type filter dropdown (All / ⭐ Favorites / 📝 Filled / 🔗 Composed / ✨ Custom), and sort controls (Newest, Oldest, A→Z, Z→A). Shows item counts by type. Filters apply instantly.
+
+- **Accessibility Improvements** — ARIA landmarks (`role="navigation"`, `role="main"`, `role="toolbar"`, `role="tablist"` with `aria-selected`), skip-to-content link (visible on Tab focus), improved `--text-dim` color contrast in both light and dark themes, `focus-visible` outline on all interactive elements, arrow-key navigation for tab bar.
+
+### Changed
+
+- Version bumped to 2.4.0
+- Linter `lintPrompt()` now accepts an optional `options` parameter with `promptType` override
+- `browserLintPrompt()` in viewer.html synced with source linter including type detection
+- `addCreateField()` now accepts optional `prefillName` and `prefillDesc` parameters for template pre-filling
+- My Library `savedSection()` no longer reverses items internally (sort order is now controlled by the filter bar)
+
+### Fixed
+
+- **`extractTemplate(null)` crash** — `extractTemplate()` in `src/index.js` now returns `null` safely when called with `null`, `undefined`, empty string, or non-string values instead of throwing a TypeError on `.match()`
+- **Linter rule divergence** — 4 regex differences between `src/linter.js` and the viewer's inline linter have been fixed: `has-output-format` now includes "structured as", `has-examples` includes "here is an example", `has-audience` includes "client/user/reader", `has-tone` includes "detailed"
+- **Recommender drops short terms** — The recommender's term filter threshold lowered from `> 2` chars to `> 1` char, so searches for "AI", "ML", "UI", "DB", "UX" now return results instead of nothing
+- **GUIDE.md version mismatch** — Updated from "v2.3" to match the actual package version
+
+### Security
+
+- **API call timeout** — All API calls (viewer `sendToAI`, optimizer `optimizeWithAI`, optimizer `sendToAI`) now enforce a 30-second timeout via `AbortController`. Prevents hanging requests from blocking the UI indefinitely. Shows "Request timed out after 30 seconds" on timeout.
+- **API key storage warning** — The API Settings modal now shows a visible security notice (🔐) explaining that keys are stored in plaintext localStorage and should not be used on shared/public computers.
+
 ## [2.3.1] — 2026-04-08
 
 ### Added
