@@ -16,7 +16,7 @@
     --bg-input: #ffffff;
     --text: #1e293b;
     --text-secondary: #64748b;
-    --text-dim: #94a3b8;
+    --text-dim: #6b7280;
     --border: #e2e8f0;
     --code-bg: #f1f5f9;
     --success: #22c55e;
@@ -32,13 +32,15 @@
     --bg-input: #0f172a;
     --text: #f1f5f9;
     --text-secondary: #94a3b8;
-    --text-dim: #64748b;
+    --text-dim: #8b95a5;
     --border: #334155;
     --code-bg: #0f172a;
     --accent-dim: rgba(37,99,235,0.2);
     --shadow: 0 1px 3px rgba(0,0,0,0.3);
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
+  .skip-link:focus { position:fixed!important; left:8px!important; top:8px!important; width:auto!important; height:auto!important; overflow:visible!important; background:var(--accent); color:#fff; padding:8px 16px; border-radius:var(--radius); z-index:10000; font-size:14px; font-weight:600; text-decoration:none; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     background: var(--bg);
@@ -678,20 +680,21 @@
 </style>
 </head>
 <body>
-<div class="sidebar" id="sidebar">
+<a href="#mainPanel" class="skip-link" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;z-index:9999;">Skip to main content</a>
+<div class="sidebar" id="sidebar" role="navigation" aria-label="Prompt navigation">
   <div class="sidebar-resize-handle" id="sidebarResizeHandle"></div>
   <div class="sidebar-header">
     <h1>Prompt Workshop <span class="count" id="countBadge"></span></h1>
     <input type="text" class="search-box" id="searchInput" placeholder="Search prompts, tags, models...">
   </div>
-  <div class="nav-tabs">
-    <div class="nav-tab active" data-tab="browse" onclick="switchTab('browse')">Browse</div>
-    <div class="nav-tab" data-tab="compose" onclick="switchTab('compose')">Compose</div>
-    <div class="nav-tab" data-tab="create" onclick="switchTab('create')">Create</div>
-    <div class="nav-tab" data-tab="generate" onclick="switchTab('generate')">Generate</div>
-    <div class="nav-tab" data-tab="tools" onclick="switchTab('tools')">Tools</div>
-    <div class="nav-tab" data-tab="playground" onclick="switchTab('playground')">Playground</div>
-    <div class="nav-tab" data-tab="saved" onclick="switchTab('saved')">My Library</div>
+  <div class="nav-tabs" role="tablist" aria-label="Workshop tabs">
+    <div class="nav-tab active" data-tab="browse" onclick="switchTab('browse')" role="tab" aria-selected="true" tabindex="0">Browse</div>
+    <div class="nav-tab" data-tab="compose" onclick="switchTab('compose')" role="tab" aria-selected="false" tabindex="-1">Compose</div>
+    <div class="nav-tab" data-tab="create" onclick="switchTab('create')" role="tab" aria-selected="false" tabindex="-1">Create</div>
+    <div class="nav-tab" data-tab="generate" onclick="switchTab('generate')" role="tab" aria-selected="false" tabindex="-1">Generate</div>
+    <div class="nav-tab" data-tab="tools" onclick="switchTab('tools')" role="tab" aria-selected="false" tabindex="-1">Tools</div>
+    <div class="nav-tab" data-tab="playground" onclick="switchTab('playground')" role="tab" aria-selected="false" tabindex="-1">Playground</div>
+    <div class="nav-tab" data-tab="saved" onclick="switchTab('saved')" role="tab" aria-selected="false" tabindex="-1">My Library</div>
   </div>
   <div id="filterBar" class="filter-bar">
     <div>
@@ -711,14 +714,14 @@
   <div class="footer">Built by <a href="https://dishine.it" target="_blank">diShine</a></div>
 </div>
 
-<div class="main welcome" id="mainPanel">
+<div class="main welcome" id="mainPanel" role="main" aria-label="Main content">
   <h2>Prompt Workshop</h2>
   <p>Browse expert prompts, fill in placeholders interactively, compose multi-layer prompts, and build your own library.</p>
   <div class="welcome-stats" id="welcomeStats"></div>
   <p style="font-size:13px; margin-top:12px;">Pick a prompt from the sidebar to get started, or try <strong>Compose</strong> to build a layered prompt.</p>
 </div>
 
-<div class="toolbar">
+<div class="toolbar" role="toolbar" aria-label="Settings">
   <button onclick="toggleHelp()" title="Toggle beginner tips (H)" id="helpBtn">?</button>
   <button onclick="showApiSettings()" title="API Settings" id="settingsBtn">&#9881;</button>
   <button onclick="toggleDark()" title="Toggle dark mode" id="darkBtn">&#9789;</button>
@@ -1216,7 +1219,10 @@ function renderWelcome() {
 function switchTab(tab) {
   activeTab = tab;
   document.querySelectorAll('.nav-tab').forEach(function(t) {
-    t.classList.toggle('active', t.getAttribute('data-tab') === tab);
+    var isActive = t.getAttribute('data-tab') === tab;
+    t.classList.toggle('active', isActive);
+    t.setAttribute('aria-selected', isActive ? 'true' : 'false');
+    t.setAttribute('tabindex', isActive ? '0' : '-1');
   });
   var filterBar = document.getElementById('filterBar');
   var sidebarList = document.getElementById('promptList');
@@ -4183,8 +4189,21 @@ document.addEventListener('keydown', function(e) {
 // Add keyboard shortcut hints to nav tabs
 (function addKbdHints() {
   var tabs = document.querySelectorAll('.nav-tab');
+  var tabNames = [];
   tabs.forEach(function(tab, i) {
     tab.title = 'Press ' + (i+1) + ' to switch';
+    tabNames.push(tab.getAttribute('data-tab'));
+  });
+  // Arrow key navigation for tabs
+  document.querySelector('.nav-tabs').addEventListener('keydown', function(e) {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+      e.preventDefault();
+      var current = tabNames.indexOf(activeTab);
+      if (e.key === 'ArrowRight') current = (current + 1) % tabNames.length;
+      else current = (current - 1 + tabNames.length) % tabNames.length;
+      switchTab(tabNames[current]);
+      tabs[current].focus();
+    }
   });
 })();
 </script>
