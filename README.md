@@ -17,6 +17,22 @@ If you work with LLMs regularly, you've probably got prompts scattered across No
   <img src="desktop/images/prompt_workshop_04_generate_framework2.webp" alt="PROMP WORKSHOP generate framework" width="60%">
 </p>
 
+---
+
+## Documentation
+
+- **[README.md](README.md)** — this file, overview and quick start
+- **[GUIDE.md](GUIDE.md)** — detailed user guide with examples
+- **[FUNCTIONS.md](FUNCTIONS.md)** — detailed reference for every tool (linter, optimizer, recommender, generator, playground, etc.)
+- **[INFRASTRUCTURE.md](INFRASTRUCTURE.md)** — algorithms, scoring math, and engine internals (technical & non-technical)
+- **[TECHNICAL.md](TECHNICAL.md)** — architecture, module reference, data formats, extension guide
+- **[CHANGELOG.md](CHANGELOG.md)** — version history and release notes
+- **[desktop/README.md](desktop/README.md)** — desktop app build and install guides
+- **[Wiki](https://github.com/diShine-digital-agency/ai-prompt-library/wiki)** — comprehensive trilingual wiki (English, Italian, French) with 33 pages covering every aspect of the tool
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** — how to contribute
+
+---
+
 **Three ways to use it:**
 
 | Interface | How to open |
@@ -354,20 +370,6 @@ See [GUIDE.md — Troubleshooting](GUIDE.md#troubleshooting) for more platform-s
 
 - **Node.js** 18 or later
 - No npm dependencies at all -- uses only Node.js built-in modules (`fs`, `path`, `url`, `readline`, `child_process`, `os`)
-
----
-
-## Documentation
-
-- **[README.md](README.md)** — this file, overview and quick start
-- **[GUIDE.md](GUIDE.md)** — detailed user guide with examples
-- **[FUNCTIONS.md](FUNCTIONS.md)** — detailed reference for every tool (linter, optimizer, recommender, generator, playground, etc.)
-- **[INFRASTRUCTURE.md](INFRASTRUCTURE.md)** — algorithms, scoring math, and engine internals (technical & non-technical)
-- **[TECHNICAL.md](TECHNICAL.md)** — architecture, module reference, data formats, extension guide
-- **[CHANGELOG.md](CHANGELOG.md)** — version history and release notes
-- **[desktop/README.md](desktop/README.md)** — desktop app build and install guides
-- **[Wiki](https://github.com/diShine-digital-agency/ai-prompt-library/wiki)** — comprehensive trilingual wiki (English, Italian, French) with 33 pages covering every aspect of the tool
-- **[CONTRIBUTING.md](CONTRIBUTING.md)** — how to contribute
 
 ---
 
