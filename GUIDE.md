@@ -727,6 +727,7 @@ Yes. The frontmatter format and file structure work with any language. Add a
 
 - **[README.md](README.md)** — overview, quick start, and CLI usage
 - **[FUNCTIONS.md](FUNCTIONS.md)** — detailed reference for every tool (linter, optimizer, recommender, etc.)
+- **[INFRASTRUCTURE.md](INFRASTRUCTURE.md)** — algorithms, scoring math, and engine internals
 - **[TECHNICAL.md](TECHNICAL.md)** — architecture, data formats, and extension guide
 - **[CHANGELOG.md](CHANGELOG.md)** — version history
 - **[desktop/README.md](desktop/README.md)** — desktop app build and install guides

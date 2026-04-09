@@ -19,7 +19,7 @@ L'AI Prompt Library est une boîte à outils complète et sans dépendances pour
 - **Générateur de prompts** — créez dynamiquement des prompts via 5 frameworks
 - **Composer et Créer** — combinez invites système + frameworks + templates, ou construisez des prompts personnalisés avec des champs dynamiques
 
-**Version :** 2.3.1 &nbsp;|&nbsp; **Licence :** MIT &nbsp;|&nbsp; **Dépendances :** Zéro (uniquement les modules natifs de Node.js 18+)
+**Version :** 2.4.0 &nbsp;|&nbsp; **Licence :** MIT &nbsp;|&nbsp; **Dépendances :** Zéro (uniquement les modules natifs de Node.js 18+)
 
 ---
 
@@ -39,6 +39,7 @@ L'AI Prompt Library est une boîte à outils complète et sans dépendances pour
 | **AI Playground** | — | ✅ | Envoyer des prompts à GPT/Claude/Gemini |
 | **Ma bibliothèque** | ✅ | ✅ | Sauvegarder, modifier, exporter/importer des prompts |
 | **Mode sombre** | — | ✅ | Basculer entre thème clair et sombre |
+| **Comparaison Multi-Modèle** | — | ✅ | Envoyez le même prompt à tous les fournisseurs, comparez côte à côte |
 
 ---
 
@@ -105,7 +106,7 @@ Applications natives pour macOS (Swift + WebKit), Linux (Python + GTK + WebKitGT
 ---
 
 <p align="center">
-Conçu avec ❤️ par <a href="https://dishine.it">diShine Digital Agency</a> — v2.3.1
+Conçu avec ❤️ par <a href="https://dishine.it">diShine Digital Agency</a> — v2.4.0
 </p>
 
 ---

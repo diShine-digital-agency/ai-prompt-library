@@ -558,6 +558,7 @@ The loader parses the frontmatter, extracts metadata, and uses the filename as t
 
 - **[README.md](README.md)** — overview, quick start, and CLI usage
 - **[GUIDE.md](GUIDE.md)** — step-by-step user guide
+- **[INFRASTRUCTURE.md](INFRASTRUCTURE.md)** — algorithms, scoring math, and engine internals (technical & non-technical)
 - **[TECHNICAL.md](TECHNICAL.md)** — architecture, data formats, and extension guide
 - **[CHANGELOG.md](CHANGELOG.md)** — version history
 - **[desktop/README.md](desktop/README.md)** — desktop app installation for macOS, Linux, Windows
