@@ -87,6 +87,7 @@ Build custom system prompts with dynamic fields from scratch.
 
 **Features:**
 - **Field Builder** — define dynamic fields that become `{{field_name}}` placeholders
+- **Starter Templates (v2.4.0)** — 6 pre-built skeletons (Expert Assistant, Content Writer, Code Generator, Data Analyst, Marketing Strategist, Image Prompt) — click to pre-fill, then customize
 - **Field metadata** — each field gets a name and description
 - **Prompt editor** — write the prompt body using your defined fields
 - **Live preview** — see the final prompt with placeholders highlighted
@@ -145,6 +146,8 @@ Analyzes your prompt against 14 quality rules. Produces a score (0–100), lette
 - Results show ✅ passing rules and 💡 improvement suggestions
 - Rules are sorted by impact (highest-weight failures first)
 
+**Prompt-Type Awareness (v2.4.0):** The linter auto-detects your prompt type (🎨 Image, 💻 Code, 🤖 System, 📝 General) and adjusts rule weights. Image prompts skip irrelevant rules like audience/tone; code prompts weight constraints higher.
+
 See [Tools: Linter, Optimizer, Recommender](Tools-Linter-Optimizer-Recommender) for the full rule list.
 
 #### Optimizer
@@ -157,6 +160,8 @@ Rewrites your prompt using content-aware optimization. Two modes:
 | **AI-powered** | Sends prompt to GPT/Claude/Gemini for professional rewriting. | API key (set in ⚙ Settings) |
 
 Shows before/after scores, all changes made, and detected domain.
+
+**Diff View (v2.4.0):** Toggle between "Optimized" (clean result) and "Diff view" (color-coded before/after: green = added, red strikethrough = removed).
 
 #### Recommender
 
@@ -188,6 +193,7 @@ Send prompts directly to AI models and get responses — all within the browser.
 - **Send button** — sends the prompt and displays the response
 - **Token tracking** — shows input/output token usage per request
 - **One-click copy** — copy the AI response
+- **⚖ Multi-Model Compare (v2.4.0)** — configure 2+ API keys, click "Compare" to send the same prompt to all providers simultaneously. Results appear side-by-side with timing, tokens, and copy buttons.
 - **Response display** — formatted AI response with markdown rendering
 
 API keys are stored in `localStorage` — they never leave your browser.
@@ -200,6 +206,7 @@ Manage all your saved prompts, compositions, and custom prompts.
 
 **Features:**
 - **View saved items** — see all saved prompts with titles, dates, and types
+- **Search, Filter & Sort (v2.4.0)** — search by title/content, filter by type (Favorites/Filled/Composed/Custom), sort (Newest/Oldest/A→Z/Z→A)
 - **Edit** — modify saved prompt content inline
 - **Copy** — copy any saved prompt to clipboard
 - **Delete** — remove individual items
