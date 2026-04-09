@@ -2947,6 +2947,7 @@ function showApiSettings() {
   modal.className = 'modal';
   modal.innerHTML = '<h3>&#9881; API Settings</h3>' +
     '<p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;">Configure API keys to use the AI Playground, AI-powered prompt optimization, and smart recommendations. Keys are stored locally in your browser — never sent anywhere except the API provider.</p>' +
+    '<p style="font-size:12px;color:var(--warning);margin-bottom:16px;">&#128274; Security: API keys are stored in your browser\'s localStorage (plaintext). This tool runs locally — keys are only sent to the API providers you select. Do not use this on shared or public computers.</p>' +
     '<div class="field-group"><label>Active Provider</label>' +
     '<select id="apiProvider">' +
     '<option value="openai"' + (s.provider==='openai'?' selected':'') + '>OpenAI (GPT)</option>' +
@@ -3379,6 +3380,9 @@ function browserRecommend(description) {
 
 // ── SEND TO AI (Playground) ──
 async function sendToAI(prompt, systemPrompt, provider, apiKey, model) {
+  var controller = new AbortController();
+  var timeoutId = setTimeout(function() { controller.abort(); }, 30000);
+  try {
   if (provider === 'openai') {
     var messages = [];
     if (systemPrompt) messages.push({ role: 'system', content: systemPrompt });
@@ -3387,6 +3391,7 @@ async function sendToAI(prompt, systemPrompt, provider, apiKey, model) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
       body: JSON.stringify({ model: model || 'gpt-4o-mini', messages: messages, temperature: 0.7, max_tokens: 4000 }),
+      signal: controller.signal,
     });
     if (!resp.ok) { var err = await resp.json().catch(function(){return {};}); throw new Error('OpenAI: ' + (err.error ? err.error.message : resp.statusText)); }
     var data = await resp.json();
@@ -3397,6 +3402,7 @@ async function sendToAI(prompt, systemPrompt, provider, apiKey, model) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
       body: JSON.stringify({ model: model || 'claude-sonnet-4-20250514', max_tokens: 4000, system: systemPrompt || undefined, messages: [{ role: 'user', content: prompt }] }),
+      signal: controller.signal,
     });
     if (!resp2.ok) { var err2 = await resp2.json().catch(function(){return {};}); throw new Error('Anthropic: ' + (err2.error ? err2.error.message : resp2.statusText)); }
     var data2 = await resp2.json();
@@ -3408,12 +3414,19 @@ async function sendToAI(prompt, systemPrompt, provider, apiKey, model) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ contents: [{ parts: [{ text: fullPrompt }] }], generationConfig: { temperature: 0.7, maxOutputTokens: 4000 } }),
+      signal: controller.signal,
     });
     if (!resp3.ok) { var err3 = await resp3.json().catch(function(){return {};}); throw new Error('Google: ' + (err3.error ? err3.error.message : resp3.statusText)); }
     var data3 = await resp3.json();
     return { text: data3.candidates[0].content.parts[0].text, model: model || 'gemini-2.0-flash', usage: null };
   }
   throw new Error('Unsupported provider: ' + provider);
+  } catch(e) {
+    if (e.name === 'AbortError') throw new Error('Request timed out after 30 seconds. Please try again.');
+    throw e;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 }
 
 // ── AI Optimize ──
