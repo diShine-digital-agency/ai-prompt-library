@@ -1,0 +1,50 @@
+# ============================================================
+# .htaccess for prompt.dishine.it — SiteGround hosting
+# ============================================================
+
+# --- Force HTTPS ---
+RewriteEngine On
+RewriteCond %{HTTPS} off
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# --- Remove www (subdomain, so just ensuring consistency) ---
+RewriteCond %{HTTP_HOST} ^www\.prompt\.dishine\.it [NC]
+RewriteRule ^ https://prompt.dishine.it%{REQUEST_URI} [L,R=301]
+
+# --- Default document ---
+DirectoryIndex index.html
+
+# --- Security headers ---
+Header always set X-Content-Type-Options "nosniff"
+Header always set X-Frame-Options "SAMEORIGIN"
+Header always set X-XSS-Protection "1; mode=block"
+Header always set Referrer-Policy "strict-origin-when-cross-origin"
+Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+
+# --- Cache control ---
+# HTML: revalidate every time (app updates weekly)
+<FilesMatch "\.(html|htm)$">
+  Header set Cache-Control "no-cache, must-revalidate"
+</FilesMatch>
+
+# SEO static files: cache 1 day
+<FilesMatch "^(robots\.txt|sitemap\.xml)$">
+  Header set Cache-Control "public, max-age=86400"
+</FilesMatch>
+
+# --- Gzip compression ---
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/xml application/xml
+</IfModule>
+
+# --- Block access to dev/config files (defensive) ---
+<FilesMatch "\.(json|md|sh|js|log|env|gitignore)$">
+  Order Allow,Deny
+  Deny from all
+</FilesMatch>
+
+# Allow sitemap and robots explicitly (override above for .xml/.txt)
+<FilesMatch "^(sitemap\.xml|robots\.txt)$">
+  Order Deny,Allow
+  Allow from all
+</FilesMatch>

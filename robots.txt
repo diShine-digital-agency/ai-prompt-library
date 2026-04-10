@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://prompt.dishine.it/sitemap.xml
+
+# Disallow dev/build assets (not present on server, but defensive)
+Disallow: /bin/
+Disallow: /src/
+Disallow: /test/
+Disallow: /node_modules/
