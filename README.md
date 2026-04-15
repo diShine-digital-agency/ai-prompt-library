@@ -1,10 +1,25 @@
-# AI-Prompt Library: the prompt-engineering powerhouse to search, compose, create, lint and optimize your prompt
+# 🌟 The Prompt Engineering Toolbox: search, compose, create, lint, optimize, save and share your prompts and system prompts
+
+<div align="center">
+  
+[![diShine Logo](https://dishine.it/favicon.ico)](https://dishine.it/)
+
+***Transform. Automate. Shine!***
+
+[![Website](https://img.shields.io/badge/Website-dishine.it-blue)](https://dishine.it/blog/ai-prompt-library-templates/)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-diShine-blue)](https://linkedin.com/company/100682596)
+[![Location](https://img.shields.io/badge/Location-Milan%2C%20Italy-green)]()
+[![License: CC0](https://img.shields.io/badge/License-CC0%201.0-lightgrey)](LICENSE)
 
 <p align="center">
-  <img src="desktop/images/prompt_workshop_02_compose_workflow2.webp" alt="PROMP WORKSHOP compose workflow" width="65%">
+  <img src="desktop/images/prompt_workshop_02_compose_workflow2.webp" alt="PROMP WORKSHOP compose workflow" width="75%">
 </p>
 
-**82+ expert-level prompt templates — with a CLI, a browser-based Prompt Workshop, and desktop apps — to search, browse, compose, create, lint, optimize, and test prompts with AI models.**
+*Mac, Windows, Linux, CLI or Web-App with 82+ expert-level prompt templates, a prompt and system prompt workshop, and everyhting to search, browse, compose, create, lint, optimize, and test prompts with AI models*
+
+Built by [diShine Digital Agency](https://dishine.it). Read more on the [diShine blog](https://dishine.it/blog/ai-prompt-library-templates/).
+
+</div>
 
 <p align="center">
   <img src="desktop/images/prompt_workshop_03_create_custom_prompt2.webp" alt="PROMP WORKSHOP create custom prompt" width="49%">
@@ -14,7 +29,7 @@
 If you work with LLMs regularly, you've probably got prompts scattered across Notion docs, Slack messages, and random text files. This library brings them together: organized, searchable, and ready to use.
 
 <p align="center">
-  <img src="desktop/images/prompt_workshop_04_generate_framework2.webp" alt="PROMP WORKSHOP generate framework" width="60%">
+  <img src="desktop/images/prompt_workshop_04_generate_framework2.webp" alt="PROMP WORKSHOP generate framework" width="65%">
 </p>
 
 ---
