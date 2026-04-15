@@ -1,4 +1,4 @@
-# 🌟 The Prompt Engineering Toolbox: search, compose, create, lint, optimize, save and share your prompts and system prompts
+# ⚙️ The Prompt Engineering Toolbox: search, compose, create, lint, optimize, save and share your prompts and system prompts
 
 <div align="center">
   
@@ -391,3 +391,14 @@ See [GUIDE.md — Troubleshooting](GUIDE.md#troubleshooting) for more platform-s
 ## License
 
 MIT -- [diShine](https://dishine.it)
+
+---
+
+## About diShine
+
+[diShine](https://dishine.it) is a creative tech agency based in Milan. We create digital strategies, design process and build tools for clients, help businesses with AI strategy and MarTech architecture, and open-source some things we wish existed.
+
+- Web: [dishine.it](https://dishine.it)
+- GitHub: [github.com/diShine-digital-agency](https://github.com/diShine-digital-agency)
+- Contact: kevin@dishine.it
+
