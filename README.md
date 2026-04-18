@@ -17,7 +17,8 @@
 
 ***Mac, Windows, Linux, CLI or Web-App with 82+ expert-level prompt templates, a prompt and system prompt workshop, and everyhting to search, browse, compose, create, lint, optimize, and test prompts with AI models***
 
-# 🚀 Try it now: [Prompt Workshop](https://prompt.dishine.it/)
+# 🚀 Official website & wiki: [Prompt Workshop](https://prompt.dishine.it/)
+
 **Run the toolbox for free right in your browser. Your data stays yours: thanks to local browser storage, you can build and save your entire prompt library without ever sending your data to a third-party server.**
 
 Built by [diShine Digital Agency](https://dishine.it). Read more on the [diShine blog](https://dishine.it/blog/ai-prompt-library-templates/).
