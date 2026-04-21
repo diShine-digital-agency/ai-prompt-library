@@ -2,6 +2,47 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.0.0] — 2026-04-21
+
+### Changed — Strategic repositioning: the Prompt Workshop moves exclusively to the web
+
+The Prompt Workshop is now delivered **exclusively** as a web application at **[prompt.dishine.it](https://prompt.dishine.it/)**. The new web version is a fully upgraded product that goes well beyond what the legacy local surfaces ever shipped:
+
+- **Many more AI models** — broader multi-provider coverage, kept up to date as new models ship
+- **Live Battle & Leaderboard** ([/wiki/leaderboard](https://prompt.dishine.it/wiki/leaderboard)) — send the same prompt to multiple models and watch community rankings update in real time
+- **Private accounts & private chat** ([/wiki/accounts-and-chat](https://prompt.dishine.it/wiki/accounts-and-chat)) — sign in to sync your prompt library across devices and have account-scoped conversations
+- **AI chat with files & memory** — upload documents, attach context, keep persistent memory across sessions
+- **Trilingual** (EN · IT · FR) with an integrated wiki served from the same site
+
+### Deprecated — CLI, Desktop apps, and `viewer.html` are frozen at v2.4.0
+
+The following surfaces are **no longer maintained**. They remain in the repository for reference, historical builds, and forks, but **no new features or bug fixes will ship to them**:
+
+- **CLI** (`bin/prompt-lib.js`, `@dishine/prompt-library` on npm)
+- **Desktop apps** — macOS (Swift native), Linux (GTK/WebKitGTK), Windows (Edge app mode) — including all `desktop/build-*.sh` scripts and native source under `desktop/macos-native/`, `desktop/linux-native/`
+- **`viewer.html`** — the standalone offline HTML Prompt Workshop
+- **`prompt-workshop/`** — the experimental redesign preview of `viewer.html`
+
+The `prompts/` library (82+ Markdown templates) and the `_wiki-pages/` trilingual wiki remain **actively maintained** and continue to be accepted via pull request — both are consumed directly by the website.
+
+### Documentation — "new home" notices added across the repo
+
+A consistent "new home / legacy surface frozen at v2.4.0" notice was added to every file and wiki page that references the CLI, desktop, or `viewer.html`, so any reader landing on the repo immediately understands the current model:
+
+- `README.md` — prominent top-of-file notice; rewrote the "Three ways to use it" section as a status table (maintained vs. legacy); marked the CLI usage, Prompt Workshop (`viewer.html`), and Desktop & Mobile Apps sections as legacy
+- `CONTRIBUTING.md` — added a notice explaining which contributions are accepted (prompts, wiki, translations) vs. which are discouraged (CLI/desktop/`viewer.html` feature PRs)
+- `GUIDE.md`, `FUNCTIONS.md`, `INFRASTRUCTURE.md`, `TECHNICAL.md`, `DEPLOY.md` — top-of-file legacy notices
+- `desktop/README.md` — **strong deprecation banner** at the top (user-requested), making clear the desktop apps are no longer maintained
+- `prompt-workshop/README.md` — marked as superseded by the website
+- `_wiki-pages/Home.md`, `Home-IT.md`, `Accueil.md` — trilingual "new exclusive home" notice on all three wiki entry points
+- `_wiki-pages/Desktop-Apps.md`, `App-Desktop.md`, `Applications-Desktop.md` — trilingual deprecation banner on the desktop wiki pages
+- `_wiki-pages/CLI-Reference.md`, `Riferimento-CLI.md`, `Reference-CLI.md` — trilingual legacy banner on the CLI wiki pages
+
+### Changed
+
+- `package.json` — version bumped `2.4.0` → `3.0.0` (breaking change: positioning / maintenance scope)
+- `package.json` — description updated to reflect that the canonical Prompt Workshop now lives at prompt.dishine.it
+
 ## [2.4.0] — 2026-04-09
 
 ### Added

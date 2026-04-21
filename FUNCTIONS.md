@@ -1,8 +1,10 @@
 # Functions Reference
 
-Every tool in the Prompt Library, explained: what it does, why you'd use it, and how it works under the hood.
+> ⚠️ **This reference documents the legacy CLI and `viewer.html`/desktop Prompt Workshop (frozen at v2.4.0).** The maintained Prompt Workshop now lives at **[prompt.dishine.it](https://prompt.dishine.it/)** and adds many features not covered here (Live Battle & Leaderboard, private accounts, private chat, AI chat with files and memory, more models). The legacy surfaces receive no further updates.
 
-This covers both the CLI commands and the Prompt Workshop (browser/desktop) tools. They use the same engines — the CLI calls the modules directly, the Workshop embeds them in the HTML.
+Every tool in the legacy Prompt Library, explained: what it does, why you'd use it, and how it works under the hood.
+
+This covers both the CLI commands and the legacy Prompt Workshop (browser/desktop) tools. They use the same engines — the CLI calls the modules directly, the Workshop embeds them in the HTML.
 
 > **New here?** Start with the [User Guide](GUIDE.md) for a walkthrough. This document goes deeper into each function.
 

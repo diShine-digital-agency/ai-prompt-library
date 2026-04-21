@@ -2,6 +2,18 @@
 
 Thanks for considering contributing to the Prompt Library. Here's how.
 
+> 🌐 **Before you start — the Prompt Workshop tool now lives exclusively at [prompt.dishine.it](https://prompt.dishine.it/).**
+>
+> The **CLI, Desktop apps, and `viewer.html`** in this repo are **frozen at v2.4.0 and no longer maintained** — we will generally **not accept feature PRs** targeting those legacy surfaces (only critical security fixes). What we *do* actively accept:
+>
+> - ✅ **New prompt templates** in [`prompts/`](prompts/) — the Markdown library is the source of truth and is consumed directly by the website. This is the highest-impact contribution.
+> - ✅ **Improvements to existing prompts** (fixes, clarifications, better examples).
+> - ✅ **Wiki contributions** in [`_wiki-pages/`](_wiki-pages/) — the trilingual wiki is also mirrored on the website.
+> - ✅ **Translations** of prompts or wiki pages into other languages.
+> - ⚠️ **Code changes to `bin/`, `src/`, `desktop/`, `viewer.html`, `prompt-workshop/`** — accepted only for security fixes or for your own forks.
+>
+> For feature requests or feedback on the current website, please open an issue tagged `website` rather than a PR against the legacy code.
+
 ---
 
 ## Adding Prompts

@@ -15,11 +15,19 @@
   <img src="desktop/images/prompt_workshop_02_compose_workflow2.webp" alt="PROMP WORKSHOP compose workflow" width="75%">
 </p>
 
-***Mac, Windows, Linux, CLI or Web-App with 82+ expert-level prompt templates, a prompt and system prompt workshop, and everyhting to search, browse, compose, create, lint, optimize, and test prompts with AI models***
+***82+ expert-level prompt templates, a prompt and system prompt workshop, and everything to search, browse, compose, create, lint, optimize and battle-test prompts across AI models.***
 
-# 🚀 Official website & wiki: [Prompt Workshop](https://prompt.dishine.it/)
+# 🚀 New exclusive home — [prompt.dishine.it](https://prompt.dishine.it/)
 
-**Run the toolbox for free right in your browser. Your data stays yours: thanks to local browser storage, you can build and save your entire prompt library without ever sending your data to a third-party server.**
+> 🌐 **The Prompt Workshop now lives *only* on the web, at [prompt.dishine.it](https://prompt.dishine.it/), and it has been substantially upgraded beyond the version shipped in this repository:**
+>
+> - 🧠 **Many more AI models** — broader multi-provider coverage, kept up to date as new models ship
+> - ⚔️ **Live Battle & [Leaderboard](https://prompt.dishine.it/wiki/leaderboard)** — send the same prompt to multiple models and watch community rankings update in real time
+> - 🔐 **[Private accounts & private chat](https://prompt.dishine.it/wiki/accounts-and-chat)** — sign in to sync your prompt library across devices and have account-scoped conversations
+> - 💬 **AI chat with files & memory** — upload documents, attach context, and keep persistent memory across sessions
+> - 🌍 **Trilingual** (EN · IT · FR) with an integrated [wiki](https://prompt.dishine.it/wiki)
+>
+> **What this means for this repository** — the **CLI**, the **Desktop apps** (macOS / Linux / Windows) and **`viewer.html`** are **frozen at v2.4.0 and are no longer maintained**. They remain in the repo for reference, historical builds, and forks, but **no new features or bug fixes will ship to them** — please use [prompt.dishine.it](https://prompt.dishine.it/) going forward. The prompt templates under [`prompts/`](prompts/) remain the source-of-truth library and continue to be accepted via pull request; the website consumes them directly. The repo stays open as the collaboration space for **issues, prompt contributions, forks, and discussion**.
 
 Built by [diShine Digital Agency](https://dishine.it). Read more on the [diShine blog](https://dishine.it/blog/ai-prompt-library-templates/).
 
@@ -52,25 +60,27 @@ If you work with LLMs regularly, you've probably got prompts scattered across No
 
 ---
 
-**Three ways to use it:**
+**Which version should you use?**
 
-| Interface | How to open |
-|-----------|-------------|
-| **CLI** | Clone the repo → `node bin/prompt-lib.js list` (or install globally with `npm install -g @dishine/prompt-library`) |
-| **Browser app** | Open `viewer.html` in any browser — no server, no internet required |
-| **Desktop app** | Build from source with `./desktop/build-all.sh` — native window on macOS, Linux, and Windows |
+| Version | Status | When to use |
+|---------|--------|-------------|
+| 🌐 **[prompt.dishine.it](https://prompt.dishine.it/)** (web) | ✅ **Actively maintained — canonical** | This is the version you should use. Live Battle & Leaderboard, private accounts, private chat, AI chat with files & memory, more models, trilingual wiki. |
+| 🕸️ **`viewer.html`** (browser, offline) | ⚠️ **Legacy — frozen at v2.4.0** | Reference / offline fallback. Missing every feature listed above. |
+| 🖥️ **Desktop apps** (macOS / Linux / Windows) | ⚠️ **Legacy — frozen at v2.4.0, no longer maintained** | Reference only. Build scripts kept for forks. See [`desktop/README.md`](desktop/README.md). |
+| 🧰 **CLI** (`prompt-lib`) | ⚠️ **Legacy — frozen at v2.4.0** | Reference only. Terminal workflows that wrap the `prompts/` library still work. No new features. |
+| 📚 **[`prompts/`](prompts/) library** | ✅ **Actively maintained** | The 82+ Markdown templates. Source-of-truth — consumed by the website. PRs welcome. |
 
-All three give you the same features: search and browse prompts, compose multi-layer prompts, create custom prompts with dynamic fields, generate prompts from frameworks, lint prompts for quality, optimize them automatically, and get smart recommendations. The browser and desktop app also include an **AI Playground** to send prompts directly to GPT, Claude, or Gemini.
-
-Zero npm dependencies. Just Node.js built-in modules.
+Zero npm dependencies. Just Node.js built-in modules (for the legacy surfaces).
 
 Built by [diShine](https://dishine.it)
 
 ---
 
-## ⚡ Prompt Workshop (viewer.html)
+## ⚡ Prompt Workshop (viewer.html) — *legacy, frozen at v2.4.0*
 
-The **Prompt Workshop** is a standalone HTML file — no server, no build step, no internet required. Just open `viewer.html` in any browser and you get the full prompt library with an interactive interface.
+> ⚠️ **This section describes the legacy offline HTML viewer.** For the up-to-date Prompt Workshop — with Live Battle, leaderboard, private accounts, private chat, AI chat with files and memory, and many more models — go to **[prompt.dishine.it](https://prompt.dishine.it/)**. The `viewer.html` file is no longer maintained.
+
+The legacy **Prompt Workshop** is a standalone HTML file — no server, no build step, no internet required. Just open `viewer.html` in any browser and you get the prompt library with an interactive interface (at the v2.4.0 feature set).
 
 ### What it does
 
@@ -138,23 +148,27 @@ These aren't generic "write me a blog post" prompts. They're structured template
 
 ## Quick start
 
+> ✅ **Recommended:** open **[prompt.dishine.it](https://prompt.dishine.it/)** — nothing to install, all new features included.
+>
+> The commands below are for the **legacy, unmaintained** local surfaces (kept for reference and forks).
+
 ```bash
-# Clone and run directly — no npm install needed
+# Legacy CLI (frozen at v2.4.0) — clone and run directly, no npm install needed
 git clone https://github.com/diShine-digital-agency/ai-prompt-library.git
 cd ai-prompt-library
 node bin/prompt-lib.js list
 
-# Or install globally
+# Or install the legacy CLI globally
 npm install -g @dishine/prompt-library
 prompt-lib list
 
-# Or just open the browser app — no Node.js required
+# Or just open the legacy browser app — no Node.js required
 # Open viewer.html in any browser
 ```
 
 ---
 
-## CLI usage
+## CLI usage — *legacy, frozen at v2.4.0*
 
 ```bash
 # List all prompts grouped by category
@@ -333,9 +347,14 @@ ai-prompt-library/
 
 ---
 
-## Desktop & Mobile Apps
+## Desktop & Mobile Apps — *legacy, frozen at v2.4.0*
 
-The Prompt Workshop runs as a **native application** on all desktop platforms — each with its own window, app icon, and one-click installer. No terminal needed after building.
+> ⚠️ **The desktop apps (macOS / Linux / Windows) are no longer maintained.**
+> Use **[prompt.dishine.it](https://prompt.dishine.it/)** on any desktop browser instead — it supports "Add to Dock / Home Screen" on every major OS (macOS, Windows, Linux, iOS, Android), includes every new feature (Live Battle & Leaderboard, private accounts, private chat, AI chat with files & memory, more models), and is kept up to date.
+>
+> The build scripts below are retained in the repo for reference, historical builds, and forks. They still produce working v2.4.0 apps, but will not receive further updates — see [`desktop/README.md`](desktop/README.md) for details.
+
+The legacy Prompt Workshop ran as a **native application** on all desktop platforms — each with its own window, app icon, and one-click installer. No terminal needed after building.
 
 Desktop apps are built from source (no pre-built downloads). You need Node.js 18+ and Bash:
 

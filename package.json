@@ -1,7 +1,8 @@
 {
   "name": "@dishine/prompt-library",
-  "version": "2.4.0",
-  "description": "82+ expert prompt engineering templates with CLI search, visual Prompt Workshop, Quick Fill & Compose, image generation prompts, system prompt creation, and dynamic prompt generation",
+  "version": "3.0.0",
+  "description": "82+ expert prompt engineering templates. The maintained Prompt Workshop now lives at https://prompt.dishine.it/ (Live Battle & Leaderboard, private accounts & chat, AI chat with files and memory, many more models). This package ships the source-of-truth prompt library and the legacy CLI frozen at v2.4.0 — no further CLI features.",
+  "homepage": "https://prompt.dishine.it/",
   "type": "module",
   "bin": { "prompt-lib": "bin/prompt-lib.js" },
   "main": "src/index.js",

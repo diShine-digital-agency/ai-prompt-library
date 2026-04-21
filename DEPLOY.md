@@ -1,6 +1,8 @@
 # Deployment Guide — prompt.dishine.it
 
-Hosting: SiteGround | Domain: prompt.dishine.it
+> ⚠️ **This deployment guide describes the *legacy* static hosting of `viewer.html` on SiteGround.** The live **[prompt.dishine.it](https://prompt.dishine.it/)** is no longer served from `viewer.html` — it is now a full React SPA with Supabase-backed accounts, private chat, and multi-model Live Battle. **This file is retained for historical reference only.** Anyone forking the repo to self-host a static viewer can still follow the steps below, but the result will be the **v2.4.0 legacy experience**, not the current website.
+
+Hosting: SiteGround | Domain: prompt.dishine.it (historical)
 
 ---
 

@@ -1,6 +1,8 @@
 # Technical Documentation
 
-Architecture, data flow, and extension guide for the diShine Prompt Library v2.4.0.
+> ⚠️ **This document describes the legacy (v2.4.0) codebase** — CLI, `viewer.html`, and desktop apps — which is **no longer maintained**. The maintained Prompt Workshop runs on a different, upgraded architecture at **[prompt.dishine.it](https://prompt.dishine.it/)** (React SPA, Supabase-backed private accounts/chat, multi-provider model routing, [Live Battle & Leaderboard](https://prompt.dishine.it/wiki/leaderboard), AI chat with files and memory). This document is preserved as a reference for contributors maintaining forks of the legacy surfaces.
+
+Architecture, data flow, and extension guide for the **legacy (v2.4.0)** diShine Prompt Library.
 
 > **Looking for how to use the tools?** See [FUNCTIONS.md](FUNCTIONS.md) for detailed usage docs on each function.
 

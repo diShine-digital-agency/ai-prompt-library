@@ -1,8 +1,10 @@
 # Infrastructure — Algorithms, Scoring & Engine Internals
 
-> How the diShine Prompt Library v2.4.0 works under the hood — explained both technically and in plain language.
+> ⚠️ **This document describes the internals of the legacy (v2.4.0) CLI / `viewer.html` / desktop codebase, which is no longer maintained.** The maintained Prompt Workshop at **[prompt.dishine.it](https://prompt.dishine.it/)** has a different, upgraded architecture (multi-provider model routing, [Live Battle & Leaderboard](https://prompt.dishine.it/wiki/leaderboard), [private accounts & chat](https://prompt.dishine.it/wiki/accounts-and-chat), AI chat with files and memory). This document is preserved for contributors maintaining forks of the legacy surfaces.
 
-This document covers every scoring algorithm, matching engine, and transformation pipeline in the system. For **how to use** these tools, see [FUNCTIONS.md](FUNCTIONS.md). For **architecture and code structure**, see [TECHNICAL.md](TECHNICAL.md).
+How the legacy diShine Prompt Library (v2.4.0) works under the hood — explained both technically and in plain language.
+
+This document covers every scoring algorithm, matching engine, and transformation pipeline in the legacy system. For **how to use** these tools, see [FUNCTIONS.md](FUNCTIONS.md). For **architecture and code structure**, see [TECHNICAL.md](TECHNICAL.md).
 
 ---
 

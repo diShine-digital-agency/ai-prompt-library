@@ -1,6 +1,8 @@
 # Prompt Library — User Guide
 
-A practical, non-technical guide to getting started with the diShine Prompt Library v2.4.0.
+> ⚠️ **This guide covers the legacy CLI, desktop, and `viewer.html` surfaces (frozen at v2.4.0).** For the maintained, up-to-date Prompt Workshop — with Live Battle & [Leaderboard](https://prompt.dishine.it/wiki/leaderboard), [private accounts & chat](https://prompt.dishine.it/wiki/accounts-and-chat), AI chat with files and memory, and many more models — go to **[prompt.dishine.it](https://prompt.dishine.it/)**. The legacy surfaces receive no further updates.
+
+A practical, non-technical guide to getting started with the **legacy (v2.4.0)** diShine Prompt Library.
 
 ---
 
