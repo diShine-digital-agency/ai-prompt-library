@@ -1,12 +1,14 @@
 # CLI Reference
 
-> Complete documentation for every `prompt-lib` command.
+> ⚠️ **Legacy — frozen at v2.4.0, no longer maintained.** The `prompt-lib` CLI documented here still works against the `prompts/` library, but receives no new features or bug fixes. For the maintained Prompt Workshop — with [Live Battle & Leaderboard](https://prompt.dishine.it/wiki/leaderboard), [private accounts & chat](https://prompt.dishine.it/wiki/accounts-and-chat), AI chat with files and memory, and many more models — use **[prompt.dishine.it](https://prompt.dishine.it/)**.
+
+> Complete documentation for every `prompt-lib` command *(legacy, v2.4.0)*.
 
 ---
 
 ## Overview
 
-The `prompt-lib` CLI is the terminal interface to the AI Prompt Library. It provides commands for discovering, building, composing, linting, optimizing, and managing prompts — all with zero npm dependencies.
+The `prompt-lib` CLI is the legacy terminal interface to the AI Prompt Library. It provides commands for discovering, building, composing, linting, optimizing, and managing prompts — all with zero npm dependencies.
 
 ```
 prompt-lib <command> [arguments]

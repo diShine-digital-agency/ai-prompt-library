@@ -1,8 +1,10 @@
 # 🧠 AI Prompt Library — Wiki
 
-> **82+ template di prompt engineering di livello esperto** con CLI, Prompt Workshop nel browser e app desktop — progettati per sviluppatori, scrittori, professionisti del marketing e praticanti di IA.
+> 🌐 **Nuova casa esclusiva — [prompt.dishine.it](https://prompt.dishine.it/)** &nbsp;·&nbsp; il Prompt Workshop vive ora **solo sul web**, con **Live [Battle & Leaderboard](https://prompt.dishine.it/wiki/leaderboard)**, **[account e chat privati](https://prompt.dishine.it/wiki/accounts-and-chat)**, **chat AI con file e memoria** e molti più modelli. La **CLI**, le **app desktop** e **`viewer.html`** descritte in questa wiki sono **congelate alla v2.4.0 e non più mantenute** — i template Markdown in [`prompts/`](https://github.com/diShine-digital-agency/ai-prompt-library/tree/main/prompts) restano invece accettati via pull request e sono consumati direttamente dal sito.
 
-Benvenuto nella wiki ufficiale della **AI Prompt Library** di [diShine Digital Agency](https://dishine.it). Questo è il tuo punto di riferimento per imparare tutto sullo strumento — dall'installazione alle tecniche avanzate di prompting.
+> **82+ template di prompt engineering di livello esperto**. Originariamente distribuiti come CLI, Prompt Workshop nel browser e app desktop — ora erogati via web su [prompt.dishine.it](https://prompt.dishine.it/).
+
+Benvenuto nella wiki ufficiale della **AI Prompt Library** di [diShine Digital Agency](https://dishine.it). Questo è il tuo punto di riferimento per imparare tutto sullo strumento — dal sito attuale alle superfici locali legacy.
 
 ---
 

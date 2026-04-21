@@ -1,12 +1,14 @@
 # Riferimento CLI
 
-> Documentazione completa per ogni comando `prompt-lib`.
+> ⚠️ **Legacy — congelata alla v2.4.0, non più mantenuta.** La CLI `prompt-lib` qui documentata continua a funzionare sulla libreria `prompts/`, ma non riceve più nuove funzionalità o correzioni. Per il Prompt Workshop mantenuto — con [Live Battle & Leaderboard](https://prompt.dishine.it/wiki/leaderboard), [account e chat privati](https://prompt.dishine.it/wiki/accounts-and-chat), chat AI con file e memoria e molti più modelli — usa **[prompt.dishine.it](https://prompt.dishine.it/)**.
+
+> Documentazione completa per ogni comando `prompt-lib` *(legacy, v2.4.0)*.
 
 ---
 
 ## Panoramica
 
-La CLI `prompt-lib` è l'interfaccia a riga di comando della AI Prompt Library. Fornisce comandi per scoprire, costruire, comporre, analizzare, ottimizzare e gestire prompt — il tutto senza alcuna dipendenza npm.
+La CLI `prompt-lib` è l'interfaccia a riga di comando legacy della AI Prompt Library. Fornisce comandi per scoprire, costruire, comporre, analizzare, ottimizzare e gestire prompt — il tutto senza alcuna dipendenza npm.
 
 ```
 prompt-lib <comando> [argomenti]

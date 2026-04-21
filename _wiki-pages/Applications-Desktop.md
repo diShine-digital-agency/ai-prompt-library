@@ -1,6 +1,12 @@
 # Applications de bureau
 
-> Compiler et installer des applications de bureau natives pour macOS, Linux et Windows.
+> ## 🛑 OBSOLÈTE — n'est plus maintenu
+>
+> Les applications de bureau documentées sur cette page sont **héritées, figées à la v2.4.0** et **ne recevront plus de mises à jour**. **Utilisez [prompt.dishine.it](https://prompt.dishine.it/)** — fonctionne dans n'importe quel navigateur moderne sur n'importe quel OS (et vous pouvez l'ajouter au Dock / à l'écran d'accueil pour une expérience type application) et inclut des fonctionnalités qui n'ont jamais été livrées sur desktop : beaucoup plus de modèles, [Live Battle & Classement](https://prompt.dishine.it/wiki/leaderboard), [comptes et chat privés](https://prompt.dishine.it/wiki/accounts-and-chat), et chat IA avec fichiers et mémoire.
+>
+> Cette page est conservée pour les contributeurs maintenant des forks des builds de bureau historiques.
+
+> Compiler et installer des applications de bureau natives pour macOS, Linux et Windows *(héritage, v2.4.0)*.
 
 ---
 

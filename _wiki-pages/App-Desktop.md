@@ -1,6 +1,12 @@
 # App Desktop
 
-> Compila e installa le applicazioni desktop native per macOS, Linux e Windows.
+> ## 🛑 DEPRECATA — non più mantenuta
+>
+> Le app desktop documentate in questa pagina sono **legacy, congelate alla v2.4.0** e **non riceveranno più aggiornamenti**. **Usa [prompt.dishine.it](https://prompt.dishine.it/)** — funziona in qualsiasi browser moderno su qualsiasi OS (e puoi aggiungerlo al Dock / Home Screen per un'esperienza simile ad app) e include funzionalità mai arrivate al desktop: molti più modelli, [Live Battle & Leaderboard](https://prompt.dishine.it/wiki/leaderboard), [account e chat privati](https://prompt.dishine.it/wiki/accounts-and-chat) e chat AI con file e memoria.
+>
+> Questa pagina è conservata per chi mantiene fork delle build desktop legacy.
+
+> Compila e installa le applicazioni desktop native per macOS, Linux e Windows *(legacy, v2.4.0)*.
 
 ---
 
