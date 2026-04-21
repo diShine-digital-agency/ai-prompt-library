@@ -1,6 +1,10 @@
 # Prompt Workshop — Modern Design Preview
 
-> ⚠️ **This is an experimental redesign preview.** It lives in its own directory
+> ## 🛑 Superseded by [prompt.dishine.it](https://prompt.dishine.it/)
+>
+> This directory was the experimental redesign preview for the legacy `viewer.html`. It has been **superseded by the production website at [prompt.dishine.it](https://prompt.dishine.it/)**, which is the actively maintained Prompt Workshop (Live Battle & Leaderboard, private accounts & chat, AI chat with files and memory, many more models). **This preview is no longer maintained** and is kept only for reference / fork purposes.
+
+> ⚠️ **Original historical notice:** This was an experimental redesign preview. It lives in its own directory
 > so you can test it side-by-side with the original `viewer.html` before
 > releasing. No original files were modified.
 

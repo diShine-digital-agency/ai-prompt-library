@@ -1,5 +1,27 @@
 # Desktop & Mobile Apps
 
+> ## 🛑 DEPRECATED — The desktop apps are no longer maintained
+>
+> The macOS / Linux / Windows desktop apps documented on this page are **legacy** and are **frozen at v2.4.0**. **No further features, updates, or bug fixes will ship to them.**
+>
+> ### Use [prompt.dishine.it](https://prompt.dishine.it/) instead.
+>
+> The web version runs in any modern browser on any desktop OS, is kept up to date, and includes features that were **never shipped to the desktop builds**:
+>
+> - 🧠 **Many more AI models** across providers, updated as models ship
+> - ⚔️ **Live Battle & [Leaderboard](https://prompt.dishine.it/wiki/leaderboard)** — multi-model comparison with community rankings in real time
+> - 🔐 **[Private accounts & private chat](https://prompt.dishine.it/wiki/accounts-and-chat)** — sync your library across devices
+> - 💬 **AI chat with files & memory** — upload documents, persistent context across sessions
+> - 🌍 **Trilingual** (EN · IT · FR) with an integrated wiki
+>
+> You can add [prompt.dishine.it](https://prompt.dishine.it/) to your **Dock, Start Menu, or Home Screen** on any platform (macOS, Windows, Linux, iOS, Android) for an app-like experience.
+>
+> **The build scripts, Swift source, GTK source, and build documentation below remain in this repo for reference, historical builds, and community forks. Do not rely on them for new deployments.**
+
+---
+
+## Legacy desktop documentation (v2.4.0, unmaintained)
+
 The Prompt Workshop can run as a **native macOS application** with its own window — no browser needed. On Linux and Windows, it opens in your browser as a lightweight, self-contained package.
 
 All build scripts run on any system with Bash and Node.js. The macOS native app requires building on a Mac with **Xcode Command Line Tools** installed (`xcode-select --install`).
